@@ -200,6 +200,30 @@ function resolveTankVsTankCollisions(state: GameState): void {
   }
 }
 
+// Tank-vs-tank push-out has no idea about obstacles or the arena boundary,
+// so a ram at the wall can shove a tank through it — nothing else in the
+// tick re-clamps that. This is the corrective final pass: re-run each alive
+// tank's own obstacle/arena-bounds resolution one more time, after the
+// pairwise push-out. It intentionally discards events (this is a safety-net
+// correction, not new gameplay feedback — the tank already got its WallHit
+// this tick if it earned one) and must remain the last spatial/collision
+// operation in step(); nothing after this may move a tank via physics
+// (the only position writes afterward are hardcoded-safe teleports: player
+// respawn to arena center, enemy respawn to an edge point already well
+// inside bounds).
+function resolveFinalStaticPass(state: GameState): void {
+  const discard: SimEvent[] = [];
+  if (state.player.alive) {
+    resolveObstacleCollisionsFor(state.player, state, TANK_RADIUS, discard);
+    resolveArenaBoundsFor(state.player, TANK_RADIUS, discard, true);
+  }
+  for (const enemy of state.enemies) {
+    if (!enemy.alive) continue;
+    resolveObstacleCollisionsFor(enemy, state, ENEMY_TANK_RADIUS, discard);
+    resolveArenaBoundsFor(enemy, ENEMY_TANK_RADIUS, discard, false);
+  }
+}
+
 function advanceWindmills(state: GameState): void {
   for (const obstacle of state.obstacles) {
     if (obstacle.kind !== 'windmill') continue;
@@ -382,6 +406,7 @@ export function step(state: GameState, commands: Record<string, Command>): void 
   }
 
   resolveTankVsTankCollisions(state);
+  resolveFinalStaticPass(state);
   advanceWindmills(state);
   updateProjectiles(state, events);
   updateGrenades(state, events);
