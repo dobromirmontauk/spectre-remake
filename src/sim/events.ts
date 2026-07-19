@@ -17,4 +17,5 @@ export type SimEvent =
   | { type: 'PlayerDamaged'; amount: number }
   | { type: 'PlayerDestroyed'; tankId: string; position: Vec2; livesRemaining: number }
   | { type: 'PlayerRespawned'; tankId: string }
+  | { type: 'PlayerLeft'; tankId: string; slot: number }
   | { type: 'GameOver'; finalScore: number; finalLevel: number; winnerId?: string };

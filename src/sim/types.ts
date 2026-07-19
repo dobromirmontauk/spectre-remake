@@ -72,6 +72,13 @@ export interface PlayerState extends TankState {
   loadout: Loadout;
   movement: MovementParams; // derived from `loadout` once at game start, see sim/movement.ts deriveMovementParams
   name: string; // display name (net play; local play uses "Player N")
+  // Net play only (M5 disconnect protocol, see sim/simulation.ts removePlayer):
+  // true once this slot has been authoritatively dropped mid-match (peer left
+  // or went zombie). The player STAYS in state.players (slot/array index and
+  // PLAYER_TANK_COLOR_SLOTS mapping must stay stable for the HUD/scoreboard)
+  // but is permanently dead, out of lives, and skipped by resetPlayerForLevel
+  // forever after — never true outside net play.
+  removed: boolean;
 }
 
 export type EnemyKind = 'drone' | 'hunter';

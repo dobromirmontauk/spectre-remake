@@ -33,6 +33,7 @@ import {
   FLAG_COLLECT_RADIUS,
   GRENADE_AMMO_COST,
   GRENADE_COOLDOWN_TICKS,
+  GRENADES_IN_DUEL,
   HUNTER_SHIELD_BONUS,
   LEVELGEN_SEED_BASE,
   PICKUP_COLLECT_RADIUS,
@@ -103,6 +104,7 @@ function createPlayerState(slot: number, loadout: Loadout, name: string): Player
     loadout,
     movement: deriveMovementParams(loadout),
     name,
+    removed: false,
   };
 }
 
@@ -205,7 +207,13 @@ export function rebuildLevel(state: GameState, level: number): void {
   state.grenades = [];
   state.bonusRemaining = BONUS_START;
 
-  for (const player of state.players) resetPlayerForLevel(state, player);
+  // A removed (disconnected/dropped, net play M5) player must NOT come back
+  // to life just because the level cleared — resetPlayerForLevel would
+  // otherwise silently revive them, undoing removePlayer().
+  for (const player of state.players) {
+    if (player.removed) continue;
+    resetPlayerForLevel(state, player);
+  }
 }
 
 // Full reset to a fresh game keeping the CURRENT roster/mode/loadouts —
@@ -392,7 +400,14 @@ function handlePlayerWeapons(state: GameState, player: TankState, cmd: Command, 
     fireProjectile(state, player, player.heading, events);
   }
 
-  if (cmd.grenade && levelCfg.grenadesUnlocked && player.grenadeCooldown <= 0 && player.ammo >= GRENADE_AMMO_COST) {
+  // Duel has no levels (grenadesUnlocked is always level<10 == false there —
+  // see config/levels.ts), so without the GRENADES_IN_DUEL override every
+  // duel match would go grenade-less forever; grant them from the start
+  // instead (a deliberate gameplay change from M1's dead-code state, not a
+  // regression — see weapons.ts explodeGrenade's duel-only player-damage
+  // branch for the matching fix that makes them actually do something).
+  const grenadesUnlocked = levelCfg.grenadesUnlocked || (state.mode === 'duel' && GRENADES_IN_DUEL);
+  if (cmd.grenade && grenadesUnlocked && player.grenadeCooldown <= 0 && player.ammo >= GRENADE_AMMO_COST) {
     player.ammo -= GRENADE_AMMO_COST;
     player.grenadeCooldown = GRENADE_COOLDOWN_TICKS;
     fireGrenade(state, player, player.heading, events);
@@ -529,6 +544,42 @@ function handlePlayerLifecycle(state: GameState, events: SimEvent[]): void {
   for (const player of state.players) handler(state, player, events);
 }
 
+// Pure, deterministic player removal (M5 disconnect protocol, plan Design
+// §3.5): net/lockstep.ts's host-authoritative `drop {slot, effectiveTick}`
+// message is applied by EVERY peer (host included) at exactly the same tick
+// via step()'s `drops` parameter below — never from local disconnect
+// detection alone, so every peer's state stays identical. The player STAYS
+// in state.players (slot/array index and PLAYER_TANK_COLOR_SLOTS mapping
+// must stay stable for the HUD/duel scoreboard — see hud/hudmp.ts) but is
+// flagged permanently gone: dead, out of lives, shield zeroed for a clean
+// HUD read, and skipped by resetPlayerForLevel forever after (see
+// rebuildLevel above) so a mid-level co-op disconnect isn't silently revived
+// on the next level clear. Duel: removing the second-to-last connected
+// player ends the match immediately — the one remaining connected player
+// wins (last one standing), same GameOver shape as reaching DUEL_KILL_TARGET.
+// Idempotent (a duplicate/late drop for an already-removed slot is a no-op)
+// and defensive against an out-of-range slot.
+export function removePlayer(state: GameState, slot: number, events: SimEvent[]): void {
+  const player = state.players[slot];
+  if (!player || player.removed) return;
+  player.removed = true;
+  player.alive = false;
+  player.lives = 0;
+  player.shield = 0;
+  player.respawnTicksRemaining = 0;
+  events.push({ type: 'PlayerLeft', tankId: player.id, slot });
+
+  if (state.mode === 'duel' && !state.gameOver) {
+    const remaining = state.players.filter((p) => !p.removed);
+    if (remaining.length === 1) {
+      const winner = remaining[0]!;
+      state.gameOver = true;
+      state.winner = winner.id;
+      events.push({ type: 'GameOver', finalScore: state.score, finalLevel: state.level, winnerId: winner.id });
+    }
+  }
+}
+
 // --- Debug-only helpers (used by game/debug.ts) ---
 
 export function spawnEnemyAt(state: GameState, x: number, z: number, kind: 'drone' | 'hunter'): void {
@@ -547,14 +598,18 @@ export function killAllEnemies(state: GameState): void {
 // Advances the simulation by exactly one fixed tick. Deterministic given
 // (state, commands) — the future multiplayer contract. `commands` is keyed
 // by tank id, so any player beyond the first is just another entry (see
-// input/keyboard.ts / game/app.ts).
-export function step(state: GameState, commands: Record<string, Command>): void {
+// input/keyboard.ts / game/app.ts). `drops` (M5): player slots removePlayer()
+// is applied to at the very start of THIS tick — driven by a net message all
+// peers apply at the same tick number (see net/CLAUDE.md), never by local
+// disconnect detection; always empty outside net play.
+export function step(state: GameState, commands: Record<string, Command>, drops: number[] = []): void {
   if (state.gameOver) {
     state.events = [];
     return;
   }
 
   const events: SimEvent[] = [];
+  for (const slot of drops) removePlayer(state, slot, events);
   const levelCfg = levelConfig(state.level);
 
   for (const player of state.players) {

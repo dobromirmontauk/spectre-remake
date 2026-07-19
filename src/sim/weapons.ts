@@ -10,6 +10,7 @@ import {
   ENEMY_DAMAGE_PER_SHOT,
   GRENADE_BLAST_RADIUS,
   GRENADE_DAMAGE,
+  GRENADE_DAMAGE_PLAYER,
   GRENADE_SPEED,
   GRENADE_FUSE_TICKS,
   PLAYER_DAMAGE_PER_SHOT,
@@ -141,7 +142,28 @@ export function updateProjectiles(state: GameState, events: SimEvent[]): void {
   state.projectiles = remaining;
 }
 
-function explodeGrenade(state: GameState, position: Vec2, events: SimEvent[]): void {
+// Duel-only player damage (deferred from M1, plan Design §1: this loop used
+// to only ever touch state.enemies — duel has none, so a duel grenade was
+// dead code that could never hurt anything). Co-op/solo are untouched (guard
+// on state.mode): co-op keeps its no-friendly-fire rule exactly like cannon
+// shots (updateProjectiles above), and solo has no second player to hit.
+// Same invuln/god-mode guard as a cannon hit; kill credit goes through
+// lastHitBy exactly like updateProjectiles' damageTank, so a fatal blast
+// still tallies a duel kill via handleDuelPlayer.
+function damageDuelPlayers(state: GameState, position: Vec2, ownerId: string): void {
+  for (const player of state.players) {
+    if (!player.alive || player.id === ownerId) continue;
+    if ((state.god && player.id === 'player') || player.invulnerableTicks > 0) continue;
+    const dx = player.position.x - position.x;
+    const dz = player.position.z - position.z;
+    if (dx * dx + dz * dz <= GRENADE_BLAST_RADIUS * GRENADE_BLAST_RADIUS) {
+      player.shield -= GRENADE_DAMAGE_PLAYER;
+      player.lastHitBy = ownerId;
+    }
+  }
+}
+
+function explodeGrenade(state: GameState, position: Vec2, ownerId: string, events: SimEvent[]): void {
   for (const enemy of state.enemies) {
     if (!enemy.alive) continue;
     const dx = enemy.position.x - position.x;
@@ -150,6 +172,7 @@ function explodeGrenade(state: GameState, position: Vec2, events: SimEvent[]): v
       enemy.shield -= GRENADE_DAMAGE;
     }
   }
+  if (state.mode === 'duel') damageDuelPlayers(state, position, ownerId);
   events.push({ type: 'GrenadeExploded', position, radius: GRENADE_BLAST_RADIUS });
 }
 
@@ -174,9 +197,24 @@ export function updateGrenades(state: GameState, events: SimEvent[]): void {
       if (!enemy.alive) continue;
       const hit = segmentVsCircle(grenade.prevPosition, grenade.position, enemy.position, TANK_RADIUS);
       if (!hit.hit) continue;
-      explodeGrenade(state, hit.point, events);
+      explodeGrenade(state, hit.point, grenade.ownerId, events);
       exploded = true;
       break;
+    }
+
+    // Duel has no enemies (the loop above is a no-op there) — detonate on
+    // contact with a non-owner opponent tank too, same as the enemy-contact
+    // case above, so a direct hit goes off immediately instead of only ever
+    // exploding on a wall/bounds/fuse timeout.
+    if (!exploded && state.mode === 'duel') {
+      for (const player of state.players) {
+        if (!player.alive || player.id === grenade.ownerId) continue;
+        const hit = segmentVsCircle(grenade.prevPosition, grenade.position, player.position, TANK_RADIUS);
+        if (!hit.hit) continue;
+        explodeGrenade(state, hit.point, grenade.ownerId, events);
+        exploded = true;
+        break;
+      }
     }
 
     if (!exploded) {
@@ -186,19 +224,19 @@ export function updateGrenades(state: GameState, events: SimEvent[]): void {
             ? segmentVsAABB(grenade.prevPosition, grenade.position, obstacle.min, obstacle.max)
             : segmentVsCircle(grenade.prevPosition, grenade.position, obstacle.position, obstacle.pylonRadius);
         if (!hit.hit) continue;
-        explodeGrenade(state, hit.point, events);
+        explodeGrenade(state, hit.point, grenade.ownerId, events);
         exploded = true;
         break;
       }
     }
 
     if (!exploded && outOfBounds(grenade.position)) {
-      explodeGrenade(state, grenade.position, events);
+      explodeGrenade(state, grenade.position, grenade.ownerId, events);
       exploded = true;
     }
 
     if (!exploded && grenade.fuseTicksRemaining <= 0) {
-      explodeGrenade(state, grenade.position, events);
+      explodeGrenade(state, grenade.position, grenade.ownerId, events);
       exploded = true;
     }
 

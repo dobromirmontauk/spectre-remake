@@ -167,6 +167,20 @@ export const GRENADE_SPEED = 55; // slower lob than cannon shots
 export const GRENADE_FUSE_TICKS = 60; // ~2s flight before auto-detonation
 export const GRENADE_BLAST_RADIUS = 18;
 export const GRENADE_DAMAGE = 5; // area damage applied to every enemy in radius
+// --- Weapons: duel grenade fix (M5, plan Design §1 deferred item) ---
+// Duel has no levels (levelConfig(1).grenadesUnlocked is always false), so
+// without this a duel match would never unlock grenades at all — grant them
+// from the start instead of gating on level (see sim/simulation.ts
+// handlePlayerWeapons). A deliberate duel-only gameplay change, not a
+// regression: grenades were dead code in duel before this milestone.
+export const GRENADES_IN_DUEL = true;
+// Duel-only splash damage against player shields when a grenade explodes
+// near a non-owner alive player (see sim/weapons.ts explodeGrenade). Co-op/
+// solo grenades still can't hurt players at all (the no-friendly-fire guard
+// stays in place, same as cannon shots). Tuned notably harder than one
+// cannon shot (PLAYER_DAMAGE_PER_SHOT=12) so the area weapon and its ammo
+// cost/cooldown are worth it in a 1v1/FFA fight.
+export const GRENADE_DAMAGE_PLAYER = 35;
 
 // --- Enemy tanks: base movement (before per-level ramp, see levels.ts) ---
 export const ENEMY_TURN_RATE = Math.PI * 0.6; // slower than the player's so it can be out-turned
@@ -290,6 +304,28 @@ export const NET_HASH_RING_SIZE = 10;
 // Wall-clock delay before the "Waiting for NAME…" stall overlay appears —
 // avoids flashing it for a single skipped frame under normal jitter.
 export const STALL_OVERLAY_MS = 300;
+
+// --- Networking (M5): disconnect robustness ---
+// How long (in ticks — converted to wall-clock ms in net/lockstep.ts, since
+// this check must keep running even while the match is fully stalled and no
+// ticks are advancing) the host waits after detecting a peer's transport-
+// level leave before broadcasting the authoritative `drop`. Every peer fills
+// that slot's commands with NEUTRAL_COMMAND for the whole window instead of
+// blocking canStep() on a departed peer's missing input (see
+// net/lockstep.ts) — ~5s: long enough not to be trigger-happy, short enough
+// that "NAME left" doesn't feel like it takes forever.
+export const DISCONNECT_GRACE_TICKS = 150;
+// Host-side only: if a (non-self) roster slot hasn't sent an `input` packet
+// in this many wall-clock ms, the host treats it as gone and broadcasts a
+// `drop` immediately — no additional grace on top, since 10s of silence
+// already exceeds DISCONNECT_GRACE_TICKS several times over. Catches a peer
+// whose transport connection is still technically alive but has stopped
+// producing input (see net/lockstep.ts, __game.net.debugStallInject).
+export const ZOMBIE_TIMEOUT_MS = 10000;
+// "NAME left the game" transient toast (game/app.ts), driven by the
+// PlayerLeft sim event — purely cosmetic display duration, not part of the
+// wire protocol.
+export const PLAYER_LEFT_TOAST_MS = 3000;
 
 // --- Networking (M4): TrysteroTransport (net/trystero.ts) ---
 // Trystero room namespace — rooms are scoped to (appId, roomCode), so this
