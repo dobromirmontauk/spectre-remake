@@ -200,6 +200,13 @@ export const ENEMY_RESPAWN_TICKS = 120; // ~4s after death
 export const ENEMY_MIN_SPAWN_DIST_FROM_PLAYER = 40;
 export const HUNTER_SHIELD_BONUS = 2; // hunters are tougher than drones at the same level
 
+// --- Local multiplayer (2P co-op / duel) ---
+export const DUEL_KILL_TARGET = 5; // first player to this many kills wins the duel
+export const DUEL_RESPAWN_TICKS = SIM_HZ * 2; // ~2s dead before respawning
+export const DUEL_RESPAWN_INVULN_TICKS = SIM_HZ * 1.5; // ~1.5s brief invuln after a duel respawn
+export const DUEL_SPAWN_EDGE_MARGIN = 20; // duel spawns sit this far in from the arena edge, on opposite sides
+export const SPLIT_SCREEN_DIVIDER_PX = 2; // width of the vertical divider line between 2P viewports
+
 // --- Lives / scoring / bonus ---
 export const PLAYER_LIVES_START = 3;
 export const PLAYER_RESPAWN_INVULN_TICKS = 60; // ~2s after respawning at arena center

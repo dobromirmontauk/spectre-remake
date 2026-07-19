@@ -48,6 +48,9 @@ export interface TankState {
   alive: boolean;
   fireCooldown: number; // ticks remaining until cannon can fire again
   grenadeCooldown: number; // ticks remaining until grenade can be thrown again (player only)
+  invulnerableTicks: number; // per-tank so two human players can be invulnerable independently (post-respawn brief window)
+  lastHitBy: string | null; // id of the tank whose shot/grenade last damaged this one; used for duel kill credit
+  respawnTicksRemaining: number; // 0 while alive; counts down to respawn (enemies always; players only in duel mode)
 }
 
 export type EnemyKind = 'drone' | 'hunter';
@@ -59,7 +62,6 @@ export interface EnemyState extends TankState {
   stuckTicks: number; // ticks spent nearly stationary while thrusting (wedged detection)
   unstickTicksRemaining: number; // ticks left in the current UNSTICK maneuver
   unstickTurnDir: -1 | 1;
-  respawnTicksRemaining: number; // 0 while alive; counts down to respawn while dead
 }
 
 export interface Projectile {
@@ -117,13 +119,22 @@ export interface Pickup {
   collected: boolean;
 }
 
+// 'solo' — unchanged 1-player game. 'coop' — two players share the arena and
+// score against AI enemies (each has own lives). 'duel' — two players fight
+// each other, no AI/flags, first to a kill target wins (see DUEL_KILL_TARGET).
+export type GameMode = 'solo' | 'coop' | 'duel';
+
 export interface GameState {
   tick: number;
   level: number;
   rng: RngState;
+  mode: GameMode;
   loadout: Loadout;
   playerMovement: MovementParams; // derived from `loadout` once at game start; see sim/movement.ts
   player: TankState;
+  loadout2: Loadout; // player2's chosen loadout; meaningful only when player2 is non-null
+  player2Movement: MovementParams; // derived from `loadout2`, mirrors playerMovement
+  player2: TankState | null; // second human tank; present only in 'coop'/'duel'
   obstacles: Obstacle[];
   flags: Flag[];
   pickups: Pickup[];
@@ -131,10 +142,12 @@ export interface GameState {
   enemies: EnemyState[];
   projectiles: Projectile[];
   grenades: Grenade[];
-  lives: number;
-  score: number;
+  lives: number; // player's lives (solo and coop)
+  lives2: number; // player2's lives (coop only; unused in solo/duel)
+  score: number; // shared score in solo/coop; unused in duel
   bonusRemaining: number; // per-level time bonus, counts down; added to score on LevelComplete
-  invulnerableTicks: number; // player-only brief invulnerability after respawn
+  kills: { player: number; player2: number }; // duel kill tally; {0,0} and unused outside duel
+  winner: 'player' | 'player2' | null; // duel-only: set once a side reaches DUEL_KILL_TARGET
   gameOver: boolean;
   god: boolean; // debug: player takes no damage
   nextEntityId: number; // monotonic counter for enemy/projectile/grenade ids

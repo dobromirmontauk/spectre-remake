@@ -15,6 +15,6 @@ export type SimEvent =
   | { type: 'EnemyDestroyed'; enemyId: string; position: Vec2 }
   | { type: 'EnemyRespawned'; enemyId: string; position: Vec2 }
   | { type: 'PlayerDamaged'; amount: number }
-  | { type: 'PlayerDestroyed'; position: Vec2; livesRemaining: number }
-  | { type: 'PlayerRespawned' }
-  | { type: 'GameOver'; finalScore: number; finalLevel: number };
+  | { type: 'PlayerDestroyed'; tankId: string; position: Vec2; livesRemaining: number }
+  | { type: 'PlayerRespawned'; tankId: string }
+  | { type: 'GameOver'; finalScore: number; finalLevel: number; winnerId?: 'player' | 'player2' };

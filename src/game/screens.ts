@@ -4,7 +4,7 @@
 // own (pure) reset helpers.
 
 import type { GameFlow } from './flow.ts';
-import type { GameState, Loadout } from '../sim/types.ts';
+import type { GameMode, GameState, Loadout } from '../sim/types.ts';
 import { resetGameWithLoadout } from '../sim/simulation.ts';
 import { loadHighScores, qualifiesForHighScore, recordHighScore } from './highscores.ts';
 import {
@@ -12,6 +12,7 @@ import {
   CUSTOM_SHIELDS_COST_PER_POINT,
   CUSTOM_SPEED_COST_PER_POINT,
   DEFAULT_LOADOUT,
+  DUEL_KILL_TARGET,
   LOADOUT_AMMO_MAX,
   LOADOUT_AMMO_MIN,
   LOADOUT_PRESETS,
@@ -80,6 +81,7 @@ export class Screens {
   private callbacks: ScreensCallbacks;
 
   private menuEl: HTMLDivElement;
+  private modeSelectEl: HTMLDivElement;
   private tankSetupEl: HTMLDivElement;
   private dialogOverlayEl: HTMLDivElement;
   private dialogPanelEl: HTMLDivElement;
@@ -89,8 +91,12 @@ export class Screens {
   private filledButton: HTMLButtonElement | null = null;
   private openDialog: DialogKind = null;
 
+  private selectedMode: GameMode = 'solo';
   private selectedPresetId: LoadoutPreset['id'] | 'custom' = 'balanced';
   private customLoadout: Loadout = { speed: LOADOUT_SPEED_MIN, shields: LOADOUT_SHIELDS_MIN, ammo: LOADOUT_AMMO_MIN };
+  // Player 2's loadout picker is preset-only (no custom sliders) — "keep it
+  // simple" per the multiplayer plan; defaults to Balanced like P1.
+  private selectedPresetId2: LoadoutPreset['id'] = 'balanced';
 
   private pendingScoreEntry: { score: number; level: number } | null = null;
   private lastPhase: string | null = null;
@@ -101,6 +107,7 @@ export class Screens {
     this.callbacks = callbacks;
 
     this.menuEl = this.buildMenu();
+    this.modeSelectEl = this.buildModeSelect();
     this.tankSetupEl = this.buildTankSetup();
     const { overlay, panel } = this.buildDialogShell();
     this.dialogOverlayEl = overlay;
@@ -108,7 +115,7 @@ export class Screens {
     this.confirmQuitEl = this.buildConfirmQuit();
     this.gameOverEl = this.buildGameOver();
 
-    root.append(this.menuEl, this.tankSetupEl, this.dialogOverlayEl, this.confirmQuitEl, this.gameOverEl);
+    root.append(this.menuEl, this.modeSelectEl, this.tankSetupEl, this.dialogOverlayEl, this.confirmQuitEl, this.gameOverEl);
   }
 
   // --- Menu ---
@@ -128,7 +135,7 @@ export class Screens {
 
     const playBtn = this.menuButton('Play', () => {
       this.callbacks.onAnyInteraction();
-      this.flow.goToTankSetup();
+      this.flow.goToModeSelect();
     });
     buttons.appendChild(playBtn);
 
@@ -161,6 +168,51 @@ export class Screens {
     this.quitNoteEl = quitNote;
 
     return wrap;
+  }
+
+  // --- Mode select (Play -> here -> Tank Setup) ---
+
+  private buildModeSelect(): HTMLDivElement {
+    const wrap = el('div', 'screen screen-modeselect');
+
+    const title = el('div', 'modeselect-title');
+    title.textContent = 'SELECT MODE';
+    wrap.appendChild(title);
+
+    const buttons = el('div', 'modeselect-buttons');
+    const modes: { mode: GameMode; label: string; blurb: string }[] = [
+      { mode: 'solo', label: '1 Player', blurb: 'The original single-player campaign.' },
+      { mode: 'coop', label: '2P Co-op', blurb: 'Share the arena, fight AI tanks together.' },
+      { mode: 'duel', label: '2P Duel', blurb: `Player vs player — first to ${DUEL_KILL_TARGET} kills wins.` },
+    ];
+    for (const { mode, label, blurb } of modes) {
+      const btn = el('button', 'menu-button modeselect-button');
+      btn.type = 'button';
+      const title2 = el('div', 'modeselect-button-label');
+      title2.textContent = label;
+      const desc = el('div', 'modeselect-button-blurb');
+      desc.textContent = blurb;
+      btn.append(title2, desc);
+      btn.addEventListener('click', () => {
+        this.callbacks.onAnyInteraction();
+        this.selectedMode = mode;
+        this.flow.goToTankSetup();
+      });
+      buttons.appendChild(btn);
+    }
+    wrap.appendChild(buttons);
+
+    const backBtn = this.menuButton('Back', () => this.flow.goToMenu());
+    backBtn.classList.add('modeselect-back');
+    wrap.appendChild(backBtn);
+
+    return wrap;
+  }
+
+  // Esc from tank setup returns to mode select (the screen immediately
+  // before it in the Play flow), not all the way back to the main menu.
+  backFromTankSetup(): void {
+    this.flow.goToModeSelect();
   }
 
   private quitNoteEl!: HTMLDivElement;
@@ -200,6 +252,9 @@ export class Screens {
   private sliderValueEls: Record<'speed' | 'shields' | 'ammo', HTMLSpanElement> = {} as never;
   private budgetEl!: HTMLDivElement;
   private presetButtons: HTMLButtonElement[] = [];
+  private p2ColEl!: HTMLDivElement;
+  private p2Preview!: HTMLDivElement;
+  private presetButtons2: HTMLButtonElement[] = [];
 
   private buildTankSetup(): HTMLDivElement {
     const wrap = el('div', 'screen screen-tanksetup');
@@ -207,6 +262,13 @@ export class Screens {
     const title = el('div', 'tanksetup-title');
     title.textContent = 'TANK SETUP';
     wrap.appendChild(title);
+
+    const columns = el('div', 'tanksetup-columns');
+
+    const p1Col = el('div', 'tanksetup-col');
+    const p1ColTitle = el('div', 'tanksetup-col-title');
+    p1ColTitle.textContent = 'Player 1';
+    p1Col.appendChild(p1ColTitle);
 
     const presetRow = el('div', 'preset-row');
     for (const preset of LOADOUT_PRESETS) {
@@ -223,10 +285,10 @@ export class Screens {
     customBtn.addEventListener('click', () => this.selectPreset('custom'));
     presetRow.appendChild(customBtn);
     this.presetButtons.push(customBtn);
-    wrap.appendChild(presetRow);
+    p1Col.appendChild(presetRow);
 
     this.tankSetupPreview = el('div', 'tanksetup-preview');
-    wrap.appendChild(this.tankSetupPreview);
+    p1Col.appendChild(this.tankSetupPreview);
 
     this.customSlidersEl = el('div', 'custom-sliders');
     (['speed', 'shields', 'ammo'] as const).forEach((stat) => {
@@ -248,16 +310,55 @@ export class Screens {
     });
     this.budgetEl = el('div', 'budget-remaining');
     this.customSlidersEl.appendChild(this.budgetEl);
-    wrap.appendChild(this.customSlidersEl);
+    p1Col.appendChild(this.customSlidersEl);
+    columns.appendChild(p1Col);
+
+    // Player 2 column: 2P modes only, preset picker only (no custom sliders)
+    // — "both default Balanced, click to change" keeps the second column
+    // simple rather than duplicating the full custom-slider UI.
+    this.p2ColEl = el('div', 'tanksetup-col tanksetup-col-p2');
+    const p2ColTitle = el('div', 'tanksetup-col-title tanksetup-col-title-p2');
+    p2ColTitle.textContent = 'Player 2';
+    this.p2ColEl.appendChild(p2ColTitle);
+    const presetRow2 = el('div', 'preset-row');
+    for (const preset of LOADOUT_PRESETS) {
+      const btn = el('button', 'preset-button');
+      btn.type = 'button';
+      btn.textContent = preset.name;
+      btn.addEventListener('click', () => this.selectPreset2(preset.id));
+      presetRow2.appendChild(btn);
+      this.presetButtons2.push(btn);
+    }
+    this.p2ColEl.appendChild(presetRow2);
+    this.p2Preview = el('div', 'tanksetup-preview');
+    this.p2ColEl.appendChild(this.p2Preview);
+    columns.appendChild(this.p2ColEl);
+
+    wrap.appendChild(columns);
 
     const actionRow = el('div', 'tanksetup-actions');
     const startBtn = this.menuButton('Start', () => this.startGame());
-    const backBtn = this.menuButton('Back', () => this.flow.goToMenu());
+    const backBtn = this.menuButton('Back', () => this.backFromTankSetup());
     actionRow.append(backBtn, startBtn);
     wrap.appendChild(actionRow);
 
     this.selectPreset('balanced');
+    this.selectPreset2('balanced');
     return wrap;
+  }
+
+  private selectPreset2(id: LoadoutPreset['id']): void {
+    this.selectedPresetId2 = id;
+    for (const btn of this.presetButtons2) {
+      btn.classList.toggle('selected', btn.textContent === this.presetLabelFor(id));
+    }
+    const preset = LOADOUT_PRESETS.find((p) => p.id === id) ?? DEFAULT_LOADOUT;
+    this.p2Preview.textContent = `Speed ${preset.speed}  ·  Shields ${preset.shields}  ·  Ammo ${preset.ammo}`;
+  }
+
+  private loadout2(): Loadout {
+    const preset = LOADOUT_PRESETS.find((p) => p.id === this.selectedPresetId2) ?? DEFAULT_LOADOUT;
+    return { speed: preset.speed, shields: preset.shields, ammo: preset.ammo };
   }
 
   private statRange(stat: 'speed' | 'shields' | 'ammo'): [number, number] {
@@ -335,7 +436,8 @@ export class Screens {
   }
 
   private startGame(): void {
-    resetGameWithLoadout(this.state, this.currentLoadout(), 1);
+    const opts = this.selectedMode === 'solo' ? undefined : { mode: this.selectedMode, loadout2: this.loadout2() };
+    resetGameWithLoadout(this.state, this.currentLoadout(), 1, opts);
     this.flow.beginRun();
   }
 
@@ -374,13 +476,23 @@ export class Screens {
       const body = el('div', 'dialog-body');
       body.innerHTML = `
         <h2>Controls</h2>
+        <h3>Player 1</h3>
         <ul class="controls-list">
           <li><span>Arrow keys</span><span>Steer &amp; throttle</span></li>
           <li><span>Space</span><span>Fire cannon</span></li>
           <li><span>Alt / G</span><span>Grenade (level 10+)</span></li>
-          <li><span>Tab</span><span>Cycle camera view</span></li>
+        </ul>
+        <h3>Player 2 (2P Co-op / Duel)</h3>
+        <ul class="controls-list">
+          <li><span>W A S D</span><span>Steer &amp; throttle</span></li>
+          <li><span>F</span><span>Fire cannon</span></li>
+          <li><span>Q</span><span>Grenade (co-op, level 10+)</span></li>
+        </ul>
+        <h3>General</h3>
+        <ul class="controls-list">
+          <li><span>Tab</span><span>Cycle camera view (1P only)</span></li>
           <li><span>P</span><span>Pause</span></li>
-          <li><span>S</span><span>Toggle sound</span></li>
+          <li><span>M</span><span>Toggle sound</span></li>
           <li><span>Esc</span><span>Menu</span></li>
           <li><span>Enter</span><span>Confirm</span></li>
         </ul>
@@ -477,7 +589,8 @@ export class Screens {
   }
 
   private maybeRecordScoreThenGoToMenu(score: number, level: number): void {
-    if (qualifiesForHighScore(score) && !this.pendingScoreEntry) {
+    // Duel is a match, not a scored run — never prompt for high-score initials.
+    if (this.state.mode !== 'duel' && qualifiesForHighScore(score) && !this.pendingScoreEntry) {
       // Manual Esc-quit mid-run: no dedicated initials screen exists outside
       // Game Over, so prompt inline via a plain browser prompt rather than
       // building a second parallel UI for the same one-time action.
@@ -514,17 +627,32 @@ export class Screens {
     if (this.flow.showMenu && this.filledButton) this.filledButton.textContent = this.filledLabel();
 
     this.menuEl.classList.toggle('visible', this.flow.showMenu);
+    this.modeSelectEl.classList.toggle('visible', this.flow.showModeSelect);
     this.tankSetupEl.classList.toggle('visible', this.flow.showTankSetup);
+    if (this.flow.showTankSetup) this.p2ColEl.classList.toggle('visible', this.selectedMode !== 'solo');
     this.confirmQuitEl.classList.toggle('visible', this.flow.showConfirmQuit);
 
     const showGameOver = this.flow.showGameOver;
     this.gameOverEl.classList.toggle('visible', showGameOver);
     if (showGameOver) {
-      this.gameOverStatsEl.innerHTML = `<div>Score: ${this.state.score}</div><div>Level: ${this.state.level}</div>`;
-      const showInitials = this.pendingScoreEntry !== null;
-      this.initialsFormEl.classList.toggle('visible', showInitials);
-      this.gameOverHintEl.style.visibility = showInitials ? 'hidden' : 'visible';
-      if (showInitials && document.activeElement !== this.initialsInputEl) this.initialsInputEl.focus();
+      if (this.state.mode === 'duel') {
+        // Duel ends in a winner screen, not a scored Game Over — no initials
+        // prompt, no high-score qualification (see maybeRecordScoreThenGoToMenu).
+        const winnerLabel = this.state.winner === 'player' ? 'PLAYER 1' : this.state.winner === 'player2' ? 'PLAYER 2' : '???';
+        this.gameOverTitleEl.textContent = `${winnerLabel} WINS!`;
+        this.gameOverStatsEl.innerHTML = `<div>Kills: ${this.state.kills.player} - ${this.state.kills.player2}</div>`;
+        this.initialsFormEl.classList.remove('visible');
+        this.gameOverHintEl.style.visibility = 'visible';
+        this.gameOverHintEl.textContent = 'Press Enter to return to menu';
+      } else {
+        this.gameOverTitleEl.textContent = 'GAME OVER';
+        this.gameOverStatsEl.innerHTML = `<div>Score: ${this.state.score}</div><div>Level: ${this.state.level}</div>`;
+        const showInitials = this.pendingScoreEntry !== null;
+        this.initialsFormEl.classList.toggle('visible', showInitials);
+        this.gameOverHintEl.style.visibility = showInitials ? 'hidden' : 'visible';
+        this.gameOverHintEl.textContent = 'Press Enter to return to menu';
+        if (showInitials && document.activeElement !== this.initialsInputEl) this.initialsInputEl.focus();
+      }
     }
   }
 }

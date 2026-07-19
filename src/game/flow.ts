@@ -2,12 +2,13 @@ import type { GameState } from '../sim/types.ts';
 import { rebuildLevel, resetGame } from '../sim/simulation.ts';
 import { LEVEL_INTRO_DURATION_TICKS } from '../config/constants.ts';
 
-// FSM: Menu -> TankSetup -> LevelIntro(1) -> Playing <-> LevelIntro(n+1) on
-// flag clear, or Playing -> GameOver -> (Enter) -> Menu. Pause and the
+// FSM: Menu -> ModeSelect -> TankSetup -> LevelIntro(1) -> Playing <->
+// LevelIntro(n+1) on flag clear, or Playing -> GameOver -> (Enter) -> Menu.
+// ModeSelect picks 1P/2P-co-op/2P-duel (see game/screens.ts); Pause and the
 // Esc "quit to menu" confirm are orthogonal flags layered on top of
 // Playing/LevelIntro rather than their own phases, so cancelling either
 // always resumes exactly where it left off.
-export type FlowPhase = 'Menu' | 'TankSetup' | 'Playing' | 'LevelIntro' | 'GameOver';
+export type FlowPhase = 'Menu' | 'ModeSelect' | 'TankSetup' | 'Playing' | 'LevelIntro' | 'GameOver';
 
 export class GameFlow {
   phase: FlowPhase = 'Menu';
@@ -73,6 +74,10 @@ export class GameFlow {
     this.confirmQuit = false;
   }
 
+  goToModeSelect(): void {
+    this.phase = 'ModeSelect';
+  }
+
   goToTankSetup(): void {
     this.phase = 'TankSetup';
   }
@@ -96,6 +101,10 @@ export class GameFlow {
 
   get showMenu(): boolean {
     return this.phase === 'Menu';
+  }
+
+  get showModeSelect(): boolean {
+    return this.phase === 'ModeSelect';
   }
 
   get showTankSetup(): boolean {

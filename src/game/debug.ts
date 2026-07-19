@@ -1,5 +1,5 @@
 import type { Command } from '../sim/commands.ts';
-import type { EnemyKind, Loadout } from '../sim/types.ts';
+import type { EnemyKind, GameMode, Loadout } from '../sim/types.ts';
 
 // window.__game hooks used for deterministic Playwright verification.
 export interface DebugHooks {
@@ -18,7 +18,9 @@ export interface DebugHooks {
   cycleCamera(): void;
   restart(): void;
   gotoMenu(): void;
-  startGame(loadout?: Loadout): void;
+  // `opts.mode` defaults to 'solo' (identical to the original 1P-only
+  // behavior); pass 'coop'/'duel' + opts.loadout2 to start a 2P match.
+  startGame(loadout?: Loadout, opts?: { mode?: GameMode; loadout2?: Loadout }): void;
   setFilled(on: boolean): void;
   setMuted(on: boolean): void;
 }

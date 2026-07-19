@@ -5,7 +5,7 @@
 // Enemies produce the same Command type as the player and go through the
 // same applyMovement()/collision path — just with their own MovementParams.
 
-import type { EnemyKind, EnemyState, GameState, Vec2 } from './types.ts';
+import type { EnemyKind, EnemyState, GameState, TankState, Vec2 } from './types.ts';
 import type { Command } from './commands.ts';
 import type { MovementParams } from './movement.ts';
 import type { LevelConfig } from '../config/levels.ts';
@@ -91,28 +91,37 @@ export function createEnemy(position: Vec2, kind: EnemyKind, levelCfg: LevelConf
     alive: true,
     fireCooldown: 0,
     grenadeCooldown: 0,
+    invulnerableTicks: 0,
+    lastHitBy: null,
+    respawnTicksRemaining: 0,
     kind,
     aiState: 'PURSUE',
     stuckTicks: 0,
     unstickTicksRemaining: 0,
     unstickTurnDir: 1,
-    respawnTicksRemaining: 0,
   };
 }
 
+// True if `point` is far enough from every present player tank (co-op:
+// checks both, not just state.player) to be a fair enemy spawn.
+function farEnoughFromPlayers(state: GameState, point: Vec2): boolean {
+  for (const player of [state.player, state.player2]) {
+    if (!player) continue;
+    const dx = point.x - player.position.x;
+    const dz = point.z - player.position.z;
+    if (dx * dx + dz * dz < ENEMY_MIN_SPAWN_DIST_FROM_PLAYER * ENEMY_MIN_SPAWN_DIST_FROM_PLAYER) return false;
+  }
+  return true;
+}
+
 // Random point on/near the arena edge, at least ENEMY_MIN_SPAWN_DIST_FROM_PLAYER
-// from the player — used both for initial level population and respawns.
+// from every player — used both for initial level population and respawns.
 export function pickEdgeSpawnPoint(state: GameState): Vec2 {
   for (let attempt = 0; attempt < 30; attempt++) {
     const side = Math.floor(state.rng.next() * 4);
     const along = (state.rng.next() * 2 - 1) * (ARENA_HALF_SIZE - EDGE_SPAWN_MARGIN);
     const point = edgePoint(side, along);
-
-    const dx = point.x - state.player.position.x;
-    const dz = point.z - state.player.position.z;
-    if (dx * dx + dz * dz >= ENEMY_MIN_SPAWN_DIST_FROM_PLAYER * ENEMY_MIN_SPAWN_DIST_FROM_PLAYER) {
-      return point;
-    }
+    if (farEnoughFromPlayers(state, point)) return point;
   }
   // Fallback: arena corner, always far from a centrally-spawning player.
   return { x: ARENA_HALF_SIZE - EDGE_SPAWN_MARGIN, z: ARENA_HALF_SIZE - EDGE_SPAWN_MARGIN };
@@ -139,6 +148,25 @@ export interface EnemyDecision {
   fireHeading: number; // angle to aim target; only meaningful when command.fire is true
 }
 
+// Closest alive player tank to `from` — the AI targeting rule for 2P co-op
+// (enemies always go after whichever human is nearest); reduces to
+// state.player alone whenever player2 is absent/dead.
+function nearestAlivePlayer(state: GameState, from: Vec2): TankState | null {
+  let best: TankState | null = null;
+  let bestDistSq = Infinity;
+  for (const candidate of [state.player, state.player2]) {
+    if (!candidate || !candidate.alive) continue;
+    const dx = candidate.position.x - from.x;
+    const dz = candidate.position.z - from.z;
+    const distSq = dx * dx + dz * dz;
+    if (distSq < bestDistSq) {
+      bestDistSq = distSq;
+      best = candidate;
+    }
+  }
+  return best;
+}
+
 export function enemyCommand(enemy: EnemyState, state: GameState, levelCfg: LevelConfig): EnemyDecision {
   if (enemy.fireCooldown > 0) enemy.fireCooldown--;
 
@@ -149,7 +177,11 @@ export function enemyCommand(enemy: EnemyState, state: GameState, levelCfg: Leve
     return { command: { turn: enemy.unstickTurnDir, thrust: -1, fire: false, grenade: false }, fireHeading: enemy.heading };
   }
 
-  const player = state.player;
+  const player = nearestAlivePlayer(state, enemy.position);
+  if (!player) {
+    // No alive player to pursue (both eliminated the same tick) — idle.
+    return { command: { turn: 0, thrust: 0, fire: false, grenade: false }, fireHeading: enemy.heading };
+  }
   const dx = player.position.x - enemy.position.x;
   const dz = player.position.z - enemy.position.z;
   const distance = Math.hypot(dx, dz);

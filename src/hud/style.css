@@ -188,6 +188,159 @@ body {
   display: flex;
 }
 
+/* ============================================================
+   2P split-screen (local multiplayer — co-op/duel)
+   ============================================================ */
+
+/* Solo HUD strip/speed readout are replaced by #hud2p-top's own left/right
+   panels in split-screen; the shared radar (#radar) stays but shifts to sit
+   inside the left half, and a second radar (#radar2) appears for the right. */
+#stage[data-splitscreen='true'] #hud-top,
+#stage[data-splitscreen='true'] #hud-speed {
+  display: none;
+}
+
+#stage[data-splitscreen='true'] #radar {
+  right: calc(50% + 2.5cqw);
+}
+
+#radar2 {
+  position: absolute;
+  top: 13cqw;
+  right: 2.5cqw;
+  width: 16cqw;
+  height: 16cqw;
+  pointer-events: none;
+  opacity: 0.85;
+  display: none;
+}
+
+#stage[data-splitscreen='true'] #radar2 {
+  display: block;
+}
+
+.split-divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  margin-left: -1px;
+  background: #000;
+  box-shadow: 0 0 0.3cqw rgba(0, 0, 0, 0.9);
+  z-index: 15;
+  display: none;
+  pointer-events: none;
+}
+
+#stage[data-splitscreen='true'] .split-divider {
+  display: block;
+}
+
+.hud2p-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: none;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 2.2cqw 2.2cqw;
+  pointer-events: none;
+  font-size: 2.5cqw;
+  line-height: 1.5;
+  z-index: 10;
+}
+
+.hud2p-top.visible {
+  display: flex;
+}
+
+.hud2p-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
+  width: 42%;
+}
+
+.hud2p-right {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.hud2p-title {
+  color: #33ff55;
+  font-weight: bold;
+  letter-spacing: 0.15em;
+  text-shadow: 0 0 0.15em rgba(51, 255, 85, 0.65);
+}
+
+.hud2p-right .hud2p-title {
+  color: #4fc3ff;
+  text-shadow: 0 0 0.15em rgba(79, 195, 255, 0.65);
+}
+
+.hud2p-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  white-space: nowrap;
+}
+
+.hud2p-right .hud2p-row {
+  flex-direction: row-reverse;
+}
+
+.hud2p-label {
+  color: #e8e8e8;
+}
+
+.hud2p-value {
+  color: #33ff55;
+  font-variant-numeric: tabular-nums;
+}
+
+.hud2p-right .hud2p-value {
+  color: #4fc3ff;
+}
+
+.hud2p-bar {
+  display: inline-block;
+  width: 5em;
+  height: 0.8em;
+  border: 1px solid #e8e8e8;
+  background: #000;
+  overflow: hidden;
+}
+
+.hud2p-bar-fill {
+  display: block;
+  height: 100%;
+  width: 0%;
+}
+
+.hud2p-bar-damage .hud2p-bar-fill {
+  background: #ff2222;
+}
+
+.hud2p-bar-ammo .hud2p-bar-fill {
+  background: #33ff55;
+}
+
+.hud2p-right .hud2p-bar-ammo .hud2p-bar-fill {
+  background: #4fc3ff;
+}
+
+.hud2p-center {
+  color: #ffee55;
+  text-align: center;
+  font-family: 'Menlo', 'Consolas', monospace;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 0.15em rgba(255, 238, 85, 0.6);
+}
+
 #crosshair span {
   position: relative;
   width: 1.2em;
@@ -421,6 +574,57 @@ body {
   opacity: 1;
 }
 
+/* --- Mode select (Play -> here -> Tank Setup) --- */
+
+.screen-modeselect {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3cqw;
+  padding: 4cqw;
+}
+
+.screen-modeselect.visible {
+  display: flex;
+}
+
+.modeselect-title {
+  font-size: 3.5cqw;
+  letter-spacing: 0.3em;
+  color: #ffee55;
+  text-shadow: 0 0 0.2em rgba(255, 238, 85, 0.6);
+}
+
+.modeselect-buttons {
+  display: flex;
+  gap: 2cqw;
+}
+
+.modeselect-button {
+  min-width: 14em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.modeselect-button-label {
+  font-size: 1.2em;
+}
+
+.modeselect-button-blurb {
+  font-weight: normal;
+  font-size: 0.75em;
+  opacity: 0.75;
+  white-space: normal;
+}
+
+.modeselect-back {
+  margin-top: 1cqw;
+}
+
 /* --- Tank setup --- */
 
 .screen-tanksetup {
@@ -442,6 +646,41 @@ body {
   color: #ffee55;
   text-shadow: 0 0 0.2em rgba(255, 238, 85, 0.6);
   margin-top: 2cqw;
+}
+
+.tanksetup-columns {
+  display: flex;
+  gap: 4cqw;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+}
+
+.tanksetup-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2cqw;
+}
+
+.tanksetup-col-p2 {
+  display: none;
+}
+
+.tanksetup-col-p2.visible {
+  display: flex;
+}
+
+.tanksetup-col-title {
+  color: #33ff55;
+  font-size: 1.6cqw;
+  letter-spacing: 0.15em;
+  text-shadow: 0 0 0.15em rgba(51, 255, 85, 0.5);
+}
+
+.tanksetup-col-title-p2 {
+  color: #4fc3ff;
+  text-shadow: 0 0 0.15em rgba(79, 195, 255, 0.5);
 }
 
 .preset-row {
@@ -568,6 +807,12 @@ body {
 .dialog-body h2 {
   color: #ffee55;
   margin-top: 0;
+}
+
+.dialog-body h3 {
+  color: #ffee55;
+  font-size: 1.1em;
+  margin: 0.9em 0 0.3em;
 }
 
 .dialog-body p {

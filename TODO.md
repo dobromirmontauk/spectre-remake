@@ -1,11 +1,12 @@
 # Roadmap
 
 ## 1. Local multiplayer (same machine)
-- [ ] Two players, split keyboard (e.g. WASD+Q vs arrows+space), shared screen or split-screen
-- [ ] Sim already supports it: a second human is just another `Command` source with a tank id —
-      add a second `KeyboardInput` mapping + a second player tank in `GameState`
-- [ ] Deathmatch scoring variant (kills win) alongside flag mode
-- [ ] Split-screen = two cameras + two scissored viewports in the renderer; radar per player
+- [x] Two players, split keyboard (arrows+Space/Alt-G vs WASD+F/Q), split-screen
+- [x] Sim already supports it: a second human is just another `Command` source with a tank id —
+      added a second `KeyboardInput` mapping + `state.player2: TankState | null` in `GameState`
+- [x] Deathmatch scoring variant (kills win) alongside flag mode — "2P Duel" mode (first to
+      `DUEL_KILL_TARGET` kills), separate from "2P Co-op" (shared flags vs AI)
+- [x] Split-screen = two cameras + two scissored viewports in the renderer; radar per player
 
 ## 2. Web multiplayer (the real Spectre soul — up to 8 players over the network)
 - [ ] Transport: WebRTC data channels (peer-to-peer, low latency) with a tiny signaling server,

@@ -98,5 +98,8 @@ export interface TankHullColors {
 }
 
 export const PLAYER_TANK_COLORS: TankHullColors = { top: 0x88ff88, side: 0x226622, front: 0x44cc44 };
+// Player 2 (2P co-op/duel only): blue/cyan family, kept distinct from both
+// the green player-1 hull and the red/orange enemy hulls.
+export const PLAYER2_TANK_COLORS: TankHullColors = { top: 0x7fd4ff, side: 0x0e4a66, front: 0x2ab0e6 };
 export const DRONE_TANK_COLORS: TankHullColors = { top: 0xff6666, side: 0x881111, front: 0xdd2222 };
 export const HUNTER_TANK_COLORS: TankHullColors = { top: 0xffb347, side: 0x8a4500, front: 0xff8c1a };

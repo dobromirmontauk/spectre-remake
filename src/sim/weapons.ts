@@ -61,16 +61,21 @@ export function fireGrenade(state: GameState, owner: TankState, heading: number,
 }
 
 function allTanks(state: GameState): TankState[] {
-  return [state.player, ...state.enemies];
+  return [state.player, ...(state.player2 ? [state.player2] : []), ...state.enemies];
 }
 
-function damageTank(state: GameState, target: TankState, isPlayer: boolean): void {
-  if (isPlayer) {
-    if (state.god || state.invulnerableTicks > 0) return;
+function isPlayerTankId(id: string): boolean {
+  return id === 'player' || id === 'player2';
+}
+
+function damageTank(state: GameState, target: TankState, shooterId: string, isPlayerTarget: boolean): void {
+  if (isPlayerTarget) {
+    if ((state.god && target.id === 'player') || target.invulnerableTicks > 0) return;
     target.shield -= PLAYER_DAMAGE_PER_SHOT;
   } else {
     target.shield -= ENEMY_DAMAGE_PER_SHOT;
   }
+  target.lastHitBy = shooterId;
 }
 
 function outOfBounds(p: Vec2): boolean {
@@ -92,11 +97,14 @@ export function updateProjectiles(state: GameState, events: SimEvent[]): void {
 
     for (const target of allTanks(state)) {
       if (target.id === shot.ownerId || !target.alive) continue;
+      // Co-op has no friendly fire: a shot from one player passes straight
+      // through the other rather than registering a hit.
+      if (state.mode === 'coop' && isPlayerTankId(target.id) && isPlayerTankId(shot.ownerId)) continue;
       const hit = segmentVsCircle(shot.prevPosition, shot.position, target.position, TANK_RADIUS + PROJECTILE_RADIUS);
       if (!hit.hit) continue;
-      const isPlayer = target.id === state.player.id;
-      damageTank(state, target, isPlayer);
-      events.push({ type: 'ShotHit', position: hit.point, targetKind: isPlayer ? 'player' : 'enemy' });
+      const isPlayerTarget = isPlayerTankId(target.id);
+      damageTank(state, target, shot.ownerId, isPlayerTarget);
+      events.push({ type: 'ShotHit', position: hit.point, targetKind: isPlayerTarget ? 'player' : 'enemy' });
       consumed = true;
       break;
     }

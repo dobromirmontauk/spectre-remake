@@ -11,7 +11,7 @@ import {
 import type { Command } from '../sim/commands.ts';
 import { NEUTRAL_COMMAND } from '../sim/commands.ts';
 import type { SimEvent } from '../sim/events.ts';
-import type { EnemyKind, Loadout } from '../sim/types.ts';
+import type { EnemyKind, GameMode, Loadout } from '../sim/types.ts';
 import { DEFAULT_LOADOUT } from '../config/constants.ts';
 import { KeyboardInput } from '../input/keyboard.ts';
 import { Renderer } from '../render/renderer.ts';
@@ -20,6 +20,7 @@ import { EffectsManager } from '../render/effects.ts';
 import { applyPixelatedSize } from '../render/retro.ts';
 import { isFilledMode, setFilledMode } from '../render/meshes.ts';
 import { Hud } from '../hud/hud.ts';
+import { Hud2P } from '../hud/hud2p.ts';
 import { Radar } from '../hud/radar.ts';
 import { GameFlow } from './flow.ts';
 import { Screens } from './screens.ts';
@@ -33,12 +34,33 @@ const screensRoot = document.getElementById('screens-root') as HTMLDivElement;
 const state = createInitialState(1, DEFAULT_LOADOUT);
 const keyboard = new KeyboardInput();
 const hud = new Hud();
-const radar = new Radar();
+const hud2p = new Hud2P(stage);
+const radar = new Radar(document.getElementById('radar') as HTMLCanvasElement);
+
+// Second radar canvas for player2's viewport corner in 2P modes — created
+// here rather than in index.html so the solo markup stays untouched.
+const radarCanvas2 = document.createElement('canvas');
+radarCanvas2.id = 'radar2';
+radarCanvas2.width = 96;
+radarCanvas2.height = 96;
+stage.appendChild(radarCanvas2);
+const radar2 = new Radar(radarCanvas2);
+
+const splitDivider = document.createElement('div');
+splitDivider.className = 'split-divider';
+stage.appendChild(splitDivider);
+
 const flow = new GameFlow();
 
 const threeRenderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 const scene = new THREE.Scene();
+// P1's rig (also the only rig used in solo mode); P2's rig only drives a
+// camera when state.player2 is present (2P co-op/duel) — see render().
+// Camera cycling (Tab) is disabled in 2P modes and both rigs stay in their
+// default 'chase' mode (see handleEdgeKeys) — simplest choice for split-screen,
+// noted in the multiplayer report.
 const cameraRig = new CameraRig(stage.clientWidth / stage.clientHeight);
+const cameraRig2 = new CameraRig(stage.clientWidth / stage.clientHeight);
 const gameRenderer = new Renderer(scene, state);
 const effects = new EffectsManager(scene);
 
@@ -54,11 +76,26 @@ const screens = new Screens(screensRoot, flow, state, {
   onAnyInteraction: () => resumeAudio(),
 });
 
+let canvasWidthPx = 0;
+let canvasHeightPx = 0;
+
 function resize(): void {
   const w = stage.clientWidth;
   const h = stage.clientHeight;
+  canvasWidthPx = w;
+  canvasHeightPx = h;
   applyPixelatedSize(threeRenderer, canvas, w, h);
-  cameraRig.setAspect(w / h);
+  updateCameraAspects();
+}
+function updateCameraAspects(): void {
+  const split = state.player2 !== null;
+  if (split) {
+    const halfAspect = canvasWidthPx / 2 / canvasHeightPx;
+    cameraRig.setAspect(halfAspect);
+    cameraRig2.setAspect(halfAspect);
+  } else {
+    cameraRig.setAspect(canvasWidthPx / canvasHeightPx);
+  }
 }
 resize();
 window.addEventListener('resize', resize);
@@ -82,11 +119,15 @@ function resolveCommand(): Command {
 let frameEvents: SimEvent[] = [];
 
 function runTick(): void {
-  const cmd = resolveCommand();
-  step(state, { [state.player.id]: cmd });
+  const cmd1 = resolveCommand();
+  const commands: Record<string, Command> = { [state.player.id]: cmd1 };
+  if (state.player2) commands[state.player2.id] = keyboard.readCommand2();
+  step(state, commands);
   frameEvents.push(...state.events);
   for (const event of state.events) {
-    if (event.type === 'GameOver') screens.notifyGameOver(event.finalScore, event.finalLevel);
+    // Duel results are match wins, not a high-score run — skip the
+    // leaderboard/initials flow for that mode (see game/screens.ts).
+    if (event.type === 'GameOver' && state.mode !== 'duel') screens.notifyGameOver(event.finalScore, event.finalLevel);
   }
   flow.handleEvents(state);
   flow.tick();
@@ -150,9 +191,9 @@ installDebugApi({
   gotoMenu: () => {
     flow.goToMenu();
   },
-  startGame: (loadout: Loadout = DEFAULT_LOADOUT) => {
+  startGame: (loadout: Loadout = DEFAULT_LOADOUT, opts?: { mode?: GameMode; loadout2?: Loadout }) => {
     resumeAudio();
-    resetGameWithLoadout(state, loadout, 1);
+    resetGameWithLoadout(state, loadout, 1, opts);
     flow.beginRun();
   },
   setFilled: (on: boolean) => {
@@ -167,18 +208,40 @@ let previousFrameTime = performance.now();
 let accumulator = 0;
 
 function handleEdgeKeys(): void {
-  if (keyboard.consumeJustPressed('Tab')) cameraRig.cycle();
+  if (keyboard.consumeJustPressed('Tab') && state.player2 === null) cameraRig.cycle(); // camera cycling is 1P-only (see cameraRig2 comment above)
   if (keyboard.consumeJustPressed('p') || keyboard.consumeJustPressed('P')) flow.togglePause();
-  if (keyboard.consumeJustPressed('s') || keyboard.consumeJustPressed('S')) hud.updateMute(toggleMuted());
+  // 'M' always toggles mute; the legacy 'S' toggle is 1P-only since 2P's
+  // player2 uses S for reverse thrust (WASD scheme) — see input/keyboard.ts.
+  if (keyboard.consumeJustPressed('m') || keyboard.consumeJustPressed('M')) hud.updateMute(toggleMuted());
+  if (state.player2 === null && (keyboard.consumeJustPressed('s') || keyboard.consumeJustPressed('S'))) hud.updateMute(toggleMuted());
 
   if (keyboard.consumeJustPressed('Escape')) {
     if (screens.isDialogOpen) screens.closeDialog();
     else if (flow.showConfirmQuit) flow.cancelQuitToMenu();
     else if (flow.isGameplayActive) flow.requestQuitToMenu();
-    else if (flow.showTankSetup) flow.goToMenu();
+    else if (flow.showTankSetup) screens.backFromTankSetup();
+    else if (flow.showModeSelect) flow.goToMenu();
   }
 
   if (keyboard.consumeJustPressed('Enter') && flow.showGameOver) screens.handleGameOverEnter();
+}
+
+function renderSplitScreen(dtSeconds: number): void {
+  const halfW = Math.floor(canvasWidthPx / 2);
+  const rightW = canvasWidthPx - halfW;
+  threeRenderer.setScissorTest(true);
+
+  threeRenderer.setViewport(0, 0, halfW, canvasHeightPx);
+  threeRenderer.setScissor(0, 0, halfW, canvasHeightPx);
+  cameraRig.chase.update(gameRenderer.playerRenderPosition, gameRenderer.playerRenderHeading, dtSeconds);
+  threeRenderer.render(scene, cameraRig.chase.camera);
+
+  threeRenderer.setViewport(halfW, 0, rightW, canvasHeightPx);
+  threeRenderer.setScissor(halfW, 0, rightW, canvasHeightPx);
+  cameraRig2.chase.update(gameRenderer.player2RenderPosition, gameRenderer.player2RenderHeading, dtSeconds);
+  threeRenderer.render(scene, cameraRig2.chase.camera);
+
+  threeRenderer.setScissorTest(false);
 }
 
 function frame(now: number): void {
@@ -210,12 +273,36 @@ function frame(now: number): void {
   effects.update(frameEvents, dtSeconds);
   updateSfx(frameEvents);
   updateEngine(state.player.speed, simActive);
-  hud.update(state, flow);
-  hud.updateMute(isMuted());
-  radar.update(state);
+
+  const split = state.player2 !== null;
+  stage.dataset.splitscreen = split ? 'true' : 'false';
+  hud.updateMute(isMuted()); // #hud-mute stays visible/shared in both solo and split layouts
+  // hud2p.update() always runs (even in solo) because it self-hides via its
+  // own 'visible' class toggle — skipping the call when !split would leave
+  // that class (and the panel) stuck from the last 2P session.
+  hud2p.update(state);
+  if (split) {
+    radar.update(state, state.player);
+    radar2.update(state, state.player2 ?? state.player);
+  } else {
+    hud.update(state, flow);
+    radar.update(state, state.player);
+  }
   screens.update();
+
+  updateCameraAspects();
   stage.dataset.camera = cameraRig.mode;
-  cameraRig.update(gameRenderer.playerRenderPosition, gameRenderer.playerRenderHeading, dtSeconds);
-  threeRenderer.render(scene, cameraRig.activeCamera);
+  if (split) {
+    renderSplitScreen(dtSeconds);
+  } else {
+    // Explicitly reset viewport/scissor to the full canvas — a previous
+    // frame's split-screen render leaves the WebGLRenderer's viewport
+    // latched to a half-width rectangle otherwise, and render() doesn't
+    // reset it on its own.
+    threeRenderer.setScissorTest(false);
+    threeRenderer.setViewport(0, 0, canvasWidthPx, canvasHeightPx);
+    cameraRig.update(gameRenderer.playerRenderPosition, gameRenderer.playerRenderHeading, dtSeconds);
+    threeRenderer.render(scene, cameraRig.activeCamera);
+  }
 }
 requestAnimationFrame(frame);
