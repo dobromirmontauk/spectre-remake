@@ -269,6 +269,28 @@ export const PROTOCOL_VERSION = 1;
 export const NET_ROOM_NOT_FOUND_TIMEOUT_MS = 5000;
 export const NET_NAME_STORAGE_KEY = 'spectre.netplay.name.v1';
 
+// --- Networking (M3): lockstep tunables ---
+// Delayed-input window: local commands sampled "now" are scheduled for
+// tick T+D rather than T, giving every peer's `input` packet time to arrive
+// before the tick that consumes it. 3 ticks @ 30Hz = 100ms — generous for
+// same-origin BroadcastChannel, and carried in `start` (config/protocol.ts
+// StartMessage) so a future adaptive-delay scheme (M5+) can raise it per-match
+// without a protocol change.
+export const NET_INPUT_DELAY_TICKS = 3;
+// Each `input` packet resends this many trailing ticks (belt-and-suspenders
+// over a reliable-ordered DataChannel/BroadcastChannel — see net/lockstep.ts).
+export const INPUT_REDUNDANCY = 3;
+// Cadence (in ticks) for the desync-detection hash exchange (sim/hash.ts's
+// hashState()) — every peer hashes its own state at tick multiples of this
+// and compares against peers' `hash` messages for the same tick.
+export const HASH_INTERVAL_TICKS = 60;
+// How many of the local peer's own hashes (at HASH_INTERVAL_TICKS boundaries)
+// stay available for __game.net.hashAtTick() / late-arriving peer comparison.
+export const NET_HASH_RING_SIZE = 10;
+// Wall-clock delay before the "Waiting for NAME…" stall overlay appears —
+// avoids flashing it for a single skipped frame under normal jitter.
+export const STALL_OVERLAY_MS = 300;
+
 // --- Lives / scoring / bonus ---
 export const PLAYER_LIVES_START = 3;
 export const PLAYER_RESPAWN_INVULN_TICKS = 60; // ~2s after respawning at arena center

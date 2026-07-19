@@ -52,7 +52,9 @@ import {
 // Tank id strings stay 'player'/'player2' for slots 0/1 (existing events,
 // kill credit, and Playwright expectations all key off those two strings —
 // see sim/types.ts PlayerState); slots above that use 'player3'..'player8'.
-function playerIdForSlot(slot: number): string {
+// Exported for net/session.ts, which maps lockstep slot numbers back to
+// tank ids when building the commands record step() expects.
+export function playerIdForSlot(slot: number): string {
   return slot === 0 ? 'player' : slot === 1 ? 'player2' : `player${slot + 1}`;
 }
 
