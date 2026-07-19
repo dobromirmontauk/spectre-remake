@@ -1,0 +1,685 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Courier New', monospace;
+  overflow: hidden;
+}
+
+#stage {
+  position: relative;
+  width: min(96vw, 128vh);
+  aspect-ratio: 4 / 3;
+  background: #000;
+  overflow: hidden;
+  container-type: inline-size;
+}
+
+#viewport {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* --- Top HUD strip: solid black letterbox above the 3D view, no chrome/borders --- */
+
+#hud-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #000;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 2.2cqw 3cqw 2.2cqw;
+  pointer-events: none;
+  font-size: 3.1cqw;
+  line-height: 1.5;
+}
+
+.hud-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
+}
+
+.hud-col-right {
+  align-items: center;
+  gap: 0.4em;
+}
+
+.hud-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  white-space: nowrap;
+}
+
+.hud-label {
+  color: #e8e8e8;
+}
+
+.hud-flags-label {
+  margin-left: 0.8em;
+}
+
+.hud-value {
+  font-variant-numeric: tabular-nums;
+}
+
+.hud-green,
+.hud-digits {
+  color: #33ff55;
+  text-shadow: 0 0 0.15em rgba(51, 255, 85, 0.65);
+}
+
+/* Score/Level/Bonus: LED-style digits — a monospace stand-in for a true
+   seven-segment font (flagged tunable; a real DSEG-style font can replace
+   this later without touching layout). */
+.hud-digits {
+  font-family: 'Menlo', 'Consolas', monospace;
+  font-weight: bold;
+  letter-spacing: 0.18em;
+  font-variant-numeric: tabular-nums;
+}
+
+.hud-bar {
+  display: inline-block;
+  width: 6em;
+  height: 0.85em;
+  border: 1px solid #e8e8e8;
+  background: #000;
+  overflow: hidden;
+}
+
+.hud-bar-fill {
+  display: block;
+  height: 100%;
+  width: 0%;
+}
+
+.hud-bar-damage .hud-bar-fill {
+  background: #ff2222;
+}
+
+.hud-bar-ammo .hud-bar-fill {
+  background: #33ff55;
+  box-shadow: 0 0 0.2em rgba(51, 255, 85, 0.5) inset;
+}
+
+.hud-vbar {
+  width: 0.6em;
+  height: 2.4em;
+  display: flex;
+  align-items: flex-end;
+  background: #000;
+}
+
+.hud-vbar-fill {
+  width: 100%;
+  height: 100%;
+  background: #33ff55;
+  box-shadow: 0 0 0.3em rgba(51, 255, 85, 0.55);
+}
+
+.hud-vbar-label {
+  color: #e8e8e8;
+}
+
+/* --- Speed readout: small, unobtrusive, bottom-right of the viewport --- */
+
+#hud-speed {
+  position: absolute;
+  right: 1.5cqw;
+  bottom: 1.2cqw;
+  font-size: 2.2cqw;
+  color: rgba(200, 200, 200, 0.55);
+  pointer-events: none;
+}
+
+/* --- Mute indicator: small badge, bottom-left, empty text = invisible --- */
+#hud-mute {
+  position: absolute;
+  left: 1.5cqw;
+  bottom: 1.2cqw;
+  font-size: 2.2cqw;
+  color: #ff8833;
+  text-shadow: 0 0 0.2em rgba(255, 136, 51, 0.6);
+  pointer-events: none;
+  letter-spacing: 0.1em;
+}
+
+/* --- Radar: subtle dot-cluster, upper-right of the 3D view. No bezel/border
+   per the corrected visual spec — just a transparent canvas the dots float
+   on top of. --- */
+#radar {
+  position: absolute;
+  top: 13cqw;
+  right: 2.5cqw;
+  width: 16cqw;
+  height: 16cqw;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+/* --- Crosshair: first-person camera mode only, toggled via #stage's
+   data-camera attribute (see cameras.ts / app.ts). --- */
+#crosshair {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+#stage[data-camera='first-person'] #crosshair {
+  display: flex;
+}
+
+#crosshair span {
+  position: relative;
+  width: 1.2em;
+  height: 1.2em;
+}
+
+#crosshair span::before,
+#crosshair span::after {
+  content: '';
+  position: absolute;
+  background: rgba(200, 255, 200, 0.75);
+}
+
+#crosshair span::before {
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1.5px;
+  transform: translateX(-50%);
+}
+
+#crosshair span::after {
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  transform: translateY(-50%);
+}
+
+#overlay-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.level-card {
+  background: rgba(0, 0, 0, 0.75);
+  border: 2px solid #8f8;
+  color: #cfc;
+  padding: 1.5em 3em;
+  font-size: 2em;
+  letter-spacing: 0.1em;
+}
+
+.paused-card {
+  color: #9f9;
+  font-size: 2.4em;
+  letter-spacing: 0.3em;
+  text-shadow: 0 0 0.3em rgba(80, 255, 80, 0.6);
+}
+
+.gameover-card {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  color: #33ff55;
+  text-shadow: 0 0 0.2em rgba(51, 255, 85, 0.6);
+  pointer-events: none;
+  z-index: 20;
+}
+
+.gameover-card.visible {
+  display: flex;
+}
+
+.gameover-card .gameover-title {
+  font-size: 3em;
+  letter-spacing: 0.25em;
+}
+
+.gameover-card .gameover-stats {
+  font-size: 1.3em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2em;
+}
+
+.gameover-card .gameover-hint {
+  margin-top: 0.8em;
+  font-size: 1em;
+  opacity: 0.75;
+}
+
+/* ============================================================
+   Screens: main menu, tank setup, dialogs, quit-confirm (M9a/b)
+   ============================================================ */
+
+#screens-root {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 30;
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+  background: #000;
+  color: #ddd;
+  font-family: 'Courier New', monospace;
+}
+
+.screen.visible {
+  display: block;
+  pointer-events: auto;
+}
+
+/* --- Beveled Mac-style buttons, reused across menu/tank-setup/dialogs --- */
+.menu-button {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  font-size: 1.6cqw;
+  color: #111;
+  background: #a8a8a8;
+  border-top: 0.25cqw solid #e8e8e8;
+  border-left: 0.25cqw solid #e8e8e8;
+  border-right: 0.25cqw solid #4a4a4a;
+  border-bottom: 0.25cqw solid #4a4a4a;
+  padding: 0.6em 1.4em;
+  cursor: pointer;
+  min-width: 8em;
+}
+
+.menu-button:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.menu-button:active:not(:disabled) {
+  border-top-color: #4a4a4a;
+  border-left-color: #4a4a4a;
+  border-right-color: #e8e8e8;
+  border-bottom-color: #e8e8e8;
+}
+
+.menu-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.menu-button.selected {
+  outline: 2px solid #33ff55;
+  outline-offset: 2px;
+}
+
+/* --- Main menu --- */
+
+.screen-menu {
+  padding: 4cqw;
+}
+
+.spectre-wordmark {
+  position: absolute;
+  top: 4cqw;
+  left: 4cqw;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 6cqw;
+  letter-spacing: 0.03em;
+  background: linear-gradient(180deg, #fff 0%, #9a9a9a 30%, #4a4a4a 50%, #cfcfcf 68%, #fff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0.15cqw 0.15cqw rgba(0, 0, 0, 0.85));
+}
+
+.spectre-wordmark .tm {
+  font-size: 0.4em;
+  vertical-align: super;
+  -webkit-text-fill-color: #ccc;
+}
+
+.menu-decor {
+  position: absolute;
+  left: 3cqw;
+  top: 16cqw;
+  width: 60cqw;
+  height: 40cqw;
+  opacity: 0.9;
+}
+
+.menu-decor svg {
+  width: 100%;
+  height: 100%;
+}
+
+.menu-buttons {
+  position: absolute;
+  right: 4cqw;
+  top: 8cqw;
+  display: flex;
+  flex-direction: column;
+  gap: 1.6cqw;
+}
+
+.menu-footer {
+  position: absolute;
+  left: 3cqw;
+  bottom: 3cqw;
+  font-size: 1.1cqw;
+  color: #777;
+  max-width: 55cqw;
+}
+
+.menu-quit-note {
+  position: absolute;
+  left: 50%;
+  bottom: 10cqw;
+  transform: translateX(-50%);
+  font-size: 1.5cqw;
+  color: #ffee55;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid #ffee55;
+  padding: 0.6em 1.2em;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.menu-quit-note.visible {
+  opacity: 1;
+}
+
+/* --- Tank setup --- */
+
+.screen-tanksetup {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  padding: 4cqw 6cqw;
+  gap: 2cqw;
+  overflow-y: auto;
+}
+
+.screen-tanksetup.visible {
+  display: flex;
+}
+
+.tanksetup-title {
+  font-size: 3.5cqw;
+  letter-spacing: 0.3em;
+  color: #ffee55;
+  text-shadow: 0 0 0.2em rgba(255, 238, 85, 0.6);
+  margin-top: 2cqw;
+}
+
+.preset-row {
+  display: flex;
+  gap: 1.5cqw;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.preset-button {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  font-size: 1.5cqw;
+  color: #111;
+  background: #a8a8a8;
+  border-top: 0.25cqw solid #e8e8e8;
+  border-left: 0.25cqw solid #e8e8e8;
+  border-right: 0.25cqw solid #4a4a4a;
+  border-bottom: 0.25cqw solid #4a4a4a;
+  padding: 0.8em 1.6em;
+  cursor: pointer;
+}
+
+.preset-button.selected {
+  outline: 2px solid #33ff55;
+  outline-offset: 2px;
+}
+
+.tanksetup-preview {
+  color: #33ff55;
+  font-size: 1.6cqw;
+  min-height: 1.6em;
+}
+
+.custom-sliders {
+  display: none;
+  flex-direction: column;
+  gap: 0.8cqw;
+  width: min(70cqw, 500px);
+}
+
+.custom-sliders.visible {
+  display: flex;
+}
+
+.slider-row {
+  display: grid;
+  grid-template-columns: 6em 1fr 3em;
+  align-items: center;
+  gap: 1em;
+  font-size: 1.4cqw;
+  color: #ddd;
+}
+
+.slider-input {
+  width: 100%;
+}
+
+.slider-value {
+  text-align: right;
+  color: #33ff55;
+  font-variant-numeric: tabular-nums;
+}
+
+.budget-remaining {
+  color: #ffee55;
+  font-size: 1.3cqw;
+  text-align: center;
+}
+
+.tanksetup-actions {
+  display: flex;
+  gap: 1.5cqw;
+  margin-top: 1cqw;
+}
+
+/* --- Modal dialogs (About/Help/Scores) --- */
+
+.dialog-overlay {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 40;
+}
+
+.dialog-overlay.visible {
+  display: flex;
+  pointer-events: auto;
+}
+
+.dialog-panel {
+  position: relative;
+  background: #1a1a1a;
+  border-top: 0.2cqw solid #888;
+  border-left: 0.2cqw solid #888;
+  border-right: 0.2cqw solid #222;
+  border-bottom: 0.2cqw solid #222;
+  padding: 2cqw 2.5cqw;
+  max-width: 70cqw;
+  max-height: 70cqh;
+  overflow-y: auto;
+  color: #ddd;
+}
+
+.dialog-close {
+  position: absolute;
+  top: 0.5em;
+  right: 0.5em;
+  background: transparent;
+  border: none;
+  color: #aaa;
+  font-size: 1.8cqw;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.dialog-close:hover {
+  color: #fff;
+}
+
+.dialog-body h2 {
+  color: #ffee55;
+  margin-top: 0;
+}
+
+.dialog-body p {
+  font-size: 1.4cqw;
+  line-height: 1.5;
+}
+
+.controls-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 1.4cqw;
+}
+
+.controls-list li {
+  display: grid;
+  grid-template-columns: 8em 1fr;
+  gap: 1em;
+  padding: 0.3em 0;
+  border-bottom: 1px solid #333;
+}
+
+.controls-list li span:first-child {
+  color: #33ff55;
+}
+
+.scores-table {
+  border-collapse: collapse;
+  font-size: 1.4cqw;
+  width: 100%;
+}
+
+.scores-table th,
+.scores-table td {
+  padding: 0.3em 0.8em;
+  text-align: left;
+  border-bottom: 1px solid #333;
+}
+
+.scores-table th {
+  color: #33ff55;
+}
+
+/* --- Esc "return to menu?" confirm --- */
+
+.confirm-quit-overlay {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 25;
+}
+
+.confirm-quit-overlay.visible {
+  display: flex;
+  pointer-events: auto;
+}
+
+.confirm-quit-panel {
+  background: #1a1a1a;
+  border-top: 0.2cqw solid #888;
+  border-left: 0.2cqw solid #888;
+  border-right: 0.2cqw solid #222;
+  border-bottom: 0.2cqw solid #222;
+  padding: 2cqw 2.5cqw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2cqw;
+}
+
+.confirm-quit-message {
+  color: #ffee55;
+  font-size: 1.5cqw;
+  text-align: center;
+}
+
+.confirm-quit-actions {
+  display: flex;
+  gap: 1.5cqw;
+}
+
+.gameover-card .initials-form {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5em;
+  pointer-events: auto;
+  margin-top: 0.5em;
+}
+
+.gameover-card .initials-form.visible {
+  display: flex;
+}
+
+.gameover-card .initials-label {
+  font-size: 1em;
+  color: #ffee55;
+  text-shadow: 0 0 0.2em rgba(255, 238, 85, 0.6);
+}
+
+.gameover-card .initials-input {
+  font-family: 'Menlo', 'Consolas', monospace;
+  font-size: 1.6em;
+  letter-spacing: 0.4em;
+  text-align: center;
+  text-transform: uppercase;
+  width: 3.2em;
+  background: #000;
+  color: #33ff55;
+  border: 2px solid #33ff55;
+  padding: 0.15em 0.3em;
+}

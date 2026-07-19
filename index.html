@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spectre</title>
+    <link rel="stylesheet" href="/src/hud/style.css" />
+  </head>
+  <body>
+    <div id="stage">
+      <canvas id="viewport"></canvas>
+
+      <div id="hud-top">
+        <div class="hud-col hud-col-left">
+          <div class="hud-row">
+            <span class="hud-label">Lives:</span>
+            <span class="hud-value hud-green" id="hud-lives">3</span>
+            <span class="hud-label hud-flags-label">Flags:</span>
+            <span class="hud-value hud-green" id="hud-flags">0/10</span>
+          </div>
+          <div class="hud-row">
+            <span class="hud-label">Damage:</span>
+            <span class="hud-bar hud-bar-damage"><span class="hud-bar-fill" id="hud-damage-fill"></span></span>
+          </div>
+          <div class="hud-row">
+            <span class="hud-label">Ammo:</span>
+            <span class="hud-bar hud-bar-ammo"><span class="hud-bar-fill" id="hud-ammo-fill"></span></span>
+            <span class="hud-value hud-green" id="hud-ammo">80</span>
+          </div>
+        </div>
+
+        <div class="hud-col hud-col-center">
+          <div class="hud-row"><span class="hud-label">Score:</span><span class="hud-digits" id="hud-score">00</span></div>
+          <div class="hud-row"><span class="hud-label">Level:</span><span class="hud-digits" id="hud-level">01</span></div>
+          <div class="hud-row"><span class="hud-label">Bonus:</span><span class="hud-digits" id="hud-bonus">000</span></div>
+        </div>
+
+        <div class="hud-col hud-col-right">
+          <div class="hud-vbar"><div class="hud-vbar-fill" id="hud-shield-fill"></div></div>
+          <div class="hud-vbar-label">H</div>
+        </div>
+      </div>
+
+      <div id="hud-speed">0.0</div>
+      <div id="hud-mute"></div>
+
+      <canvas id="radar" width="96" height="96"></canvas>
+      <div id="crosshair"><span></span></div>
+
+      <div id="overlay-layer"></div>
+      <div id="screens-root"></div>
+    </div>
+    <script type="module" src="/src/game/app.ts"></script>
+  </body>
+</html>
