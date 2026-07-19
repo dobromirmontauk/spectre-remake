@@ -103,3 +103,20 @@ export const PLAYER_TANK_COLORS: TankHullColors = { top: 0x88ff88, side: 0x22662
 export const PLAYER2_TANK_COLORS: TankHullColors = { top: 0x7fd4ff, side: 0x0e4a66, front: 0x2ab0e6 };
 export const DRONE_TANK_COLORS: TankHullColors = { top: 0xff6666, side: 0x881111, front: 0xdd2222 };
 export const HUNTER_TANK_COLORS: TankHullColors = { top: 0xffb347, side: 0x8a4500, front: 0xff8c1a };
+
+// Per-slot player hull colors (index = player slot, 0-7) — the N-player
+// generalization of PLAYER_TANK_COLORS/PLAYER2_TANK_COLORS above. Slots 0/1
+// are those two colors VERBATIM (today's solo/2P look must not shift); slots
+// 2-7 add magenta, silver, violet, deep blue, mint, and tan — chosen to stay
+// visually distinct from each other and from the red/orange enemy hulls and
+// the yellow obstacle/windmill palette.
+export const PLAYER_TANK_COLOR_SLOTS: TankHullColors[] = [
+  PLAYER_TANK_COLORS, // slot 0 — green (unchanged)
+  PLAYER2_TANK_COLORS, // slot 1 — cyan/blue (unchanged)
+  { top: 0xff88ee, side: 0x661144, front: 0xdd33aa }, // slot 2 — magenta/pink
+  { top: 0xdddddd, side: 0x555555, front: 0x999999 }, // slot 3 — silver
+  { top: 0xb388ff, side: 0x442266, front: 0x8844cc }, // slot 4 — violet
+  { top: 0x6688ff, side: 0x102255, front: 0x3355cc }, // slot 5 — deep blue
+  { top: 0x99ffcc, side: 0x115533, front: 0x33cc88 }, // slot 6 — mint
+  { top: 0xe0c090, side: 0x664422, front: 0xc09960 }, // slot 7 — tan
+];

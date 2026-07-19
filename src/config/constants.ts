@@ -199,13 +199,66 @@ export const UNSTICK_DURATION_TICKS = 21; // ~0.7s reverse-and-turn maneuver
 export const ENEMY_RESPAWN_TICKS = 120; // ~4s after death
 export const ENEMY_MIN_SPAWN_DIST_FROM_PLAYER = 40;
 export const HUNTER_SHIELD_BONUS = 2; // hunters are tougher than drones at the same level
+// Enemies have unlimited ammo; a plain large finite number instead of
+// Infinity so GameState (and enemy.ammo/maxAmmo) stays JSON round-trip safe
+// — JSON.stringify(Infinity) produces `null`, which would silently corrupt
+// state on any serialize/deserialize (the sim/hash.ts walk, and later the
+// network wire format, both depend on state staying exactly reconstructible
+// from its JSON form).
+export const ENEMY_AMMO = 999999;
 
-// --- Local multiplayer (2P co-op / duel) ---
+// --- Local multiplayer (2P co-op / duel) / N-player prep (net play, M2-M5) ---
+export const MAX_PLAYERS = 8;
 export const DUEL_KILL_TARGET = 5; // first player to this many kills wins the duel
 export const DUEL_RESPAWN_TICKS = SIM_HZ * 2; // ~2s dead before respawning
 export const DUEL_RESPAWN_INVULN_TICKS = SIM_HZ * 1.5; // ~1.5s brief invuln after a duel respawn
 export const DUEL_SPAWN_EDGE_MARGIN = 20; // duel spawns sit this far in from the arena edge, on opposite sides
+export const COOP_SPAWN_OFFSET = 5; // slot 1's co-op spawn offset east of center (unchanged legacy value)
 export const SPLIT_SCREEN_DIVIDER_PX = 2; // width of the vertical divider line between 2P viewports
+
+export interface SpawnPoint {
+  x: number;
+  z: number;
+  heading: number;
+}
+
+// Fixed per-slot spawn points, index = player slot (0-7). Slots 0/1 reproduce
+// today's coop/duel spawns exactly (byte-identical regression requirement);
+// slots 2-7 aren't reachable by any local flow today (max 2 local players) —
+// they exist so the sim already has a defined, deterministic answer once net
+// play (M2-M5) allows 3-8 players. Exact double literals, computed OFFLINE
+// (see the node one-liner in the M1 commit that generated them) rather than
+// with runtime trig, per the sim purity rule (no Math.sin/cos at spawn time).
+//
+// Slots are placed via a bit-reversal ordering around the arena (0, 4, 2, 6,
+// 1, 5, 3, 7 in angular order) so that adding players one at a time always
+// keeps them maximally spread out, rather than clustering the 3rd/4th/5th
+// player into one arc while the far side of the arena sits empty.
+export const DUEL_SPAWN_POINTS: SpawnPoint[] = [
+  { x: 0, z: -80, heading: 0 }, // slot 0 — unchanged: south edge, facing north
+  { x: 0, z: 80, heading: Math.PI }, // slot 1 — unchanged: north edge, facing south
+  { x: -80, z: 0, heading: 1.5707963267948966 },
+  { x: 80, z: 0, heading: -1.5707963267948966 },
+  { x: -56.5685424949238, z: -56.56854249492382, heading: 0.7853981633974483 },
+  { x: 56.56854249492379, z: 56.56854249492382, heading: -2.356194490192344 },
+  { x: -56.56854249492382, z: 56.56854249492379, heading: 2.356194490192344 },
+  { x: 56.56854249492387, z: -56.56854249492373, heading: -0.7853981633974492 },
+];
+
+// Co-op has no "facing an opponent" requirement, so extra slots just ring the
+// center at a wider radius than the legacy slot-1 offset (facing heading 0,
+// same as everyone else — cooperative, not adversarial). Same bit-reversal
+// angular placement as the duel ring, computed offline.
+export const COOP_SPAWN_POINTS: SpawnPoint[] = [
+  { x: 0, z: 0, heading: 0 }, // slot 0 — unchanged: arena center
+  { x: COOP_SPAWN_OFFSET, z: 0, heading: 0 }, // slot 1 — unchanged: COOP_SPAWN_OFFSET east of center
+  { x: -15, z: 0, heading: 0 },
+  { x: 15, z: 0, heading: 0 },
+  { x: -10.606601717798211, z: -10.606601717798215, heading: 0 },
+  { x: 10.60660171779821, z: 10.606601717798215, heading: 0 },
+  { x: -10.606601717798215, z: 10.60660171779821, heading: 0 },
+  { x: 10.606601717798226, z: -10.6066017177982, heading: 0 },
+];
 
 // --- Lives / scoring / bonus ---
 export const PLAYER_LIVES_START = 3;

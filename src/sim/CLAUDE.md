@@ -5,6 +5,20 @@
 `GameState` must stay JSON-serializable (this is the future multiplayer wire contract; lockstep
 replays `step(state, commandsByTankId)`).
 
+**No native trig/hypot** — `Math.sin/cos/atan2/hypot` are not bit-identical across JS engines (only
+"implementation-approximated", per spec), which desyncs a future lockstep match tick by tick. Use
+`dmath.ts`'s `dsin/dcos/datan2/dlen` instead — built only from `+ - * /`, comparisons, and
+`Math.sqrt/abs/floor` (all IEEE-754-exact), so they're bit-identical everywhere. `scripts/check-sim-purity.mjs`
+(wired into `npm run build`) fails the build if a forbidden `Math.*` call (or `Date./performance./.sort(/new Set(/new Map(`)
+shows up anywhere in `sim/` outside `dmath.ts` itself. `players[]` slots and enemy/projectile/grenade ids
+must also stay reconstructible from `(state, commands)` alone — no module-global counters (`ai.ts` learned
+this the hard way; see its `createEnemy` doc comment) — because `hash.ts`'s `hashState()` and any future
+network replay both depend on it.
+
+**Players are N, not 2**: `GameState.players: PlayerState[]`, slot order == array order (solo = 1 entry,
+local 2P = 2, net play M2+ up to 8). Tank ids stay the strings `'player'`/`'player2'` for slots 0/1
+(events, kill credit, and Playwright expectations all key off those two); slot ≥2 uses `'player3'..'player8'`.
+
 ## Tick order (`simulation.ts` step)
 
 1. Build commands (player command passed in; `ai.ts` produces enemy commands — same `Command` type)

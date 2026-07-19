@@ -1,5 +1,6 @@
 import type { Loadout, MovementParams, TankState } from './types.ts';
 import type { Command } from './commands.ts';
+import { dcos, dsin } from './dmath.ts';
 import {
   SIM_DT,
   TURN_RATE,
@@ -19,8 +20,8 @@ import {
 export type { MovementParams };
 
 // Balanced-preset defaults; also the fallback for any call site that doesn't
-// pass params explicitly (enemies always pass their own; the player passes
-// state.playerMovement, derived below from the chosen Loadout).
+// pass params explicitly (enemies always pass their own; each player passes
+// their own PlayerState.movement, derived below from their chosen Loadout).
 export const PLAYER_MOVEMENT_PARAMS: MovementParams = {
   turnRate: TURN_RATE,
   thrustAccel: THRUST_ACCEL,
@@ -71,6 +72,6 @@ export function applyMovement(tank: TankState, cmd: Command, params: MovementPar
 
   tank.speed = Math.max(-params.maxReverseSpeed, Math.min(params.maxSpeed, tank.speed));
 
-  tank.position.x += Math.sin(tank.heading) * tank.speed * SIM_DT;
-  tank.position.z += Math.cos(tank.heading) * tank.speed * SIM_DT;
+  tank.position.x += dsin(tank.heading) * tank.speed * SIM_DT;
+  tank.position.z += dcos(tank.heading) * tank.speed * SIM_DT;
 }

@@ -36,7 +36,9 @@ input/keyboard.ts → Command → sim/ (pure, 30 Hz fixed tick) → state + even
 Playwright against the dev server + `window.__game` debug API:
 `getState()` (JSON snapshot), `pause/resume`, `stepTicks(n)`, `pressCommand(cmd, ticks)`, `fire()`,
 `setLevel(n)`, `collectAllFlags()`, `setGod(b)`, `spawnEnemyAt(x,z,kind)`, `killAllEnemies()`,
-`setLives(n)`, `cycleCamera()`, `restart()`, `gotoMenu()`, `startGame(loadout?)`, `setFilled(b)`, `setMuted(b)`.
+`setLives(n)`, `cycleCamera()`, `restart()`, `gotoMenu()`, `startGame(loadout?, {mode, loadout2}?)`,
+`setFilled(b)`, `setMuted(b)`, `hashState()` (deterministic state checksum, `sim/hash.ts` — the
+desync-detection primitive for lockstep multiplayer).
 
 Drive real keyboard keys for input-layer checks (the debug API bypasses `keyboard.ts`).
 Visual ground truth: `reference/original/` (original-game screenshots + side-by-side). Past verification shots: `reference/verification/`.

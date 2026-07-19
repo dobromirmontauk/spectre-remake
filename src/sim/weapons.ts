@@ -4,6 +4,7 @@
 import type { GameState, TankState, Vec2 } from './types.ts';
 import type { SimEvent } from './events.ts';
 import { segmentVsAABB, segmentVsCircle } from './collision.ts';
+import { dcos, dsin } from './dmath.ts';
 import {
   ARENA_HALF_SIZE,
   ENEMY_DAMAGE_PER_SHOT,
@@ -19,7 +20,11 @@ import {
   TANK_RADIUS,
 } from '../config/constants.ts';
 
-function nextId(state: GameState, prefix: string): string {
+// Exported so simulation.ts's debug-only spawnEnemyAt can mint an id the
+// same way projectiles/grenades do, keeping every runtime-created (as
+// opposed to level-roster) entity on the single shared state.nextEntityId
+// counter — see ai.ts createEnemy's doc comment for why that matters.
+export function nextId(state: GameState, prefix: string): string {
   return `${prefix}-${state.nextEntityId++}`;
 }
 
@@ -27,8 +32,8 @@ function nextId(state: GameState, prefix: string): string {
 // it doesn't immediately register as originating inside the firer.
 function noseOf(tank: TankState, aheadDistance: number): Vec2 {
   return {
-    x: tank.position.x + Math.sin(tank.heading) * aheadDistance,
-    z: tank.position.z + Math.cos(tank.heading) * aheadDistance,
+    x: tank.position.x + dsin(tank.heading) * aheadDistance,
+    z: tank.position.z + dcos(tank.heading) * aheadDistance,
   };
 }
 
@@ -61,11 +66,11 @@ export function fireGrenade(state: GameState, owner: TankState, heading: number,
 }
 
 function allTanks(state: GameState): TankState[] {
-  return [state.player, ...(state.player2 ? [state.player2] : []), ...state.enemies];
+  return [...state.players, ...state.enemies];
 }
 
-function isPlayerTankId(id: string): boolean {
-  return id === 'player' || id === 'player2';
+function isPlayerTankId(state: GameState, id: string): boolean {
+  return state.players.some((p) => p.id === id);
 }
 
 function damageTank(state: GameState, target: TankState, shooterId: string, isPlayerTarget: boolean): void {
@@ -88,8 +93,8 @@ export function updateProjectiles(state: GameState, events: SimEvent[]): void {
   for (const shot of state.projectiles) {
     shot.prevPosition = { ...shot.position };
     shot.position = {
-      x: shot.position.x + Math.sin(shot.heading) * shot.speed * SIM_DT,
-      z: shot.position.z + Math.cos(shot.heading) * shot.speed * SIM_DT,
+      x: shot.position.x + dsin(shot.heading) * shot.speed * SIM_DT,
+      z: shot.position.z + dcos(shot.heading) * shot.speed * SIM_DT,
     };
     shot.ticksRemaining--;
 
@@ -99,10 +104,10 @@ export function updateProjectiles(state: GameState, events: SimEvent[]): void {
       if (target.id === shot.ownerId || !target.alive) continue;
       // Co-op has no friendly fire: a shot from one player passes straight
       // through the other rather than registering a hit.
-      if (state.mode === 'coop' && isPlayerTankId(target.id) && isPlayerTankId(shot.ownerId)) continue;
+      if (state.mode === 'coop' && isPlayerTankId(state, target.id) && isPlayerTankId(state, shot.ownerId)) continue;
       const hit = segmentVsCircle(shot.prevPosition, shot.position, target.position, TANK_RADIUS + PROJECTILE_RADIUS);
       if (!hit.hit) continue;
-      const isPlayerTarget = isPlayerTankId(target.id);
+      const isPlayerTarget = isPlayerTankId(state, target.id);
       damageTank(state, target, shot.ownerId, isPlayerTarget);
       events.push({ type: 'ShotHit', position: hit.point, targetKind: isPlayerTarget ? 'player' : 'enemy' });
       consumed = true;
@@ -154,8 +159,8 @@ export function updateGrenades(state: GameState, events: SimEvent[]): void {
   for (const grenade of state.grenades) {
     grenade.prevPosition = { ...grenade.position };
     grenade.position = {
-      x: grenade.position.x + Math.sin(grenade.heading) * grenade.speed * SIM_DT,
-      z: grenade.position.z + Math.cos(grenade.heading) * grenade.speed * SIM_DT,
+      x: grenade.position.x + dsin(grenade.heading) * grenade.speed * SIM_DT,
+      z: grenade.position.z + dcos(grenade.heading) * grenade.speed * SIM_DT,
     };
     grenade.fuseTicksRemaining--;
 

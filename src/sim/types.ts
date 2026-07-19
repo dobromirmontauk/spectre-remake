@@ -34,6 +34,13 @@ export interface Loadout {
   ammo: number; // player maxAmmo (cap 127)
 }
 
+// One roster entry passed to sim/simulation.ts createInitialState/
+// resetGameWithRoster — array index becomes the player's slot (0-7).
+export interface PlayerSpec {
+  loadout: Loadout;
+  name?: string; // defaults to "Player N" (1-indexed) if omitted
+}
+
 export interface TankState {
   id: string;
   position: Vec2;
@@ -48,9 +55,23 @@ export interface TankState {
   alive: boolean;
   fireCooldown: number; // ticks remaining until cannon can fire again
   grenadeCooldown: number; // ticks remaining until grenade can be thrown again (player only)
-  invulnerableTicks: number; // per-tank so two human players can be invulnerable independently (post-respawn brief window)
+  invulnerableTicks: number; // per-tank so multiple human players can be invulnerable independently (post-respawn brief window)
   lastHitBy: string | null; // id of the tank whose shot/grenade last damaged this one; used for duel kill credit
   respawnTicksRemaining: number; // 0 while alive; counts down to respawn (enemies always; players only in duel mode)
+}
+
+// A human-controlled tank, one per slot (0-7). Tank ids stay the strings
+// 'player'/'player2' for slots 0/1 (existing events, kill credit, and
+// Playwright expectations all key off those two strings); slots above that
+// use 'player3'..'player8'. See config/constants.ts SpawnPoint tables for
+// where each slot spawns per mode.
+export interface PlayerState extends TankState {
+  slot: number; // 0-7, stable for the whole match — index into players[] and into PLAYER_TANK_COLOR_SLOTS/spawn tables
+  lives: number; // solo/coop only (each player has an independent pool); unused (0) in duel, which respawns on a timer instead
+  kills: number; // duel-only kill tally credited to this player; unused (0) outside duel
+  loadout: Loadout;
+  movement: MovementParams; // derived from `loadout` once at game start, see sim/movement.ts deriveMovementParams
+  name: string; // display name (net play; local play uses "Player N")
 }
 
 export type EnemyKind = 'drone' | 'hunter';
@@ -129,12 +150,7 @@ export interface GameState {
   level: number;
   rng: RngState;
   mode: GameMode;
-  loadout: Loadout;
-  playerMovement: MovementParams; // derived from `loadout` once at game start; see sim/movement.ts
-  player: TankState;
-  loadout2: Loadout; // player2's chosen loadout; meaningful only when player2 is non-null
-  player2Movement: MovementParams; // derived from `loadout2`, mirrors playerMovement
-  player2: TankState | null; // second human tank; present only in 'coop'/'duel'
+  players: PlayerState[]; // slot order == array order; solo has exactly one (slot 0)
   obstacles: Obstacle[];
   flags: Flag[];
   pickups: Pickup[];
@@ -142,14 +158,11 @@ export interface GameState {
   enemies: EnemyState[];
   projectiles: Projectile[];
   grenades: Grenade[];
-  lives: number; // player's lives (solo and coop)
-  lives2: number; // player2's lives (coop only; unused in solo/duel)
   score: number; // shared score in solo/coop; unused in duel
   bonusRemaining: number; // per-level time bonus, counts down; added to score on LevelComplete
-  kills: { player: number; player2: number }; // duel kill tally; {0,0} and unused outside duel
-  winner: 'player' | 'player2' | null; // duel-only: set once a side reaches DUEL_KILL_TARGET
+  winner: string | null; // duel-only: id of the player who reached DUEL_KILL_TARGET
   gameOver: boolean;
-  god: boolean; // debug: player takes no damage
+  god: boolean; // debug: slot-0 player takes no damage
   nextEntityId: number; // monotonic counter for enemy/projectile/grenade ids
   events: SimEvent[]; // this tick's events; consumers drain per render frame
 }

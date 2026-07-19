@@ -1,5 +1,6 @@
 import type { Flag, Obstacle, Pickup, PickupKind, Vec2 } from './types.ts';
 import { createRng } from './rng.ts';
+import { dlen } from './dmath.ts';
 import {
   ARENA_HALF_SIZE,
   EDGE_MARGIN,
@@ -70,7 +71,7 @@ export function buildLevel(levelNum: number): LevelLayout {
     const center = randomPoint();
     const sizeX = WALL_MIN_SIZE + rng.next() * (WALL_MAX_SIZE - WALL_MIN_SIZE);
     const sizeZ = WALL_MIN_SIZE + rng.next() * (WALL_MAX_SIZE - WALL_MIN_SIZE);
-    const boundingRadius = Math.hypot(sizeX, sizeZ) / 2;
+    const boundingRadius = dlen(sizeX, sizeZ) / 2;
     if (!farEnough(center, boundingRadius)) continue;
 
     obstacles.push({

@@ -1,4 +1,4 @@
-import type { EnemyState, GameMode, GameState, Loadout, TankState, Vec2 } from './types.ts';
+import type { EnemyState, GameMode, GameState, Loadout, PlayerSpec, PlayerState, TankState, Vec2 } from './types.ts';
 import type { Command } from './commands.ts';
 import { NEUTRAL_COMMAND } from './commands.ts';
 import type { SimEvent } from './events.ts';
@@ -14,18 +14,19 @@ import {
   pickEdgeSpawnPoint,
   updateStuckDetection,
 } from './ai.ts';
-import { fireGrenade, fireProjectile, updateGrenades, updateProjectiles } from './weapons.ts';
+import { fireGrenade, fireProjectile, nextId, updateGrenades, updateProjectiles } from './weapons.ts';
 import { levelConfig, type LevelConfig } from '../config/levels.ts';
 import {
   AMMO_PER_SHOT,
   ARENA_HALF_SIZE,
   BONUS_DECAY_INTERVAL_TICKS,
   BONUS_START,
+  COOP_SPAWN_POINTS,
   DEFAULT_LOADOUT,
   DUEL_KILL_TARGET,
   DUEL_RESPAWN_INVULN_TICKS,
   DUEL_RESPAWN_TICKS,
-  DUEL_SPAWN_EDGE_MARGIN,
+  DUEL_SPAWN_POINTS,
   ENEMY_RESPAWN_TICKS,
   ENEMY_SEED_SALT,
   ENEMY_TANK_RADIUS,
@@ -45,11 +46,41 @@ import {
   TANK_RADIUS,
   WALL_STOPS_DEAD,
   WINDMILL_SPIN_RATE,
+  type SpawnPoint,
 } from '../config/constants.ts';
 
-function createPlayer(id: string, loadout: Loadout): TankState {
+// Tank id strings stay 'player'/'player2' for slots 0/1 (existing events,
+// kill credit, and Playwright expectations all key off those two strings —
+// see sim/types.ts PlayerState); slots above that use 'player3'..'player8'.
+function playerIdForSlot(slot: number): string {
+  return slot === 0 ? 'player' : slot === 1 ? 'player2' : `player${slot + 1}`;
+}
+
+function defaultPlayerName(slot: number): string {
+  return `Player ${slot + 1}`;
+}
+
+// Where a player tank appears at the start of a level (solo/coop) or after a
+// duel respawn — a fixed per-slot table (config/constants.ts), not computed
+// trig, so it stays reproducible from (slot, mode) alone. Slots 0/1 exactly
+// reproduce the pre-refactor solo/coop/duel spawns.
+function spawnForSlot(slot: number, mode: GameMode): SpawnPoint {
+  const table = mode === 'duel' ? DUEL_SPAWN_POINTS : COOP_SPAWN_POINTS;
+  return table[slot] ?? table[table.length - 1]!;
+}
+
+function applySpawn(tank: TankState, spawn: SpawnPoint): void {
+  tank.position = { x: spawn.x, z: spawn.z };
+  tank.prevPosition = { x: spawn.x, z: spawn.z };
+  tank.heading = spawn.heading;
+  tank.prevHeading = spawn.heading;
+  tank.speed = 0;
+}
+
+function createPlayerState(slot: number, loadout: Loadout, name: string): PlayerState {
   return {
-    id,
+    id: playerIdForSlot(slot),
+    slot,
     position: { x: 0, z: 0 },
     prevPosition: { x: 0, z: 0 },
     heading: 0,
@@ -65,40 +96,19 @@ function createPlayer(id: string, loadout: Loadout): TankState {
     invulnerableTicks: 0,
     lastHitBy: null,
     respawnTicksRemaining: 0,
+    lives: PLAYER_LIVES_START,
+    kills: 0,
+    loadout,
+    movement: deriveMovementParams(loadout),
+    name,
   };
 }
 
-// Where a player tank appears at the start of a level (solo/coop) or after a
-// duel respawn. 'player' always spawns at arena center in solo/coop (matches
-// the original, untouched); 'player2' spawns a short hop away in coop so the
-// two tanks don't start stacked. Duel spawns both tanks at opposite arena
-// edges, facing each other, since there's no shared "level start" to share.
-const COOP_SPAWN_OFFSET = 5; // > 2*TANK_RADIUS so the two tanks don't spawn overlapping and shove each other apart on tick 1
-
-function spawnForTank(tankId: string, mode: GameMode): { position: Vec2; heading: number } {
-  if (mode === 'duel') {
-    const edge = ARENA_HALF_SIZE - DUEL_SPAWN_EDGE_MARGIN;
-    return tankId === 'player' ? { position: { x: 0, z: -edge }, heading: 0 } : { position: { x: 0, z: edge }, heading: Math.PI };
-  }
-  if (tankId === 'player2') return { position: { x: COOP_SPAWN_OFFSET, z: 0 }, heading: 0 };
-  return { position: { x: 0, z: 0 }, heading: 0 };
-}
-
-function applySpawn(tank: TankState, spawn: { position: Vec2; heading: number }): void {
-  tank.position = { ...spawn.position };
-  tank.prevPosition = { ...spawn.position };
-  tank.heading = spawn.heading;
-  tank.prevHeading = spawn.heading;
-  tank.speed = 0;
-}
-
 // Every alive human-controlled tank this tick — the shared collection point
-// for AI targeting (nearest alive player) and co-op flag/pickup pickup.
-export function alivePlayers(state: GameState): TankState[] {
-  const players: TankState[] = [];
-  if (state.player.alive) players.push(state.player);
-  if (state.player2 && state.player2.alive) players.push(state.player2);
-  return players;
+// for co-op flag/pickup pickup (AI targeting has its own iteration in
+// ai.ts's nearestAlivePlayer, which needs early-out-free access to state.players).
+export function alivePlayers(state: GameState): PlayerState[] {
+  return state.players.filter((p) => p.alive);
 }
 
 function enemySeedFor(level: number): number {
@@ -106,10 +116,15 @@ function enemySeedFor(level: number): number {
 }
 
 // Duel has no AI combatants at all; solo/coop use the usual level roster.
+// Roster enemy ids are level-qualified (`enemy-L{level}-{i}`) rather than
+// drawn from a session-lifetime counter — see ai.ts createEnemy's doc
+// comment for why (reconstructibility from (state, commands) alone, and
+// cross-peer hash agreement). They stay unique across levels (needed
+// because the renderer caches meshes by id and never re-checks `kind`).
 function buildEnemies(level: number, mode: GameMode): EnemyState[] {
   if (mode === 'duel') return [];
   const cfg = levelConfig(level);
-  return buildEnemyRoster(enemySeedFor(level), cfg).map((spec) => createEnemy(spec.position, spec.kind, cfg));
+  return buildEnemyRoster(enemySeedFor(level), cfg).map((spec, i) => createEnemy(spec.position, spec.kind, cfg, `enemy-L${level}-${i}`));
 }
 
 // Duel has no flags (kill-count decides the match, not a level clear) —
@@ -120,30 +135,23 @@ function layoutForMode(level: number, mode: GameMode): LevelLayout {
   return layout;
 }
 
-export function createInitialState(
-  level: number,
-  loadout: Loadout = DEFAULT_LOADOUT,
-  mode: GameMode = 'solo',
-  loadout2: Loadout = DEFAULT_LOADOUT,
-): GameState {
+// Builds a brand-new GameState for `specs.length` players (array index =
+// slot). Solo is just `[{ loadout }]`, mode defaulted to 'solo'.
+export function createInitialState(level: number, specs: PlayerSpec[], mode: GameMode = 'solo'): GameState {
   const layout = layoutForMode(level, mode);
-  const player = createPlayer('player', loadout);
-  applySpawn(player, spawnForTank('player', mode));
 
-  const player2 = mode === 'solo' ? null : createPlayer('player2', loadout2);
-  if (player2) applySpawn(player2, spawnForTank('player2', mode));
+  const players: PlayerState[] = specs.map((spec, slot) => {
+    const player = createPlayerState(slot, spec.loadout, spec.name ?? defaultPlayerName(slot));
+    applySpawn(player, spawnForSlot(slot, mode));
+    return player;
+  });
 
   return {
     tick: 0,
     level,
     rng: createRng(LEVELGEN_SEED_BASE ^ level),
     mode,
-    loadout,
-    playerMovement: deriveMovementParams(loadout),
-    player,
-    loadout2,
-    player2Movement: deriveMovementParams(loadout2),
-    player2,
+    players,
     obstacles: layout.obstacles,
     flags: layout.flags,
     pickups: layout.pickups,
@@ -151,11 +159,8 @@ export function createInitialState(
     enemies: buildEnemies(level, mode),
     projectiles: [],
     grenades: [],
-    lives: PLAYER_LIVES_START,
-    lives2: PLAYER_LIVES_START,
     score: 0,
     bonusRemaining: BONUS_START,
-    kills: { player: 0, player2: 0 },
     winner: null,
     gameOver: false,
     god: false,
@@ -168,8 +173,8 @@ export function createInitialState(
 // Called by rebuildLevel for every present player — this is what makes a
 // co-op player eliminated (0 lives) earlier in the level come back the
 // moment the level clears, with no special-casing needed here.
-function resetPlayerForLevel(state: GameState, player: TankState): void {
-  applySpawn(player, spawnForTank(player.id, state.mode));
+function resetPlayerForLevel(state: GameState, player: PlayerState): void {
+  applySpawn(player, spawnForSlot(player.slot, state.mode));
   player.alive = true;
   player.fireCooldown = 0;
   player.grenadeCooldown = 0;
@@ -185,7 +190,7 @@ function resetPlayerForLevel(state: GameState, player: TankState): void {
 // Rebuilds the arena for `level` in place, resetting all present players to
 // spawn and repopulating enemies. Called by game/flow.ts on LevelComplete, or
 // directly by debug hooks. Lives/score/god persist across levels; only a full
-// resetGame()/resetGameWithLoadout() clears those.
+// resetGameWithRoster()/resetGameWithLoadout() clears those.
 export function rebuildLevel(state: GameState, level: number): void {
   const layout = layoutForMode(level, state.mode);
   state.level = level;
@@ -198,28 +203,45 @@ export function rebuildLevel(state: GameState, level: number): void {
   state.grenades = [];
   state.bonusRemaining = BONUS_START;
 
-  resetPlayerForLevel(state, state.player);
-  if (state.player2) resetPlayerForLevel(state, state.player2);
+  for (const player of state.players) resetPlayerForLevel(state, player);
 }
 
-// Full reset to a fresh game with the current loadout/mode — used by the
-// debug `restart` hook (bypasses the menu/tank-setup flow for deterministic
-// tests).
+// Full reset to a fresh game keeping the CURRENT roster/mode/loadouts —
+// used by the debug `restart` hook (game/flow.ts's Enter-to-restart fast
+// path, bypassing the menu/tank-setup flow for deterministic tests). Revives
+// every player and clears lives/kills/score/winner; use resetGameWithRoster
+// (or the resetGameWithLoadout wrapper) to change the roster/mode itself.
 export function resetGame(state: GameState): void {
   state.tick = 0;
-  state.lives = PLAYER_LIVES_START;
-  state.lives2 = PLAYER_LIVES_START;
   state.score = 0;
-  state.kills = { player: 0, player2: 0 };
   state.winner = null;
   state.gameOver = false;
+  for (const player of state.players) {
+    player.lives = PLAYER_LIVES_START;
+    player.kills = 0;
+  }
   rebuildLevel(state, 1);
 }
 
-// Full reset to a fresh game with a newly-chosen loadout (and, for 2P modes,
-// a mode + player2 loadout) — used by the tank-setup screen's "Start" button
-// (see game/flow.ts / debug `startGame`). Omitting `opts` reproduces the
-// original 1-player-only behavior exactly.
+// Full reset to a fresh game with a chosen player roster/mode — used by the
+// tank-setup screen's "Start" button and the debug `startGame` hook. Array
+// index of `specs` becomes the player's slot (0-7); slots 0/1 keep the
+// 'player'/'player2' ids so existing events/kill-credit/tests keep working.
+export function resetGameWithRoster(state: GameState, specs: PlayerSpec[], level = 1, mode: GameMode = 'solo'): void {
+  state.mode = mode;
+  state.players = specs.map((spec, slot) => createPlayerState(slot, spec.loadout, spec.name ?? defaultPlayerName(slot)));
+  state.tick = 0;
+  state.score = 0;
+  state.winner = null;
+  state.gameOver = false;
+  rebuildLevel(state, level); // spawns + refills shield/ammo to the new maxes (REFILL_ON_LEVEL_START)
+}
+
+// Thin wrapper preserving the exact pre-refactor call signature (loadout,
+// level, {mode, loadout2}) so screens.ts/debug.ts/app.ts call sites are
+// unchanged — omitting `opts` reproduces the original 1-player-only behavior
+// exactly. Only ever produces 1 (solo) or 2 (coop/duel) players; use
+// resetGameWithRoster directly for 3-8 (net play, M2+).
 export function resetGameWithLoadout(
   state: GameState,
   loadout: Loadout,
@@ -227,31 +249,8 @@ export function resetGameWithLoadout(
   opts: { mode?: GameMode; loadout2?: Loadout } = {},
 ): void {
   const mode = opts.mode ?? 'solo';
-  state.mode = mode;
-  state.loadout = loadout;
-  state.playerMovement = deriveMovementParams(loadout);
-  state.player.maxShield = loadout.shields;
-  state.player.maxAmmo = loadout.ammo;
-
-  if (mode === 'solo') {
-    state.player2 = null;
-  } else {
-    const loadout2 = opts.loadout2 ?? DEFAULT_LOADOUT;
-    state.loadout2 = loadout2;
-    state.player2Movement = deriveMovementParams(loadout2);
-    if (!state.player2) state.player2 = createPlayer('player2', loadout2);
-    state.player2.maxShield = loadout2.shields;
-    state.player2.maxAmmo = loadout2.ammo;
-  }
-
-  state.tick = 0;
-  state.lives = PLAYER_LIVES_START;
-  state.lives2 = PLAYER_LIVES_START;
-  state.score = 0;
-  state.kills = { player: 0, player2: 0 };
-  state.winner = null;
-  state.gameOver = false;
-  rebuildLevel(state, level); // refills shield/ammo to the new maxes (REFILL_ON_LEVEL_START)
+  const specs: PlayerSpec[] = mode === 'solo' ? [{ loadout }] : [{ loadout }, { loadout: opts.loadout2 ?? DEFAULT_LOADOUT }];
+  resetGameWithRoster(state, specs, level, mode);
 }
 
 function resolveObstacleCollisionsFor(tank: TankState, state: GameState, radius: number, events: SimEvent[], emitWallHit: boolean): void {
@@ -286,7 +285,7 @@ function resolveArenaBoundsFor(tank: TankState, radius: number, events: SimEvent
 // change) — matches the plan's "tanks/flags/pickups = circles" 2D collision
 // model.
 function resolveTankVsTankCollisions(state: GameState): void {
-  const tanks: TankState[] = [state.player, ...(state.player2 ? [state.player2] : []), ...state.enemies].filter((t) => t.alive);
+  const tanks: TankState[] = [...state.players, ...state.enemies].filter((t) => t.alive);
   for (let i = 0; i < tanks.length; i++) {
     for (let j = i + 1; j < tanks.length; j++) {
       const a = tanks[i]!;
@@ -315,8 +314,8 @@ function resolveTankVsTankCollisions(state: GameState): void {
 // inside bounds).
 function resolveFinalStaticPass(state: GameState): void {
   const discard: SimEvent[] = [];
-  for (const player of [state.player, state.player2]) {
-    if (!player || !player.alive) continue;
+  for (const player of state.players) {
+    if (!player.alive) continue;
     resolveObstacleCollisionsFor(player, state, TANK_RADIUS, discard, false);
     resolveArenaBoundsFor(player, TANK_RADIUS, discard, false);
   }
@@ -336,7 +335,7 @@ function advanceWindmills(state: GameState): void {
 }
 
 // Duel has no flags at all (see layoutForMode); co-op's 10 flags are shared —
-// either alive player can collect one and both count toward the same total.
+// any alive player can collect one and all of them count toward the same total.
 function resolveFlags(state: GameState, events: SimEvent[]): void {
   if (state.mode === 'duel' || state.flags.length === 0) return;
   const collectors = alivePlayers(state);
@@ -445,8 +444,8 @@ function handleEnemyLifecycle(state: GameState, levelCfg: LevelConfig, events: S
   }
 }
 
-function respawnPlayerAtSpawn(state: GameState, player: TankState, invulnTicks: number): void {
-  applySpawn(player, spawnForTank(player.id, state.mode));
+function respawnPlayerAtSpawn(state: GameState, player: PlayerState, invulnTicks: number): void {
+  applySpawn(player, spawnForSlot(player.slot, state.mode));
   player.alive = true;
   player.shield = player.maxShield;
   player.invulnerableTicks = invulnTicks;
@@ -456,22 +455,20 @@ function respawnPlayerAtSpawn(state: GameState, player: TankState, invulnTicks: 
 // what happens on death. Co-op: each player has an independent lives pool;
 // hitting 0 leaves that player dead until the level clears (resetPlayerForLevel
 // revives them then, regardless of remaining lives) rather than ending the
-// run — the run only ends once every player's lives are exhausted.
-function handleSoloCoopPlayer(state: GameState, player: TankState, livesKey: 'lives' | 'lives2', events: SimEvent[]): void {
+// run — the run only ends once every present player's lives are exhausted.
+function handleSoloCoopPlayer(state: GameState, player: PlayerState, events: SimEvent[]): void {
   if (player.invulnerableTicks > 0) player.invulnerableTicks--;
   if (!player.alive) return;
-  if (state.god && player.id === 'player') return;
+  if (state.god && player.slot === 0) return;
   if (player.shield > 0) return;
 
   const deathPosition = { ...player.position };
-  state[livesKey]--;
-  events.push({ type: 'PlayerDestroyed', tankId: player.id, position: deathPosition, livesRemaining: state[livesKey] });
+  player.lives--;
+  events.push({ type: 'PlayerDestroyed', tankId: player.id, position: deathPosition, livesRemaining: player.lives });
 
-  if (state[livesKey] <= 0) {
+  if (player.lives <= 0) {
     player.alive = false;
-    const otherLives = player.id === 'player' ? state.lives2 : state.lives;
-    const bothOut = !state.player2 || otherLives <= 0;
-    if (bothOut) {
+    if (state.players.every((p) => p.lives <= 0)) {
       state.gameOver = true;
       events.push({ type: 'GameOver', finalScore: state.score, finalLevel: state.level });
     }
@@ -486,11 +483,11 @@ function handleSoloCoopPlayer(state: GameState, player: TankState, livesKey: 'li
 // than costing a life; the match instead ends when one side's kill tally
 // reaches DUEL_KILL_TARGET. Kill credit goes to whichever tank's shot/grenade
 // last damaged the victim (TankState.lastHitBy).
-function handleDuelPlayer(state: GameState, player: TankState, events: SimEvent[]): void {
+function handleDuelPlayer(state: GameState, player: PlayerState, events: SimEvent[]): void {
   if (player.invulnerableTicks > 0) player.invulnerableTicks--;
 
   if (player.alive) {
-    if (state.god && player.id === 'player') return;
+    if (state.god && player.slot === 0) return;
     if (player.shield > 0) return;
 
     const deathPosition = { ...player.position };
@@ -500,17 +497,17 @@ function handleDuelPlayer(state: GameState, player: TankState, events: SimEvent[
 
     const killerId = player.lastHitBy;
     player.lastHitBy = null;
-    const killerKey = killerId === 'player' ? 'player' : killerId === 'player2' ? 'player2' : null;
-    if (killerKey) {
-      state.kills[killerKey]++;
-      // Guard against a same-tick double win: if both players' final shots
-      // land in the same tick (each hits the other's last point simultaneously),
-      // state.player is processed first — its win must stick, not get
-      // overwritten by state.player2's processing right after.
-      if (!state.gameOver && state.kills[killerKey] >= DUEL_KILL_TARGET) {
+    const killer = killerId ? state.players.find((p) => p.id === killerId) : undefined;
+    if (killer) {
+      killer.kills++;
+      // Guard against a same-tick double win: if two players' final shots
+      // land in the same tick, players are processed in slot order (see
+      // handlePlayerLifecycle below) — the first winner found must stick,
+      // not get overwritten by a later slot's processing in the same tick.
+      if (!state.gameOver && killer.kills >= DUEL_KILL_TARGET) {
         state.gameOver = true;
-        state.winner = killerKey;
-        events.push({ type: 'GameOver', finalScore: state.score, finalLevel: state.level, winnerId: killerKey });
+        state.winner = killer.id;
+        events.push({ type: 'GameOver', finalScore: state.score, finalLevel: state.level, winnerId: killer.id });
       }
     }
     return;
@@ -526,20 +523,15 @@ function handleDuelPlayer(state: GameState, player: TankState, events: SimEvent[
 }
 
 function handlePlayerLifecycle(state: GameState, events: SimEvent[]): void {
-  if (state.mode === 'duel') {
-    handleDuelPlayer(state, state.player, events);
-    if (state.player2) handleDuelPlayer(state, state.player2, events);
-    return;
-  }
-  handleSoloCoopPlayer(state, state.player, 'lives', events);
-  if (state.player2) handleSoloCoopPlayer(state, state.player2, 'lives2', events);
+  const handler = state.mode === 'duel' ? handleDuelPlayer : handleSoloCoopPlayer;
+  for (const player of state.players) handler(state, player, events);
 }
 
 // --- Debug-only helpers (used by game/debug.ts) ---
 
 export function spawnEnemyAt(state: GameState, x: number, z: number, kind: 'drone' | 'hunter'): void {
   const cfg = levelConfig(state.level);
-  state.enemies.push(createEnemy({ x, z }, kind, cfg));
+  state.enemies.push(createEnemy({ x, z }, kind, cfg, nextId(state, 'enemy')));
 }
 
 export function killAllEnemies(state: GameState): void {
@@ -552,7 +544,7 @@ export function killAllEnemies(state: GameState): void {
 
 // Advances the simulation by exactly one fixed tick. Deterministic given
 // (state, commands) — the future multiplayer contract. `commands` is keyed
-// by tank id, so a second human player is just another entry (see
+// by tank id, so any player beyond the first is just another entry (see
 // input/keyboard.ts / game/app.ts).
 export function step(state: GameState, commands: Record<string, Command>): void {
   if (state.gameOver) {
@@ -563,11 +555,10 @@ export function step(state: GameState, commands: Record<string, Command>): void 
   const events: SimEvent[] = [];
   const levelCfg = levelConfig(state.level);
 
-  for (const player of [state.player, state.player2]) {
-    if (!player || !player.alive) continue;
+  for (const player of state.players) {
+    if (!player.alive) continue;
     const cmd = commands[player.id] ?? NEUTRAL_COMMAND;
-    const movement = player.id === 'player2' ? state.player2Movement : state.playerMovement;
-    applyMovement(player, cmd, movement);
+    applyMovement(player, cmd, player.movement);
     resolveObstacleCollisionsFor(player, state, TANK_RADIUS, events, true);
     resolveArenaBoundsFor(player, TANK_RADIUS, events, true);
     handlePlayerWeapons(state, player, cmd, levelCfg, events);

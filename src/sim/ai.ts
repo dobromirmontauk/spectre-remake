@@ -5,14 +5,16 @@
 // Enemies produce the same Command type as the player and go through the
 // same applyMovement()/collision path — just with their own MovementParams.
 
-import type { EnemyKind, EnemyState, GameState, TankState, Vec2 } from './types.ts';
+import type { EnemyKind, EnemyState, GameState, PlayerState, Vec2 } from './types.ts';
 import type { Command } from './commands.ts';
 import type { MovementParams } from './movement.ts';
 import type { LevelConfig } from '../config/levels.ts';
 import { createRng } from './rng.ts';
+import { datan2, dcos, dlen, dsin } from './dmath.ts';
 import {
   ARENA_HALF_SIZE,
   ENEMY_AIM_CONE_RAD,
+  ENEMY_AMMO,
   ENEMY_COAST_FRICTION,
   ENEMY_FIRE_COOLDOWN_JITTER_TICKS,
   ENEMY_FIRE_RANGE,
@@ -32,7 +34,7 @@ import {
 } from '../config/constants.ts';
 
 function angleTo(from: Vec2, to: Vec2): number {
-  return Math.atan2(to.x - from.x, to.z - from.z);
+  return datan2(to.x - from.x, to.z - from.z);
 }
 
 function normalizeAngle(a: number): number {
@@ -58,11 +60,6 @@ function shieldForKind(kind: EnemyKind, levelCfg: LevelConfig): number {
   return levelCfg.enemyBaseShield + (kind === 'hunter' ? HUNTER_SHIELD_BONUS : 0);
 }
 
-let idCounter = 0;
-function nextEnemyId(): string {
-  return `enemy-${idCounter++}`;
-}
-
 const EDGE_SPAWN_MARGIN = 6;
 
 // One of the 4 arena edges, offset `along` its length — shared by the
@@ -75,10 +72,17 @@ function edgePoint(side: number, along: number): Vec2 {
   return { x: -edge, z: along };
 }
 
-export function createEnemy(position: Vec2, kind: EnemyKind, levelCfg: LevelConfig): EnemyState {
+// `id` is supplied by the caller — simulation.ts's buildEnemies() assigns
+// level-qualified roster ids (`enemy-L{level}-{i}`); debug/respawn spawns
+// (simulation.ts spawnEnemyAt) draw from state.nextEntityId, exactly like
+// projectiles/grenades (weapons.ts). A module-global counter used to do this
+// instead, which made an enemy's id depend on how many enemies had ever
+// existed in the session — not reconstructible from (state, commands) alone,
+// which breaks both save/restore and cross-peer state hashing.
+export function createEnemy(position: Vec2, kind: EnemyKind, levelCfg: LevelConfig, id: string): EnemyState {
   const shield = shieldForKind(kind, levelCfg);
   return {
-    id: nextEnemyId(),
+    id,
     position: { ...position },
     prevPosition: { ...position },
     heading: 0,
@@ -86,8 +90,8 @@ export function createEnemy(position: Vec2, kind: EnemyKind, levelCfg: LevelConf
     speed: 0,
     shield,
     maxShield: shield,
-    ammo: Infinity,
-    maxAmmo: Infinity,
+    ammo: ENEMY_AMMO,
+    maxAmmo: ENEMY_AMMO,
     alive: true,
     fireCooldown: 0,
     grenadeCooldown: 0,
@@ -102,11 +106,10 @@ export function createEnemy(position: Vec2, kind: EnemyKind, levelCfg: LevelConf
   };
 }
 
-// True if `point` is far enough from every present player tank (co-op:
-// checks both, not just state.player) to be a fair enemy spawn.
+// True if `point` is far enough from every present player tank (all slots,
+// not just slot 0) to be a fair enemy spawn.
 function farEnoughFromPlayers(state: GameState, point: Vec2): boolean {
-  for (const player of [state.player, state.player2]) {
-    if (!player) continue;
+  for (const player of state.players) {
     const dx = point.x - player.position.x;
     const dz = point.z - player.position.z;
     if (dx * dx + dz * dz < ENEMY_MIN_SPAWN_DIST_FROM_PLAYER * ENEMY_MIN_SPAWN_DIST_FROM_PLAYER) return false;
@@ -148,14 +151,16 @@ export interface EnemyDecision {
   fireHeading: number; // angle to aim target; only meaningful when command.fire is true
 }
 
-// Closest alive player tank to `from` — the AI targeting rule for 2P co-op
-// (enemies always go after whichever human is nearest); reduces to
-// state.player alone whenever player2 is absent/dead.
-function nearestAlivePlayer(state: GameState, from: Vec2): TankState | null {
-  let best: TankState | null = null;
+// Closest alive player tank to `from` — the AI targeting rule for N-player
+// co-op (enemies always go after whichever human is nearest); reduces to
+// the lone solo player whenever there's only one, and iterates state.players
+// in slot order so 1-2 player behavior (and rng consumption elsewhere) is
+// unchanged from before this refactor.
+function nearestAlivePlayer(state: GameState, from: Vec2): PlayerState | null {
+  let best: PlayerState | null = null;
   let bestDistSq = Infinity;
-  for (const candidate of [state.player, state.player2]) {
-    if (!candidate || !candidate.alive) continue;
+  for (const candidate of state.players) {
+    if (!candidate.alive) continue;
     const dx = candidate.position.x - from.x;
     const dz = candidate.position.z - from.z;
     const distSq = dx * dx + dz * dz;
@@ -184,15 +189,15 @@ export function enemyCommand(enemy: EnemyState, state: GameState, levelCfg: Leve
   }
   const dx = player.position.x - enemy.position.x;
   const dz = player.position.z - enemy.position.z;
-  const distance = Math.hypot(dx, dz);
+  const distance = dlen(dx, dz);
 
   const isHunter = enemy.kind === 'hunter';
   let aimTarget: Vec2 = player.position;
   if (isHunter && distance > 1e-3) {
     const leadTime = (distance / PROJECTILE_SPEED) * HUNTER_LEAD_TIME_SCALE;
     aimTarget = {
-      x: player.position.x + Math.sin(player.heading) * player.speed * leadTime,
-      z: player.position.z + Math.cos(player.heading) * player.speed * leadTime,
+      x: player.position.x + dsin(player.heading) * player.speed * leadTime,
+      z: player.position.z + dcos(player.heading) * player.speed * leadTime,
     };
   }
 
@@ -222,7 +227,7 @@ export function updateStuckDetection(enemy: EnemyState, commandedThrust: number,
 
   const dx = enemy.position.x - enemy.prevPosition.x;
   const dz = enemy.position.z - enemy.prevPosition.z;
-  const displacement = Math.hypot(dx, dz);
+  const displacement = dlen(dx, dz);
 
   if (commandedThrust !== 0 && displacement < STUCK_DISPLACEMENT_EPSILON) {
     enemy.stuckTicks++;
