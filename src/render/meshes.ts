@@ -222,18 +222,28 @@ export function buildWindmillMesh(
   pylon.position.y = pylonHeight / 2;
   group.add(pylon);
 
+  // Fan blades sit in a VERTICAL plane with a fixed facing (+Z — the sim
+  // gives windmills no orientation of their own, and the reference
+  // screenshots don't settle which way they should face, so a fixed axis is
+  // as principled as any) and spin about the horizontal Z axis, reading as a
+  // classic pinwheel/fan rather than a helicopter rotor spinning flat overhead.
+  // Hub is raised to bladeLength (above the pylon top) so the vertical blade
+  // sweep clears the ground instead of dipping below it.
   const blades = new THREE.Group();
-  blades.position.y = pylonHeight;
+  const hubHeight = obstacle.bladeLength;
+  blades.position.y = hubHeight;
   const bladeCount = 4;
   for (let i = 0; i < bladeCount; i++) {
-    const blade = coloredBox(0.4, 0.4, obstacle.bladeLength, theme.windmillBlade, theme.windmillBlade, theme.windmillBlade);
-    blade.position.z = obstacle.bladeLength / 2;
+    // Blade extends along local Y from the hub; each pivot is spread by
+    // rotating about Z, so the 4 blades sweep the vertical XY plane.
+    const blade = coloredBox(0.4, obstacle.bladeLength, 0.4, theme.windmillBlade, theme.windmillBlade, theme.windmillBlade);
+    blade.position.y = obstacle.bladeLength / 2;
     const pivot = new THREE.Group();
-    pivot.rotation.y = (i / bladeCount) * Math.PI * 2;
+    pivot.rotation.z = (i / bladeCount) * Math.PI * 2;
     pivot.add(blade);
     blades.add(pivot);
   }
-  blades.rotation.y = obstacle.bladeAngle;
+  blades.rotation.z = obstacle.bladeAngle;
   group.add(blades);
 
   group.position.set(obstacle.position.x, 0, obstacle.position.z);

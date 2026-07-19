@@ -126,7 +126,7 @@ export class Renderer {
     for (const obstacle of state.obstacles) {
       if (obstacle.kind !== 'windmill') continue;
       const blades = this.windmillBlades.get(obstacle.id);
-      if (blades) blades.rotation.y = lerpAngle(obstacle.prevBladeAngle, obstacle.bladeAngle, alpha);
+      if (blades) blades.rotation.z = lerpAngle(obstacle.prevBladeAngle, obstacle.bladeAngle, alpha);
     }
 
     for (const flag of state.flags) {
