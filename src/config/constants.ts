@@ -260,6 +260,15 @@ export const COOP_SPAWN_POINTS: SpawnPoint[] = [
   { x: 10.606601717798226, z: -10.6066017177982, heading: 0 },
 ];
 
+// --- Networking (M2+): transport/lobby tunables ---
+export const PROTOCOL_VERSION = 1;
+// How long a joiner waits for the host's `lobby` reply after sending
+// `hello` before concluding no host is listening on that room code (see
+// net/lobby.ts join()). Not a transport-level timeout — BroadcastChannel/
+// Loopback joins never fail at that layer (no network round trip).
+export const NET_ROOM_NOT_FOUND_TIMEOUT_MS = 5000;
+export const NET_NAME_STORAGE_KEY = 'spectre.netplay.name.v1';
+
 // --- Lives / scoring / bonus ---
 export const PLAYER_LIVES_START = 3;
 export const PLAYER_RESPAWN_INVULN_TICKS = 60; // ~2s after respawning at arena center

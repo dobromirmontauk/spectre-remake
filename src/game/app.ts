@@ -25,6 +25,7 @@ import { HudMp } from '../hud/hudmp.ts';
 import { Radar } from '../hud/radar.ts';
 import { GameFlow } from './flow.ts';
 import { Screens } from './screens.ts';
+import { NetScreens } from './netscreens.ts';
 import { installDebugApi } from './debug.ts';
 import { isMuted, resumeAudio, setMuted, toggleMuted, updateEngine, updateSfx } from '../audio/sfx.ts';
 
@@ -76,6 +77,10 @@ const screens = new Screens(screensRoot, flow, state, {
   },
   getMuted: () => isMuted(),
   toggleMuted: () => toggleMuted(),
+  onAnyInteraction: () => resumeAudio(),
+});
+
+const netScreens = new NetScreens(screensRoot, flow, {
   onAnyInteraction: () => resumeAudio(),
 });
 
@@ -211,6 +216,13 @@ installDebugApi({
     setMuted(on);
   },
   hashState: () => hashState(state),
+  net: {
+    host: (name) => netScreens.debugHost(name),
+    join: (code, name, debugOverride) => netScreens.debugJoin(code, name, debugOverride),
+    roomCode: () => netScreens.debugRoomCode(),
+    roster: () => netScreens.debugRoster(),
+    leave: () => netScreens.debugLeave(),
+  },
 });
 
 let previousFrameTime = performance.now();
@@ -231,6 +243,7 @@ function handleEdgeKeys(): void {
     else if (flow.isGameplayActive) flow.requestQuitToMenu();
     else if (flow.showTankSetup) screens.backFromTankSetup();
     else if (flow.showModeSelect) flow.goToMenu();
+    else netScreens.handleEscape();
   }
 
   if (keyboard.consumeJustPressed('Enter') && flow.showGameOver) screens.handleGameOverEnter();
@@ -303,6 +316,7 @@ function frame(now: number): void {
     if (p0) radar.update(state, p0);
   }
   screens.update();
+  netScreens.update();
 
   updateCameraAspects();
   stage.dataset.camera = cameraRig.mode;

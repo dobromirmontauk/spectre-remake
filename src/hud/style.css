@@ -974,3 +974,209 @@ body {
   border: 2px solid #33ff55;
   padding: 0.15em 0.3em;
 }
+
+/* ============================================================
+   Net play: NetMenu / NetLobby screens (M2)
+   ============================================================ */
+
+.screen-netmenu {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2cqw;
+  padding: 4cqw;
+}
+
+.screen-netmenu.visible {
+  display: flex;
+}
+
+.netmenu-title {
+  font-size: 3.5cqw;
+  letter-spacing: 0.3em;
+  color: #4fc3ff;
+  text-shadow: 0 0 0.2em rgba(79, 195, 255, 0.6);
+}
+
+.netmenu-name-row {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  font-size: 1.6cqw;
+  color: #ddd;
+}
+
+.netmenu-name-input,
+.netmenu-code-input {
+  font-family: 'Courier New', monospace;
+  font-size: 1.4cqw;
+  background: #000;
+  color: #33ff55;
+  border: 2px solid #33ff55;
+  padding: 0.4em 0.6em;
+}
+
+.netmenu-code-input {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  width: 7em;
+}
+
+.netmenu-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.4cqw;
+}
+
+.netmenu-join-row {
+  display: flex;
+  gap: 1cqw;
+}
+
+.netmenu-status {
+  min-height: 1.4em;
+  font-size: 1.3cqw;
+  color: #ffee55;
+}
+
+.netmenu-back {
+  margin-top: 1cqw;
+}
+
+.screen-netlobby {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  padding: 3cqw 6cqw;
+  gap: 1.4cqw;
+  overflow-y: auto;
+}
+
+.screen-netlobby.visible {
+  display: flex;
+}
+
+.netlobby-title {
+  font-size: 3cqw;
+  letter-spacing: 0.3em;
+  color: #4fc3ff;
+  text-shadow: 0 0 0.2em rgba(79, 195, 255, 0.6);
+  margin-top: 1cqw;
+}
+
+.netlobby-code-row {
+  display: none;
+  align-items: center;
+  gap: 1cqw;
+}
+
+.netlobby-code-row.visible {
+  display: flex;
+}
+
+.netlobby-code {
+  font-size: 3cqw;
+  letter-spacing: 0.3em;
+  color: #33ff55;
+  text-shadow: 0 0 0.2em rgba(51, 255, 85, 0.6);
+}
+
+.netlobby-roster {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8cqw;
+  width: min(80cqw, 640px);
+}
+
+.netlobby-row {
+  display: flex;
+  align-items: center;
+  gap: 1cqw;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.6cqw 1cqw;
+}
+
+.netlobby-chip {
+  width: 1.2cqw;
+  height: 1.2cqw;
+  min-width: 12px;
+  min-height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.netlobby-name {
+  flex: 0 0 auto;
+  min-width: 12em;
+  font-size: 1.3cqw;
+  color: #ddd;
+}
+
+.netlobby-preset-row {
+  display: flex;
+  gap: 0.5cqw;
+  flex-wrap: wrap;
+}
+
+.netlobby-preset-button {
+  font-size: 1.1cqw;
+  padding: 0.4em 0.9em;
+}
+
+.netlobby-mode-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6cqw;
+}
+
+.netlobby-mode-buttons {
+  display: none;
+  gap: 1cqw;
+}
+
+.netlobby-mode-buttons.visible {
+  display: flex;
+}
+
+.netlobby-mode-label {
+  display: none;
+  font-size: 1.3cqw;
+  color: #ffee55;
+}
+
+.netlobby-mode-label.visible {
+  display: block;
+}
+
+.netlobby-actions {
+  display: flex;
+  gap: 1.5cqw;
+  margin-top: 0.5cqw;
+}
+
+.netlobby-start {
+  display: none;
+}
+
+.netlobby-start.visible {
+  display: inline-block;
+}
+
+.netlobby-waiting {
+  display: none;
+  font-size: 1.2cqw;
+  color: #999;
+}
+
+.netlobby-waiting.visible {
+  display: block;
+}
+
+.dialog-ok-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.2em;
+}

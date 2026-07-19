@@ -1,5 +1,18 @@
 import type { Command } from '../sim/commands.ts';
 import type { EnemyKind, GameMode, Loadout } from '../sim/types.ts';
+import type { JoinDebugOverride } from '../net/lobby.ts';
+import type { RosterEntry } from '../net/protocol.ts';
+
+// window.__game.net — drives the net-play lobby without DOM scraping (see
+// game/netscreens.ts). `debugOverride` lets a test force a version mismatch
+// (e.g. `{buildHash: 'stale'}`) without shipping two different builds.
+export interface NetDebugHooks {
+  host(name?: string): Promise<void>;
+  join(code: string, name?: string, debugOverride?: JoinDebugOverride): Promise<void>;
+  roomCode(): string | null;
+  roster(): RosterEntry[];
+  leave(): void;
+}
 
 // window.__game hooks used for deterministic Playwright verification.
 export interface DebugHooks {
@@ -27,6 +40,7 @@ export interface DebugHooks {
   // primitive for lockstep multiplayer (M3+) and the cross-browser
   // determinism proof for M1 (see scripts/, this file's callers).
   hashState(): number;
+  net: NetDebugHooks;
 }
 
 declare global {

@@ -8,7 +8,11 @@ import { LEVEL_INTRO_DURATION_TICKS } from '../config/constants.ts';
 // Esc "quit to menu" confirm are orthogonal flags layered on top of
 // Playing/LevelIntro rather than their own phases, so cancelling either
 // always resumes exactly where it left off.
-export type FlowPhase = 'Menu' | 'ModeSelect' | 'TankSetup' | 'Playing' | 'LevelIntro' | 'GameOver';
+// NetMenu -> NetLobby (see game/netscreens.ts, M2+) is a parallel branch off
+// Menu — name entry + host/join, then the live-roster lobby. Neither phase
+// is gameplay-active; M3 will land a match by transitioning into
+// LevelIntro/Playing same as local play once the host sends `start`.
+export type FlowPhase = 'Menu' | 'ModeSelect' | 'TankSetup' | 'Playing' | 'LevelIntro' | 'GameOver' | 'NetMenu' | 'NetLobby';
 
 export class GameFlow {
   phase: FlowPhase = 'Menu';
@@ -82,6 +86,14 @@ export class GameFlow {
     this.phase = 'TankSetup';
   }
 
+  goToNetMenu(): void {
+    this.phase = 'NetMenu';
+  }
+
+  goToNetLobby(): void {
+    this.phase = 'NetLobby';
+  }
+
   // Tank-setup screen's Start button already reset `state` via
   // resetGameWithLoadout(); this just starts the intro-card sequence.
   beginRun(): void {
@@ -109,6 +121,14 @@ export class GameFlow {
 
   get showTankSetup(): boolean {
     return this.phase === 'TankSetup';
+  }
+
+  get showNetMenu(): boolean {
+    return this.phase === 'NetMenu';
+  }
+
+  get showNetLobby(): boolean {
+    return this.phase === 'NetLobby';
   }
 
   get showLevelIntro(): boolean {

@@ -139,9 +139,7 @@ export class Screens {
     });
     buttons.appendChild(playBtn);
 
-    const netPlayBtn = this.menuButton('Net Play', () => {});
-    netPlayBtn.disabled = true;
-    netPlayBtn.title = 'Coming soon';
+    const netPlayBtn = this.menuButton('Net Play', () => this.flow.goToNetMenu());
     buttons.appendChild(netPlayBtn);
 
     buttons.appendChild(this.menuButton('Scores', () => this.showDialog('scores')));
