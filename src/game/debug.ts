@@ -12,6 +12,22 @@ export interface NetDebugHooks {
   roomCode(): string | null;
   roster(): RosterEntry[];
   leave(): void;
+  // Host-only convenience — same path as clicking the lobby's Start button.
+  startMatch(): void;
+  // Ticks handed to the sim so far (net play only — see net/lockstep.ts);
+  // 0 outside net play.
+  confirmedTick(): number;
+  // This client's own hash (sim/hash.ts) at a HASH_INTERVAL_TICKS boundary,
+  // from the net/lockstep.ts ring — undefined if not net play, not yet
+  // computed, or aged out of the ring.
+  hashAtTick(tick: number): number | undefined;
+  // Debug-only: suppresses this client's outbound input broadcast for `ms`
+  // wall-clock milliseconds, starving peers' canStep() so the stall overlay
+  // (and its recovery) can be verified without a real network partition.
+  debugStallInject(ms: number): void;
+  // Debug-only: nudges one float in local state so the next hash exchange
+  // provably disagrees with peers — exercises the desync-detection path.
+  debugCorruptState(): void;
 }
 
 // window.__game hooks used for deterministic Playwright verification.

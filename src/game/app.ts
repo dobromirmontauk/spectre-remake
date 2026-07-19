@@ -1,17 +1,17 @@
 import * as THREE from 'three';
-import { SIM_DT, MAX_FRAME_DT_MS, MAX_ACCUMULATED_TICKS } from '../config/constants.ts';
+import { SIM_DT, MAX_FRAME_DT_MS, MAX_ACCUMULATED_TICKS, STALL_OVERLAY_MS } from '../config/constants.ts';
 import {
   createInitialState,
   killAllEnemies,
   rebuildLevel,
   resetGameWithLoadout,
+  resetGameWithRoster,
   spawnEnemyAt,
   step,
 } from '../sim/simulation.ts';
 import type { Command } from '../sim/commands.ts';
-import { NEUTRAL_COMMAND } from '../sim/commands.ts';
 import type { SimEvent } from '../sim/events.ts';
-import type { EnemyKind, GameMode, Loadout } from '../sim/types.ts';
+import type { EnemyKind, GameMode, Loadout, PlayerSpec } from '../sim/types.ts';
 import { DEFAULT_LOADOUT } from '../config/constants.ts';
 import { KeyboardInput } from '../input/keyboard.ts';
 import { Renderer } from '../render/renderer.ts';
@@ -25,9 +25,10 @@ import { HudMp } from '../hud/hudmp.ts';
 import { Radar } from '../hud/radar.ts';
 import { GameFlow } from './flow.ts';
 import { Screens } from './screens.ts';
-import { NetScreens } from './netscreens.ts';
+import { NetScreens, type MatchStartInfo } from './netscreens.ts';
 import { installDebugApi } from './debug.ts';
 import { isMuted, resumeAudio, setMuted, toggleMuted, updateEngine, updateSfx } from '../audio/sfx.ts';
+import { LocalSession, NetSession, type PlaySession } from '../net/session.ts';
 
 const canvas = document.getElementById('viewport') as HTMLCanvasElement;
 const stage = document.getElementById('stage') as HTMLDivElement;
@@ -38,6 +39,13 @@ const keyboard = new KeyboardInput();
 const hud = new Hud();
 const hudmp = new HudMp(stage);
 const radar = new Radar(document.getElementById('radar') as HTMLCanvasElement);
+
+// PlaySession abstraction (net/session.ts, plan §3.6): decides where each
+// tick's commands come from. LocalSession is the default at boot and is
+// restored any time net play ends (voluntary leave, peer-left, desync, or
+// simply idling in NetLobby between matches) — see startNetMatch()/
+// teardownNetSession() below.
+let session: PlaySession = new LocalSession(state, keyboard);
 
 // Second radar canvas for player2's viewport corner in 2P modes — created
 // here rather than in index.html so the solo markup stays untouched.
@@ -51,6 +59,12 @@ const radar2 = new Radar(radarCanvas2);
 const splitDivider = document.createElement('div');
 splitDivider.className = 'split-divider';
 stage.appendChild(splitDivider);
+
+// "Waiting for NAME…" lockstep stall overlay (net play only) — see
+// net/lockstep.ts canStep()/session.ts NetSession.missingNames().
+const stallOverlayEl = document.createElement('div');
+stallOverlayEl.className = 'stall-overlay';
+stage.appendChild(stallOverlayEl);
 
 const flow = new GameFlow();
 
@@ -82,6 +96,7 @@ const screens = new Screens(screensRoot, flow, state, {
 
 const netScreens = new NetScreens(screensRoot, flow, {
   onAnyInteraction: () => resumeAudio(),
+  onMatchStart: (info) => startNetMatch(info),
 });
 
 let canvasWidthPx = 0;
@@ -96,7 +111,10 @@ function resize(): void {
   updateCameraAspects();
 }
 function updateCameraAspects(): void {
-  const split = state.players.length > 1;
+  // Viewport count follows the session's local slots, not player count —
+  // net play renders one full viewport (following the local player) even
+  // with a full 8-player roster (see net/session.ts localSlots()).
+  const split = session.localSlots().length > 1;
   if (split) {
     const halfAspect = canvasWidthPx / 2 / canvasHeightPx;
     cameraRig.setAspect(halfAspect);
@@ -108,40 +126,41 @@ function updateCameraAspects(): void {
 resize();
 window.addEventListener('resize', resize);
 
-let commandOverride: { command: Command; ticksRemaining: number } | null = null;
-
-function resolveCommand(): Command {
-  if (commandOverride) {
-    const cmd = commandOverride.command;
-    commandOverride.ticksRemaining--;
-    if (commandOverride.ticksRemaining <= 0) commandOverride = null;
-    return cmd;
-  }
-  return keyboard.readCommand();
-}
-
 // Events accumulate across every sim tick run within a single rendered
 // frame (the fixed-timestep accumulator can run several ticks per frame)
 // so HUD/effects never miss a tick's events just because a later tick in
 // the same frame overwrote state.events.
 let frameEvents: SimEvent[] = [];
 
-function runTick(): void {
-  // Only slots 0/1 have a local input source (keyboard) today — net play
-  // (M2+) feeds remaining slots from received peer input instead.
-  const commands: Record<string, Command> = {};
-  const [p0, p1] = state.players;
-  if (p0) commands[p0.id] = resolveCommand();
-  if (p1) commands[p1.id] = keyboard.readCommand2();
+// The exact sequence net/CLAUDE.md documents as the cross-peer invariant:
+// step() -> flow.handleEvents() -> flow.tick(), identical on every client
+// for a given tick's `commands`. `session.afterTick()` runs after — it only
+// observes `state` (hash exchange for net play), never mutates it.
+function runTick(commands: Record<string, Command>): void {
   step(state, commands);
   frameEvents.push(...state.events);
   for (const event of state.events) {
     // Duel results are match wins, not a high-score run — skip the
-    // leaderboard/initials flow for that mode (see game/screens.ts).
-    if (event.type === 'GameOver' && state.mode !== 'duel') screens.notifyGameOver(event.finalScore, event.finalLevel);
+    // leaderboard/initials flow for that mode. Net play never shows the
+    // local high-score/initials flow either (see game/screens.ts).
+    if (event.type === 'GameOver' && session.kind === 'local' && state.mode !== 'duel') {
+      screens.notifyGameOver(event.finalScore, event.finalLevel);
+    }
   }
   flow.handleEvents(state);
   flow.tick();
+  session.afterTick(state);
+}
+
+// State-mutating debug hooks make no sense once state is network-
+// synchronized (every peer must reach a given tick via the identical
+// lockstep path) — see net/CLAUDE.md and the plan's M3 debug-hooks note.
+function assertLocal(action: string): void {
+  if (session.kind !== 'local') throw new Error(`${action} is not available in net play — state is network-synchronized`);
+}
+
+function asNetSession(): NetSession | null {
+  return session instanceof NetSession ? session : null;
 }
 
 installDebugApi({
@@ -153,17 +172,23 @@ installDebugApi({
     flow.paused = false;
   },
   stepTicks: (n: number) => {
-    for (let i = 0; i < n; i++) runTick();
+    assertLocal('stepTicks'); // ticks are gated by the network in net play
+    for (let i = 0; i < n; i++) {
+      const commands = session.commandsForNextTick();
+      if (commands) runTick(commands);
+    }
   },
   pressCommand: (cmd: Partial<Command>, ticks: number) => {
-    commandOverride = { command: { ...NEUTRAL_COMMAND, ...cmd }, ticksRemaining: ticks };
+    session.pressCommand(cmd, ticks);
   },
   setLevel: (n: number) => {
+    assertLocal('setLevel');
     state.gameOver = false; // jumping levels for testing should always resume active play
     rebuildLevel(state, n);
     flow.forcePlaying();
   },
   collectAllFlags: () => {
+    assertLocal('collectAllFlags');
     for (const flag of state.flags) {
       if (flag.collected) continue;
       flag.collected = true;
@@ -174,15 +199,19 @@ installDebugApi({
     flow.handleEvents(state);
   },
   setGod: (on: boolean) => {
+    assertLocal('setGod');
     state.god = on;
   },
   spawnEnemyAt: (x: number, z: number, kind: EnemyKind = 'drone') => {
+    assertLocal('spawnEnemyAt');
     spawnEnemyAt(state, x, z, kind);
   },
   killAllEnemies: () => {
+    assertLocal('killAllEnemies');
     killAllEnemies(state);
   },
   setLives: (n: number) => {
+    assertLocal('setLives');
     const p0 = state.players[0];
     if (!p0) return;
     p0.lives = n;
@@ -193,18 +222,20 @@ installDebugApi({
     }
   },
   fire: () => {
-    commandOverride = { command: { ...NEUTRAL_COMMAND, fire: true }, ticksRemaining: 1 };
+    session.pressCommand({ fire: true }, 1);
   },
   cycleCamera: () => {
     cameraRig.cycle();
   },
   restart: () => {
+    assertLocal('restart');
     flow.restart(state);
   },
   gotoMenu: () => {
     flow.goToMenu();
   },
   startGame: (loadout: Loadout = DEFAULT_LOADOUT, opts?: { mode?: GameMode; loadout2?: Loadout }) => {
+    assertLocal('startGame');
     resumeAudio();
     resetGameWithLoadout(state, loadout, 1, opts);
     flow.beginRun();
@@ -222,31 +253,105 @@ installDebugApi({
     roomCode: () => netScreens.debugRoomCode(),
     roster: () => netScreens.debugRoster(),
     leave: () => netScreens.debugLeave(),
+    startMatch: () => netScreens.debugStartMatch(),
+    confirmedTick: () => asNetSession()?.confirmedTick() ?? 0,
+    hashAtTick: (tick: number) => asNetSession()?.hashAtTick(tick),
+    debugStallInject: (ms: number) => asNetSession()?.debugStallInject(ms),
+    debugCorruptState: () => {
+      // Nudges local state so the next HASH_INTERVAL_TICKS hash exchange
+      // provably disagrees with every peer — exercises the desync path.
+      // Must be a fault the sim's own invariants don't silently heal before
+      // the next hash boundary (e.g. a position nudge gets snapped back in
+      // bounds by the arena clamp on the very next tick — see
+      // sim/CLAUDE.md's tick order) — rng.state has no such self-correction.
+      state.rng.state = (state.rng.state ^ 0x1) >>> 0;
+    },
   },
 });
 
 let previousFrameTime = performance.now();
 let accumulator = 0;
+let stallStartMs: number | null = null; // wall-clock time the current stall began, net play only
+
+// --- Net match lifecycle (M3) ---
+// startNetMatch() fires on every peer (host included) via NetLobby.onStart()
+// (see game/netscreens.ts); the other three tear a NetSession back down to a
+// fresh LocalSession, per the plan's v1 "simple" disconnect/desync handling
+// (full grace/drop protocol is M5).
+
+function startNetMatch(info: MatchStartInfo): void {
+  resumeAudio();
+  if (session instanceof NetSession) session.dispose(); // shouldn't normally happen — belt and suspenders
+  const specs: PlayerSpec[] = [...info.roster]
+    .sort((a, b) => a.slot - b.slot)
+    .map((r) => ({ loadout: r.loadout, name: r.name }));
+  resetGameWithRoster(state, specs, info.level, info.mode);
+  session = new NetSession({
+    transport: info.transport,
+    roster: info.roster,
+    selfPeerId: info.selfPeerId,
+    keyboard,
+    inputDelay: info.inputDelay,
+    onDesync: () => showMatchEndedDialog('Out Of Sync', 'The game fell out of sync — match ended.'),
+    onPeerLeft: (name) => showMatchEndedDialog('Player Left', `${name} left — match ended.`),
+  });
+  stallStartMs = null;
+  flow.beginRun();
+}
+
+function teardownNetSession(): void {
+  if (session instanceof NetSession) session.dispose();
+  session = new LocalSession(state, keyboard);
+  stallStartMs = null;
+}
+
+// Abnormal match end (peer left / desync) — v1 "simple" handling: freeze,
+// show the dialog, full teardown back to NetMenu on acknowledge.
+function showMatchEndedDialog(title: string, message: string): void {
+  flow.paused = true;
+  netScreens.showMatchEndedDialog(title, message, () => {
+    teardownNetSession();
+    netScreens.forceLeaveMatch();
+  });
+}
 
 function handleEdgeKeys(): void {
-  const isSolo = state.players.length <= 1;
-  if (keyboard.consumeJustPressed('Tab') && isSolo) cameraRig.cycle(); // camera cycling is 1P-only (see cameraRig2 comment above)
-  if (keyboard.consumeJustPressed('p') || keyboard.consumeJustPressed('P')) flow.togglePause();
+  // Camera cycling is allowed whenever there's exactly one local viewport —
+  // true solo AND net play (which always renders one viewport following the
+  // local player, however many players are in the match) — but not local
+  // split-screen (see cameraRig2 comment above).
+  const singleViewport = session.localSlots().length <= 1;
+  if (keyboard.consumeJustPressed('Tab') && singleViewport) cameraRig.cycle();
+  if ((keyboard.consumeJustPressed('p') || keyboard.consumeJustPressed('P')) && session.isPauseAllowed()) flow.togglePause();
   // 'M' always toggles mute; the legacy 'S' toggle is 1P-only since 2P's
   // player2 uses S for reverse thrust (WASD scheme) — see input/keyboard.ts.
   if (keyboard.consumeJustPressed('m') || keyboard.consumeJustPressed('M')) hud.updateMute(toggleMuted());
-  if (isSolo && (keyboard.consumeJustPressed('s') || keyboard.consumeJustPressed('S'))) hud.updateMute(toggleMuted());
+  if (singleViewport && (keyboard.consumeJustPressed('s') || keyboard.consumeJustPressed('S'))) hud.updateMute(toggleMuted());
 
   if (keyboard.consumeJustPressed('Escape')) {
     if (screens.isDialogOpen) screens.closeDialog();
-    else if (flow.showConfirmQuit) flow.cancelQuitToMenu();
+    else if (netScreens.isDialogOpen || netScreens.isLeaveConfirmOpen) netScreens.handleEscape();
+    else if (session.kind === 'net' && flow.isGameplayActive) {
+      netScreens.requestLeaveConfirm(() => {
+        teardownNetSession();
+        netScreens.forceLeaveMatch();
+      });
+    } else if (flow.showConfirmQuit) flow.cancelQuitToMenu();
     else if (flow.isGameplayActive) flow.requestQuitToMenu();
     else if (flow.showTankSetup) screens.backFromTankSetup();
     else if (flow.showModeSelect) flow.goToMenu();
     else netScreens.handleEscape();
   }
 
-  if (keyboard.consumeJustPressed('Enter') && flow.showGameOver) screens.handleGameOverEnter();
+  if (keyboard.consumeJustPressed('Enter') && flow.showGameOver) {
+    if (session.kind === 'net') {
+      teardownNetSession();
+      netScreens.returnToLobbyAfterMatch();
+      flow.goToNetLobby();
+    } else {
+      screens.handleGameOverEnter();
+    }
+  }
 }
 
 function renderSplitScreen(dtSeconds: number): void {
@@ -254,8 +359,11 @@ function renderSplitScreen(dtSeconds: number): void {
   const rightW = canvasWidthPx - halfW;
   threeRenderer.setScissorTest(true);
 
-  const pose0 = gameRenderer.getPlayerRenderPose('player');
-  const pose1 = gameRenderer.getPlayerRenderPose('player2');
+  // Local split-screen only ever shows slots 0/1 (session.localSlots() is
+  // [0,1] exactly when split — see net/session.ts LocalSession.localSlots()).
+  const [slot0, slot1] = session.localSlots();
+  const pose0 = gameRenderer.getPlayerRenderPose(state.players[slot0 ?? 0]?.id ?? 'player');
+  const pose1 = gameRenderer.getPlayerRenderPose(state.players[slot1 ?? 1]?.id ?? 'player2');
 
   threeRenderer.setViewport(0, 0, halfW, canvasHeightPx);
   threeRenderer.setScissor(0, 0, halfW, canvasHeightPx);
@@ -281,16 +389,36 @@ function frame(now: number): void {
 
   frameEvents = [];
   const simActive = flow.isGameplayActive && !flow.paused;
+  let stalled = false;
   if (simActive) {
     accumulator += frameDt / 1000;
     const maxAccumSeconds = MAX_ACCUMULATED_TICKS * SIM_DT;
     if (accumulator > maxAccumSeconds) accumulator = maxAccumSeconds;
 
     while (accumulator >= SIM_DT) {
-      runTick();
+      const commands = session.commandsForNextTick();
+      if (!commands) {
+        // Net play only — a live slot's command for this tick hasn't
+        // arrived yet. Freeze the accumulator (don't let it build up a
+        // burst of ticks to fire off once we catch up) and keep rendering
+        // the last confirmed state (see net/CLAUDE.md, plan §3.6).
+        accumulator = SIM_DT;
+        stalled = true;
+        break;
+      }
+      runTick(commands);
       accumulator -= SIM_DT;
     }
   }
+
+  if (stalled) {
+    if (stallStartMs === null) stallStartMs = now;
+  } else {
+    stallStartMs = null;
+  }
+  const showStallOverlay = stalled && stallStartMs !== null && now - stallStartMs >= STALL_OVERLAY_MS;
+  stallOverlayEl.classList.toggle('visible', showStallOverlay);
+  if (showStallOverlay) stallOverlayEl.textContent = `Waiting for ${session.missingNames().join(', ')}…`;
 
   const alpha = simActive ? accumulator / SIM_DT : 1;
   const dtSeconds = simActive ? frameDt / 1000 : 0;
@@ -298,22 +426,37 @@ function frame(now: number): void {
   gameRenderer.update(state, alpha, now / 1000);
   effects.update(frameEvents, dtSeconds);
   updateSfx(frameEvents);
-  updateEngine(state.players[0]?.speed ?? 0, simActive);
 
-  const split = state.players.length > 1;
+  const localSlots = session.localSlots();
+  const mySlot = localSlots[0] ?? 0;
+  const myPlayer = state.players[mySlot] ?? state.players[0];
+  updateEngine(myPlayer?.speed ?? 0, simActive);
+
+  // `split` = dual-viewport rendering (local 2P only — net play always
+  // renders ONE viewport, following the local player, regardless of roster
+  // size); `multiplayer` = HUD/radar selection (hudmp vs the solo Hud),
+  // which also applies to net play. See net/session.ts localSlots() and
+  // src/hud/style.css's data-splitscreen/data-multiplayer split.
+  const split = localSlots.length > 1;
+  const multiplayer = state.players.length > 1;
   stage.dataset.splitscreen = split ? 'true' : 'false';
+  stage.dataset.multiplayer = multiplayer ? 'true' : 'false';
   hud.updateMute(isMuted()); // #hud-mute stays visible/shared in both solo and split layouts
   // hudmp.update() always runs (even in solo) because it self-hides via its
-  // own 'visible' class toggle — skipping the call when !split would leave
-  // that class (and the panel) stuck from the last 2P session.
+  // own 'visible' class toggle — skipping the call when !multiplayer would
+  // leave that class (and the panel) stuck from the last 2P/net session.
   hudmp.update(state);
-  const p0 = state.players[0];
-  if (split) {
-    if (p0) radar.update(state, p0);
-    if (p0) radar2.update(state, state.players[1] ?? p0);
+  if (multiplayer) {
+    if (split) {
+      if (myPlayer) radar.update(state, myPlayer);
+      const other = state.players[localSlots[1] ?? 1] ?? myPlayer;
+      if (other) radar2.update(state, other);
+    } else if (myPlayer) {
+      radar.update(state, myPlayer); // net play: single radar follows the local player
+    }
   } else {
     hud.update(state, flow);
-    if (p0) radar.update(state, p0);
+    if (myPlayer) radar.update(state, myPlayer);
   }
   screens.update();
   netScreens.update();
@@ -329,7 +472,7 @@ function frame(now: number): void {
     // reset it on its own.
     threeRenderer.setScissorTest(false);
     threeRenderer.setViewport(0, 0, canvasWidthPx, canvasHeightPx);
-    const pose0 = gameRenderer.getPlayerRenderPose('player');
+    const pose0 = gameRenderer.getPlayerRenderPose(myPlayer?.id ?? 'player');
     if (pose0) cameraRig.update(pose0.position, pose0.heading, dtSeconds);
     threeRenderer.render(scene, cameraRig.activeCamera);
   }

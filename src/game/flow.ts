@@ -86,12 +86,18 @@ export class GameFlow {
     this.phase = 'TankSetup';
   }
 
+  // Both reset `paused` (like goToMenu()) — M3's match-ended/desync dialogs
+  // (game/app.ts showMatchEndedDialog) set `paused` to freeze the frame
+  // behind the dialog, and net sessions disable the pause key entirely (see
+  // net/session.ts isPauseAllowed()), so nothing else would ever clear it.
   goToNetMenu(): void {
     this.phase = 'NetMenu';
+    this.paused = false;
   }
 
   goToNetLobby(): void {
     this.phase = 'NetLobby';
+    this.paused = false;
   }
 
   // Tank-setup screen's Start button already reset `state` via
