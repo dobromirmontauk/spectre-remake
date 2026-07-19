@@ -405,11 +405,21 @@ export function step(state: GameState, commands: Record<string, Command>): void 
     }
   }
 
+  // Weapons hit-test tank positions BEFORE tank-vs-tank push-out runs. Every
+  // shot fired above used its owner's position as of that per-tank block —
+  // if push-out ran first, a violent multi-tank pile-up (e.g. several tanks
+  // stacked at a wall) can catapult a target several units in this same
+  // tick, well past a projectile's short first-tick travel, so a shot that
+  // was genuinely aimed at its target could whiff simply because the target
+  // teleported away before hit-testing ran. Resolving weapons against the
+  // same position snapshot that fired them eliminates that gap; push-out is
+  // purely a physical solidity correction and doesn't need to happen before
+  // combat is resolved for the tick.
+  updateProjectiles(state, events);
+  updateGrenades(state, events);
   resolveTankVsTankCollisions(state);
   resolveFinalStaticPass(state);
   advanceWindmills(state);
-  updateProjectiles(state, events);
-  updateGrenades(state, events);
   handleEnemyLifecycle(state, levelCfg, events, ENEMY_RESPAWN_TICKS);
   handlePlayerLifecycle(state, events);
   resolveFlags(state, events);
