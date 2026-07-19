@@ -1002,6 +1002,17 @@ body {
   text-shadow: 0 0 0.2em rgba(79, 195, 255, 0.6);
 }
 
+/* Debuggability aid (M4): which transport Host/Join will actually use —
+   "via relay network" (TrysteroTransport, the default) vs "same-browser
+   mode" (?net=bc). Shown on both NetMenu and NetLobby (game/netscreens.ts)
+   since confusion tends to surface once two peers can't find each other. */
+.netmenu-transport-hint {
+  font-size: 1cqw;
+  letter-spacing: 0.15em;
+  color: #7a8a9a;
+  text-transform: uppercase;
+}
+
 .netmenu-name-row {
   display: flex;
   align-items: center;

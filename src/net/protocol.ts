@@ -110,3 +110,19 @@ export interface NetMessageMap {
 }
 
 export type NetMessageKind = keyof NetMessageMap;
+
+// Runtime enumeration of the same keys as NetMessageMap — TrysteroTransport
+// (net/trystero.ts) needs an actual array to create one trystero action
+// channel per message kind (types alone don't exist at runtime). Kept here,
+// next to NetMessageMap, so the two can't drift apart.
+export const NET_MESSAGE_KINDS: NetMessageKind[] = [
+  'hello',
+  'reject',
+  'lobby',
+  'loadoutPick',
+  'start',
+  'bye',
+  'input',
+  'hash',
+  'drop',
+];

@@ -11,7 +11,7 @@ JSON-serializable or replay-deterministic across engines.
 ## Layering
 
 ```
-transport.ts (interface)  ──implemented by──>  broadcast.ts / loopback.ts / (M4) trystero.ts
+transport.ts (interface)  ──implemented by──>  broadcast.ts / loopback.ts / trystero.ts (M4)
         ↑
      lobby.ts (host-authoritative state machine, protocol.ts message shapes)
         ↑
@@ -25,9 +25,33 @@ transport.ts (interface)  ──implemented by──>  broadcast.ts / loopback.t
 - `transport.ts` — `NetTransport`: `join(roomCode)`/`leave()`, `send(kind, payload, to?)`,
   `onMessage`/`onPeerJoin`/`onPeerLeave`. A generic named-message pub/sub plus peer presence;
   no protocol semantics live here.
-- `broadcast.ts` — same-origin `BroadcastChannel`, the M2-M3 default. Layers its own presence
-  protocol (`hello`/`here`/`bye`) on top since `BroadcastChannel` has no peer discovery.
-  **Does not cross Playwright browser contexts** — two-peer tests need two *pages* in one context.
+- `broadcast.ts` — same-origin `BroadcastChannel`. Layers its own presence protocol
+  (`hello`/`here`/`bye`) on top since `BroadcastChannel` has no peer discovery. **Does not cross
+  Playwright browser contexts** — two-peer tests need two *pages* in one context. Forced via
+  `?net=bc`; kept as the deterministic no-network test path (see M2/M3 verification notes below).
+- `trystero.ts` — `TrysteroTransport` (M4), the **default** transport: real cross-browser WebRTC
+  DataChannels signaled over the public Nostr relay network (`trystero/nostr`, dynamically
+  imported inside `join()` only, so the base game never pays for it — see createTransport.ts).
+  `TRYSTERO_APP_ID`/`TRYSTERO_RELAY_URLS`/`NET_JOIN_TIMEOUT_MS` live in `config/constants.ts`.
+  Every `NetMessageKind` (protocol.ts) maps straight to a trystero action namespace of the same
+  name — all are ≤11 ASCII bytes, under even the historical 12-byte action-name limit, so no
+  truncation table is needed. `join()` resolves once at least one pinned relay's WebSocket opens
+  (`waitForRelay()`, racing `NET_JOIN_TIMEOUT_MS`) — this is "relay unreachable," a transport-level
+  concern distinct from `lobby.ts`'s own `NET_ROOM_NOT_FOUND_TIMEOUT_MS` ("relay reachable, but
+  nobody answered `hello`"), and the two run concurrently (lobby.ts's not-found timer starts the
+  instant `NetLobby.join()` is called, not after `transport.join()` resolves).
+  - **`pendingSends` — a real bug found under actual cross-machine testing, not a defensive
+    nicety**: `lobby.ts`'s `join()` sends `hello` the instant `transport.join()` resolves. For
+    BroadcastChannel/Loopback that's fine (no connection-setup latency at that layer). Over a real
+    P2P transport, though, "relay reachable" and "connected to the host peer" are two different
+    moments — the WebRTC handshake is still in flight when `hello` gets sent, trystero's own
+    `action.send()` silently delivers to zero peers (not an error, just a no-op), and the `hello`
+    is gone for good. `TrysteroTransport` queues any send whose target(s) aren't yet in its
+    `activePeers` set (trystero's own `onPeerJoin`-activated peers) and replays the queue — through
+    `send()` itself, so a still-pending specific `to` target just re-queues — the moment a peer
+    activates. Confirmed against real public relays: without this, two separate browser contexts
+    would connect at the WebRTC layer (data visibly flowing both ways) but the lobby would never
+    see a second roster entry, because the joiner's one and only `hello` had already been dropped.
 - `loopback.ts` — in-memory bus keyed by room code, for same-page multi-peer harnesses (M5's
   8-player test) and lobby unit tests without a real message channel.
 - `roomcode.ts` — 5-char Crockford base32 (minus I/L/O/U/0/1), `crypto.getRandomValues`.
@@ -140,12 +164,18 @@ transport.ts (interface)  ──implemented by──>  broadcast.ts / loopback.t
   `flow.goToNetLobby()`) so the host can Start another — state is fully rebuilt every match, so
   this is safe.
 
-## M2/M3 verification notes
+## M2/M3/M4 verification notes
 
 `BroadcastChannel` doesn't cross Playwright *browser contexts*, only *pages within one context*
-(same origin, same partition). Two-tab choreography tests must open two pages in a single
-context/tab set, not two separate contexts. `?net=` forces a transport (`bc` today); leaving it
-unset also picks `bc` until M4 adds `trystero`.
+(same origin, same partition). Two-tab choreography tests with `?net=bc` must open two pages in a
+single context/tab set, not two separate contexts. Leaving `?net=` unset (the real scenario, and
+the one that must use two *separate* contexts to mean anything) picks `TrysteroTransport` and goes
+over real public relays + WebRTC — network-dependent, and per-relay flakiness is real (a specific
+relay rate-limiting a test IP is not the same as the transport being broken; a pinned relay list of
+5 is deliberately redundant against exactly this). Verified end to end against real relays: two
+separate Playwright browser contexts (different storage, proving BroadcastChannel could not have
+bridged them) host/join, sync a roster, start a co-op match, and produce matching
+`hashAtTick()` at every compared tick boundary.
 
 `debugStallInject(ms)`/`debugCorruptState()`/`confirmedTick()`/`hashAtTick(tick)`/`startMatch()`
 live under `__game.net` (see `game/debug.ts`). `debugCorruptState()` must corrupt something the

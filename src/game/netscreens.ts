@@ -9,7 +9,7 @@ import type { GameFlow } from './flow.ts';
 import type { GameMode, Loadout } from '../sim/types.ts';
 import { LOADOUT_PRESETS, NET_INPUT_DELAY_TICKS, NET_NAME_STORAGE_KEY } from '../config/constants.ts';
 import { PLAYER_TANK_COLOR_SLOTS } from '../config/palette.ts';
-import { createTransport } from '../net/createTransport.ts';
+import { createTransport, transportLabel } from '../net/createTransport.ts';
 import { NetLobby, type JoinDebugOverride, type LobbyError, type LobbyErrorReason } from '../net/lobby.ts';
 import { generateRoomCode, normalizeRoomCode } from '../net/roomcode.ts';
 import type { NetTransport } from '../net/transport.ts';
@@ -247,6 +247,10 @@ export class NetScreens {
     title.textContent = 'NET PLAY';
     wrap.appendChild(title);
 
+    const transportHint = el('div', 'netmenu-transport-hint');
+    transportHint.textContent = transportLabel();
+    wrap.appendChild(transportHint);
+
     const nameRow = el('label', 'netmenu-name-row');
     const nameLabel = el('span', 'netmenu-name-label');
     nameLabel.textContent = 'Name';
@@ -317,6 +321,10 @@ export class NetScreens {
     const title = el('div', 'netlobby-title');
     title.textContent = 'LOBBY';
     wrap.appendChild(title);
+
+    const transportHint = el('div', 'netmenu-transport-hint');
+    transportHint.textContent = transportLabel();
+    wrap.appendChild(transportHint);
 
     const hostCodeRow = el('div', 'netlobby-code-row netlobby-code-row-host');
     const hostCodeEl = el('span', 'netlobby-code');

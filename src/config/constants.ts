@@ -291,6 +291,30 @@ export const NET_HASH_RING_SIZE = 10;
 // avoids flashing it for a single skipped frame under normal jitter.
 export const STALL_OVERLAY_MS = 300;
 
+// --- Networking (M4): TrysteroTransport (net/trystero.ts) ---
+// Trystero room namespace — rooms are scoped to (appId, roomCode), so this
+// just needs to be unique enough not to collide with unrelated apps on the
+// same public relays/trackers.
+export const TRYSTERO_APP_ID = 'spectre-remake';
+// Pinned public Nostr relay set (a handful of the well-known ones out of
+// trystero/nostr's much larger built-in default list) — carries only the
+// WebRTC signaling handshake, never gameplay traffic. A constant array so
+// it's easy to extend/replace if one goes down; passed as
+// `relayConfig.urls` so joinRoom() doesn't fall back to trystero's full
+// default list (some of which are unmaintained/flaky).
+export const TRYSTERO_RELAY_URLS = [
+  'wss://relay.damus.io',
+  'wss://nos.lol',
+  'wss://relay.mostr.pub',
+  'wss://nostr.data.haus',
+  'wss://nostr-01.yakihonne.com',
+];
+// How long TrysteroTransport.join() waits for at least one pinned relay's
+// WebSocket to open before rejecting as "relay unreachable" (net/lobby.ts's
+// LobbyErrorReason). Distinct from NET_ROOM_NOT_FOUND_TIMEOUT_MS above,
+// which fires only once the relay IS reachable but no host answers.
+export const NET_JOIN_TIMEOUT_MS = 10000;
+
 // --- Lives / scoring / bonus ---
 export const PLAYER_LIVES_START = 3;
 export const PLAYER_RESPAWN_INVULN_TICKS = 60; // ~2s after respawning at arena center
