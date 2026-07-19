@@ -23,6 +23,10 @@ export interface DebugHooks {
   startGame(loadout?: Loadout, opts?: { mode?: GameMode; loadout2?: Loadout }): void;
   setFilled(on: boolean): void;
   setMuted(on: boolean): void;
+  // Deterministic state checksum (sim/hash.ts) — the desync-detection
+  // primitive for lockstep multiplayer (M3+) and the cross-browser
+  // determinism proof for M1 (see scripts/, this file's callers).
+  hashState(): number;
 }
 
 declare global {

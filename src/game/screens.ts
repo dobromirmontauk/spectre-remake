@@ -638,9 +638,11 @@ export class Screens {
       if (this.state.mode === 'duel') {
         // Duel ends in a winner screen, not a scored Game Over — no initials
         // prompt, no high-score qualification (see maybeRecordScoreThenGoToMenu).
-        const winnerLabel = this.state.winner === 'player' ? 'PLAYER 1' : this.state.winner === 'player2' ? 'PLAYER 2' : '???';
+        const winner = this.state.players.find((p) => p.id === this.state.winner);
+        const winnerLabel = winner ? `PLAYER ${winner.slot + 1}` : '???';
         this.gameOverTitleEl.textContent = `${winnerLabel} WINS!`;
-        this.gameOverStatsEl.innerHTML = `<div>Kills: ${this.state.kills.player} - ${this.state.kills.player2}</div>`;
+        const tally = this.state.players.map((p) => `P${p.slot + 1}: ${p.kills}`).join(' - ');
+        this.gameOverStatsEl.innerHTML = `<div>Kills: ${tally}</div>`;
         this.initialsFormEl.classList.remove('visible');
         this.gameOverHintEl.style.visibility = 'visible';
         this.gameOverHintEl.textContent = 'Press Enter to return to menu';

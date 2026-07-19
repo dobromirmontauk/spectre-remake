@@ -53,9 +53,10 @@ export class Hud {
       this.lastFlags = state.flagsCollected;
     }
 
-    if (state.lives !== this.lastLives) {
-      this.livesEl.textContent = String(Math.max(0, state.lives));
-      this.lastLives = state.lives;
+    const player = state.players[0]!;
+    if (player.lives !== this.lastLives) {
+      this.livesEl.textContent = String(Math.max(0, player.lives));
+      this.lastLives = player.lives;
     }
 
     if (state.score !== this.lastScore) {
@@ -68,21 +69,21 @@ export class Hud {
       this.lastBonus = state.bonusRemaining;
     }
 
-    const shieldPct = Math.round((state.player.shield / state.player.maxShield) * 100);
+    const shieldPct = Math.round((player.shield / player.maxShield) * 100);
     if (shieldPct !== this.lastShieldPct) {
       this.damageFillEl.style.width = `${100 - shieldPct}%`;
       this.shieldFillEl.style.height = `${shieldPct}%`;
       this.lastShieldPct = shieldPct;
     }
 
-    const ammo = Math.round(state.player.ammo);
+    const ammo = Math.round(player.ammo);
     if (ammo !== this.lastAmmo) {
       this.ammoEl.textContent = String(ammo);
-      this.ammoFillEl.style.width = `${(ammo / state.player.maxAmmo) * 100}%`;
+      this.ammoFillEl.style.width = `${(ammo / player.maxAmmo) * 100}%`;
       this.lastAmmo = ammo;
     }
 
-    const speed = Math.round(Math.abs(state.player.speed) * 10) / 10;
+    const speed = Math.round(Math.abs(player.speed) * 10) / 10;
     if (speed !== this.lastSpeed) {
       this.speedEl.textContent = speed.toFixed(1);
       this.lastSpeed = speed;

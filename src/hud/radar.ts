@@ -32,7 +32,7 @@ export class Radar {
     return { x: dx * cos - dz * sin, z: dx * sin + dz * cos };
   }
 
-  update(state: GameState, viewer: TankState = state.player): void {
+  update(state: GameState, viewer: TankState = state.players[0]!): void {
     const ctx = this.ctx;
     const w = this.canvas.width;
     const h = this.canvas.height;
@@ -61,12 +61,16 @@ export class Radar {
       draw(dx, dz, DOT_RADIUS_ENEMY, enemy.kind === 'hunter' ? '#ff8833' : '#ff3333');
     }
 
-    // Duel has no flags/enemies — show the opposing player as the threat dot.
-    const opponent = state.mode === 'duel' ? (viewer.id === 'player' ? state.player2 : state.player) : null;
-    if (opponent && opponent.alive) {
-      const dx = opponent.position.x - viewer.position.x;
-      const dz = opponent.position.z - viewer.position.z;
-      if (dx * dx + dz * dz <= RADAR_RANGE * RADAR_RANGE) draw(dx, dz, DOT_RADIUS_OPPONENT, '#ff5566');
+    // Duel has no flags/enemies — show every other player as a threat dot
+    // (reduces to "the opposing tank" for today's 2-player duel; generalizes
+    // cleanly to a future FFA with more players).
+    if (state.mode === 'duel') {
+      for (const opponent of state.players) {
+        if (opponent.id === viewer.id || !opponent.alive) continue;
+        const dx = opponent.position.x - viewer.position.x;
+        const dz = opponent.position.z - viewer.position.z;
+        if (dx * dx + dz * dz <= RADAR_RANGE * RADAR_RANGE) draw(dx, dz, DOT_RADIUS_OPPONENT, '#ff5566');
+      }
     }
 
     for (const flag of state.flags) {

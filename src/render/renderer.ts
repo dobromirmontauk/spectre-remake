@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import type { EnemyState, GameState } from '../sim/types.ts';
 import { buildArena, type ArenaControls } from './arena.ts';
 import { buildFlagMesh, buildPickupMesh, buildTankMesh, buildWallMesh, buildWindmillMesh } from './meshes.ts';
-import { DRONE_TANK_COLORS, HUNTER_TANK_COLORS, PLAYER2_TANK_COLORS, PLAYER_TANK_COLORS, themeForLevel } from '../config/palette.ts';
+import { DRONE_TANK_COLORS, HUNTER_TANK_COLORS, PLAYER_TANK_COLOR_SLOTS, themeForLevel } from '../config/palette.ts';
 import { GRENADE_FUSE_TICKS } from '../config/constants.ts';
 
 function lerp(a: number, b: number, t: number): number {
@@ -15,22 +15,23 @@ function lerpAngle(a: number, b: number, t: number): number {
   return a + diff * t;
 }
 
+// A player mesh plus its last-interpolated render pose — recomputed once per
+// update() and cached so getPlayerRenderPose() (cameras, app.ts split-screen)
+// can read it back without redoing the lerp.
+interface PlayerVisual {
+  mesh: THREE.Group;
+  renderPosition: THREE.Vector3;
+  renderHeading: number;
+}
+
 // Mirrors sim state onto Three.js objects. Owns no gameplay logic — purely
 // a state-to-scene projection with render-frame interpolation.
 export class Renderer {
-  readonly playerRenderPosition = new THREE.Vector3();
-  playerRenderHeading = 0;
-  // Player 2 (2P co-op/duel only) — mirrors playerRenderPosition/Heading so
-  // a second chase camera can follow it the same way (see app.ts split-screen).
-  readonly player2RenderPosition = new THREE.Vector3();
-  player2RenderHeading = 0;
-
   private scene: THREE.Scene;
   private arenaControls: ArenaControls;
-  private playerMesh: THREE.Group;
-  private player2Mesh: THREE.Group | null = null;
   private renderedLevel = -1;
 
+  private playerVisuals = new Map<string, PlayerVisual>();
   private obstacleMeshes = new Map<string, THREE.Object3D>();
   private windmillBlades = new Map<string, THREE.Object3D>();
   private flagMeshes = new Map<string, THREE.Object3D>();
@@ -41,11 +42,17 @@ export class Renderer {
   constructor(scene: THREE.Scene, initialState: GameState) {
     this.scene = scene;
     this.arenaControls = buildArena(scene, themeForLevel(initialState.level));
-
-    this.playerMesh = buildTankMesh(PLAYER_TANK_COLORS);
-    scene.add(this.playerMesh);
-
     this.syncLevelObjects(initialState);
+  }
+
+  // Render-frame-interpolated position/heading for a player tank id (e.g.
+  // 'player', 'player2'), or null if that id isn't in play this
+  // frame — used by app.ts to drive each viewport's chase camera off the
+  // renderer's own interpolated pose rather than raw (un-lerped) sim state.
+  getPlayerRenderPose(id: string): { position: THREE.Vector3; heading: number } | null {
+    const visual = this.playerVisuals.get(id);
+    if (!visual) return null;
+    return { position: visual.renderPosition, heading: visual.renderHeading };
   }
 
   private buildEnemyMesh(enemy: EnemyState): THREE.Object3D {
@@ -119,19 +126,7 @@ export class Renderer {
       this.syncLevelObjects(state);
     }
 
-    const p = state.player;
-    this.playerRenderPosition.set(lerp(p.prevPosition.x, p.position.x, alpha), 0, lerp(p.prevPosition.z, p.position.z, alpha));
-    this.playerRenderHeading = lerpAngle(p.prevHeading, p.heading, alpha);
-    this.playerMesh.position.copy(this.playerRenderPosition);
-    this.playerMesh.rotation.y = this.playerRenderHeading;
-    // Brief post-respawn invulnerability blink: toggle visibility a few times
-    // a second rather than a steady fade — reads clearly as "temporarily safe".
-    // `p.alive` matters in duel mode, where a player can be legitimately dead
-    // for a couple of seconds awaiting respawn while the match continues.
-    const p1Blinking = p.invulnerableTicks <= 0 || Math.floor(frameTimeSeconds * 8) % 2 === 0;
-    this.playerMesh.visible = p.alive && p1Blinking;
-
-    this.reconcilePlayer2(state, alpha, frameTimeSeconds);
+    this.reconcilePlayers(state, alpha, frameTimeSeconds);
 
     for (const obstacle of state.obstacles) {
       if (obstacle.kind !== 'windmill') continue;
@@ -153,28 +148,45 @@ export class Renderer {
     this.reconcileGrenades(state);
   }
 
-  // Builds/tears down player2's mesh as state.player2 comes and goes (mode
-  // switches always go through a full resetGameWithLoadout, which recreates
-  // or nulls it out) and mirrors it the same way the solo player mesh works.
-  private reconcilePlayer2(state: GameState, alpha: number, frameTimeSeconds: number): void {
-    const p2 = state.player2;
-    if (!p2) {
-      if (this.player2Mesh) {
-        this.scene.remove(this.player2Mesh);
-        this.player2Mesh = null;
+  // Builds/tears down each player's mesh as state.players comes and goes
+  // (mode switches always go through a full resetGameWithRoster, which
+  // rebuilds the roster from scratch) — reconciled the same way enemies are,
+  // generalized from the old fixed playerMesh/player2Mesh pair.
+  private reconcilePlayers(state: GameState, alpha: number, frameTimeSeconds: number): void {
+    const seen = new Set<string>();
+    for (const player of state.players) {
+      seen.add(player.id);
+      let visual = this.playerVisuals.get(player.id);
+      if (!visual) {
+        const colors = PLAYER_TANK_COLOR_SLOTS[player.slot] ?? PLAYER_TANK_COLOR_SLOTS[PLAYER_TANK_COLOR_SLOTS.length - 1]!;
+        const mesh = buildTankMesh(colors);
+        this.scene.add(mesh);
+        visual = { mesh, renderPosition: new THREE.Vector3(), renderHeading: 0 };
+        this.playerVisuals.set(player.id, visual);
       }
-      return;
+
+      visual.renderPosition.set(
+        lerp(player.prevPosition.x, player.position.x, alpha),
+        0,
+        lerp(player.prevPosition.z, player.position.z, alpha),
+      );
+      visual.renderHeading = lerpAngle(player.prevHeading, player.heading, alpha);
+      visual.mesh.position.copy(visual.renderPosition);
+      visual.mesh.rotation.y = visual.renderHeading;
+      // Brief post-respawn invulnerability blink: toggle visibility a few
+      // times a second rather than a steady fade — reads clearly as
+      // "temporarily safe". `player.alive` matters in duel mode, where a
+      // player can be legitimately dead for a couple of seconds awaiting
+      // respawn while the match continues.
+      const blinking = player.invulnerableTicks <= 0 || Math.floor(frameTimeSeconds * 8) % 2 === 0;
+      visual.mesh.visible = player.alive && blinking;
     }
-    if (!this.player2Mesh) {
-      this.player2Mesh = buildTankMesh(PLAYER2_TANK_COLORS);
-      this.scene.add(this.player2Mesh);
+
+    for (const [id, visual] of this.playerVisuals) {
+      if (seen.has(id)) continue;
+      this.scene.remove(visual.mesh);
+      this.playerVisuals.delete(id);
     }
-    this.player2RenderPosition.set(lerp(p2.prevPosition.x, p2.position.x, alpha), 0, lerp(p2.prevPosition.z, p2.position.z, alpha));
-    this.player2RenderHeading = lerpAngle(p2.prevHeading, p2.heading, alpha);
-    this.player2Mesh.position.copy(this.player2RenderPosition);
-    this.player2Mesh.rotation.y = this.player2RenderHeading;
-    const blinking = p2.invulnerableTicks <= 0 || Math.floor(frameTimeSeconds * 8) % 2 === 0;
-    this.player2Mesh.visible = p2.alive && blinking;
   }
 
   private reconcileEnemies(state: GameState, alpha: number): void {
