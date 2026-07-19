@@ -637,7 +637,11 @@ export class Screens {
         // Duel ends in a winner screen, not a scored Game Over — no initials
         // prompt, no high-score qualification (see maybeRecordScoreThenGoToMenu).
         const winner = this.state.players.find((p) => p.id === this.state.winner);
-        const winnerLabel = winner ? `PLAYER ${winner.slot + 1}` : '???';
+        // Net play needs the chosen name, not just the slot (plan §M3 "GameOver
+        // in net: winner by name"); local play's name is always "Player N"
+        // (see sim/simulation.ts defaultPlayerName), so .toUpperCase() here
+        // reproduces today's "PLAYER N" text byte-for-byte — not a regression.
+        const winnerLabel = winner ? winner.name.toUpperCase() : '???';
         this.gameOverTitleEl.textContent = `${winnerLabel} WINS!`;
         const tally = this.state.players.map((p) => `P${p.slot + 1}: ${p.kills}`).join(' - ');
         this.gameOverStatsEl.innerHTML = `<div>Kills: ${tally}</div>`;

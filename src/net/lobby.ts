@@ -20,6 +20,7 @@ import {
   type LobbyMessage,
   type RejectMessage,
   type RosterEntry,
+  type StartMessage,
 } from './protocol.ts';
 
 export type LobbyErrorReason = 'not-found' | 'full' | 'started' | 'version' | 'host-left' | 'relay-unreachable';
@@ -39,6 +40,7 @@ export interface JoinDebugOverride {
 
 type Listener = () => void;
 type ErrorListener = (err: LobbyError) => void;
+type StartListener = (msg: StartMessage) => void;
 
 // DEFAULT_LOADOUT is a LoadoutPreset (carries `id`/`name` too) — strip it
 // down to the plain {speed,shields,ammo} shape RosterEntry.loadout expects
@@ -51,6 +53,7 @@ export class NetLobby {
   private readonly unsubPeerLeave: Unsubscribe;
   private readonly listeners = new Set<Listener>();
   private readonly errorListeners = new Set<ErrorListener>();
+  private readonly startListeners = new Set<StartListener>();
 
   private code: string | null = null;
   private isHostFlag = false;
@@ -73,6 +76,14 @@ export class NetLobby {
   onError(fn: ErrorListener): Unsubscribe {
     this.errorListeners.add(fn);
     return () => this.errorListeners.delete(fn);
+  }
+
+  // Fires on every peer (host included — see startMatch()) the moment a
+  // match actually begins. game/netscreens.ts forwards this to app.ts's
+  // NetSession construction (see net/session.ts).
+  onStart(fn: StartListener): Unsubscribe {
+    this.startListeners.add(fn);
+    return () => this.startListeners.delete(fn);
   }
 
   get roomCode(): string | null {
@@ -188,6 +199,32 @@ export class NetLobby {
     this.broadcastLobby();
   }
 
+  // Host-only: begins the match. Broadcasts `start` to every joiner AND
+  // fires onStart() locally (peers never receive their own broadcast — see
+  // net/broadcast.ts/loopback.ts, which never loop a message back to its
+  // sender), so the host enters the match through the exact same path as
+  // everyone else. No extra seed needed — level fully determines the sim
+  // (see net/CLAUDE.md); `roster` order is the slot order every peer must
+  // reconstruct createInitialState/resetGameWithRoster with.
+  startMatch(level: number, inputDelay: number): void {
+    if (!this.isHostFlag) return;
+    this.started = true;
+    const msg: StartMessage = { mode: this.mode, level, roster: [...this.roster], inputDelay };
+    this.transport.send('start', msg);
+    this.emitStart(msg);
+  }
+
+  // Called by every peer once a match ends (GameOver -> Enter, back to
+  // NetLobby with the room still alive) so the host can Start another —
+  // resets the "match in progress" gate that would otherwise reject new
+  // joiners' `hello` (see handleHello). Only the host's flag actually gates
+  // anything; non-host peers reset their own copy for consistency and
+  // in case they later become host of a new room.
+  markMatchEnded(): void {
+    this.started = false;
+    if (this.isHostFlag) this.broadcastLobby();
+  }
+
   leave(): void {
     const bye: ByeMessage = { peerId: this.transport.selfId };
     this.transport.send('bye', bye);
@@ -203,6 +240,17 @@ export class NetLobby {
     else if (kind === 'lobby' && !this.isHostFlag) this.handleLobbyBroadcast(payload as LobbyMessage);
     else if (kind === 'loadoutPick') this.handleLoadoutPick(payload as LoadoutPickMessage, from);
     else if (kind === 'bye') this.handlePeerGone((payload as ByeMessage).peerId);
+    else if (kind === 'start' && !this.isHostFlag) this.handleStart(payload as StartMessage);
+  }
+
+  // Non-host peers learn the match started from the host's broadcast (the
+  // host itself takes the same StartMessage via startMatch()'s direct
+  // emitStart() call, since transports never loop a send back to sender).
+  private handleStart(msg: StartMessage): void {
+    this.started = true;
+    this.mode = msg.mode;
+    this.roster = msg.roster;
+    this.emitStart(msg);
   }
 
   private handleHello(msg: HelloMessage, from: string): void {
@@ -282,5 +330,9 @@ export class NetLobby {
 
   private emitError(err: LobbyError): void {
     for (const l of this.errorListeners) l(err);
+  }
+
+  private emitStart(msg: StartMessage): void {
+    for (const l of this.startListeners) l(msg);
   }
 }

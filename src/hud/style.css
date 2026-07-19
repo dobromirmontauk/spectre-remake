@@ -192,11 +192,14 @@ body {
    2P split-screen (local multiplayer — co-op/duel)
    ============================================================ */
 
-/* Solo HUD strip/speed readout are replaced by #hud2p-top's own left/right
-   panels in split-screen; the shared radar (#radar) stays but shifts to sit
-   inside the left half, and a second radar (#radar2) appears for the right. */
-#stage[data-splitscreen='true'] #hud-top,
-#stage[data-splitscreen='true'] #hud-speed {
+/* Solo HUD strip/speed readout are replaced by hudmp's own panels whenever
+   there's more than one player in the match — local split-screen (2P
+   co-op/duel) AND net play's single-viewport N-player match both set
+   data-multiplayer, independently of data-splitscreen (dual-viewport
+   rendering, local split-screen only — net play always renders ONE
+   viewport, following the local player, so it never sets data-splitscreen). */
+#stage[data-multiplayer='true'] #hud-top,
+#stage[data-multiplayer='true'] #hud-speed {
   display: none;
 }
 
@@ -1179,4 +1182,29 @@ body {
   display: flex;
   justify-content: center;
   margin-top: 1.2em;
+}
+
+/* ============================================================
+   Net play: lockstep stall overlay (M3)
+   ============================================================ */
+
+.stall-overlay {
+  position: absolute;
+  top: 16cqw;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.75);
+  color: #ffee55;
+  text-shadow: 0 0 0.2em rgba(255, 238, 85, 0.6);
+  padding: 0.6em 1.2em;
+  font-size: 1.3cqw;
+  border: 1px solid #ffee55;
+  display: none;
+  z-index: 35;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.stall-overlay.visible {
+  display: block;
 }

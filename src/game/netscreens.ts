@@ -7,15 +7,29 @@
 
 import type { GameFlow } from './flow.ts';
 import type { GameMode, Loadout } from '../sim/types.ts';
-import { LOADOUT_PRESETS, NET_NAME_STORAGE_KEY } from '../config/constants.ts';
+import { LOADOUT_PRESETS, NET_INPUT_DELAY_TICKS, NET_NAME_STORAGE_KEY } from '../config/constants.ts';
 import { PLAYER_TANK_COLOR_SLOTS } from '../config/palette.ts';
 import { createTransport } from '../net/createTransport.ts';
 import { NetLobby, type JoinDebugOverride, type LobbyError, type LobbyErrorReason } from '../net/lobby.ts';
 import { generateRoomCode, normalizeRoomCode } from '../net/roomcode.ts';
-import type { RosterEntry } from '../net/protocol.ts';
+import type { NetTransport } from '../net/transport.ts';
+import type { RosterEntry, StartMessage } from '../net/protocol.ts';
+
+export interface MatchStartInfo {
+  transport: NetTransport;
+  roster: RosterEntry[];
+  mode: GameMode;
+  level: number;
+  inputDelay: number;
+  selfPeerId: string;
+}
 
 export interface NetScreensCallbacks {
   onAnyInteraction(): void;
+  // Fires on every peer (host included) the instant a match begins — see
+  // net/lobby.ts NetLobby.startMatch()/onStart(). app.ts owns turning this
+  // into a NetSession + resetGameWithRoster + flow.beginRun() (M3).
+  onMatchStart(info: MatchStartInfo): void;
 }
 
 function el<K extends keyof HTMLElementTagNameMap>(tag: K, className?: string): HTMLElementTagNameMap[K] {
@@ -55,6 +69,11 @@ export class NetScreens {
   private readonly dialogMessageEl: HTMLDivElement;
   private dialogOnClose: (() => void) | null = null;
 
+  // --- M3: leave-match confirm (Esc mid-match) ---
+  private readonly leaveConfirmEl: HTMLDivElement;
+  private showLeaveConfirmFlag = false;
+  private onLeaveConfirmed: (() => void) | null = null;
+
   private readonly nameInput: HTMLInputElement;
   private readonly statusEl: HTMLDivElement;
 
@@ -72,6 +91,7 @@ export class NetScreens {
   private lobby: NetLobby | null = null;
   private unsubChange: (() => void) | null = null;
   private unsubError: (() => void) | null = null;
+  private unsubStart: (() => void) | null = null;
   private sessionToken = 0;
 
   constructor(root: HTMLElement, flow: GameFlow, callbacks: NetScreensCallbacks) {
@@ -101,9 +121,11 @@ export class NetScreens {
     this.dialogTitleEl = dialog.title;
     this.dialogMessageEl = dialog.message;
 
+    this.leaveConfirmEl = this.buildLeaveConfirm();
+
     this.nameInput.value = loadStoredName();
 
-    root.append(this.netMenuEl, this.netLobbyEl, this.dialogOverlayEl);
+    root.append(this.netMenuEl, this.netLobbyEl, this.dialogOverlayEl, this.leaveConfirmEl);
   }
 
   // --- Per-frame visibility sync (mirrors game/screens.ts Screens.update) ---
@@ -111,10 +133,15 @@ export class NetScreens {
   update(): void {
     this.netMenuEl.classList.toggle('visible', this.flow.showNetMenu);
     this.netLobbyEl.classList.toggle('visible', this.flow.showNetLobby);
+    this.leaveConfirmEl.classList.toggle('visible', this.showLeaveConfirmFlag);
   }
 
   get isDialogOpen(): boolean {
     return this.dialogOverlayEl.classList.contains('visible');
+  }
+
+  get isLeaveConfirmOpen(): boolean {
+    return this.showLeaveConfirmFlag;
   }
 
   // Esc while on a net screen — Back-button-equivalent. Returns true if it
@@ -122,6 +149,10 @@ export class NetScreens {
   handleEscape(): boolean {
     if (this.isDialogOpen) {
       this.closeDialog();
+      return true;
+    }
+    if (this.showLeaveConfirmFlag) {
+      this.hideLeaveConfirm();
       return true;
     }
     if (this.flow.showNetLobby) {
@@ -134,6 +165,42 @@ export class NetScreens {
       return true;
     }
     return false;
+  }
+
+  // --- M3: leave-match confirm (Esc mid-match) ---
+
+  private buildLeaveConfirm(): HTMLDivElement {
+    // Reuses screens.ts's confirm-quit-* CSS classes verbatim (generic
+    // modal-confirm styling, not scoped to that module) rather than
+    // duplicating the look in a new stylesheet block.
+    const overlay = el('div', 'confirm-quit-overlay');
+    const panel = el('div', 'confirm-quit-panel');
+    const msg = el('div', 'confirm-quit-message');
+    msg.textContent = 'Leave the match? It will end for everyone.';
+    panel.appendChild(msg);
+    const row = el('div', 'confirm-quit-actions');
+    const yesBtn = this.menuButton('Yes', () => {
+      const cb = this.onLeaveConfirmed;
+      this.hideLeaveConfirm();
+      cb?.();
+    });
+    const noBtn = this.menuButton('No', () => this.hideLeaveConfirm());
+    row.append(noBtn, yesBtn);
+    panel.appendChild(row);
+    overlay.appendChild(panel);
+    return overlay;
+  }
+
+  // Shows the "Leave match?" confirm; `onConfirm` runs if the player picks
+  // Yes (app.ts wires this to net-session teardown — see game/app.ts).
+  requestLeaveConfirm(onConfirm: () => void): void {
+    this.onLeaveConfirmed = onConfirm;
+    this.showLeaveConfirmFlag = true;
+  }
+
+  hideLeaveConfirm(): void {
+    this.showLeaveConfirmFlag = false;
+    this.onLeaveConfirmed = null;
   }
 
   // --- Debug hooks (window.__game.net — see game/debug.ts) ---
@@ -158,6 +225,12 @@ export class NetScreens {
 
   debugLeave(): void {
     this.backFromLobby();
+  }
+
+  // Host-only convenience for Playwright verification — same path as
+  // clicking the lobby's Start button.
+  debugStartMatch(): void {
+    this.onStartClicked();
   }
 
   // --- NetMenu screen ---
@@ -395,7 +468,31 @@ export class NetScreens {
 
   private onStartClicked(): void {
     if (!this.lobby?.isHost) return;
-    this.showDialog('Coming Soon', 'Network play arrives in the next milestone.');
+    if (this.lobby.currentRoster.length < 2) return;
+    this.lobby.startMatch(1, NET_INPUT_DELAY_TICKS);
+  }
+
+  // --- Match lifecycle (M3) ---
+
+  // Called by app.ts when a net match ends normally (GameOver -> Enter) —
+  // the room/transport stay alive and the host can Start another (state is
+  // fully rebuilt each match, so this is safe — see plan §3.6).
+  returnToLobbyAfterMatch(): void {
+    this.lobby?.markMatchEnded();
+    this.renderLobby();
+  }
+
+  // Info dialog for a match that ended abnormally (peer left, desync) — v1
+  // "simple" handling per the plan (the full grace/drop protocol is M5):
+  // whoever sees this ends up back at NetMenu via `onAcknowledge`.
+  showMatchEndedDialog(title: string, message: string, onAcknowledge: () => void): void {
+    this.showDialog(title, message, onAcknowledge);
+  }
+
+  // Full teardown back to NetMenu — used for the voluntary Esc-leave
+  // confirm and after a match-ended dialog's OK (see game/app.ts).
+  forceLeaveMatch(): void {
+    this.backFromLobby();
   }
 
   // --- Host/join lifecycle ---
@@ -403,14 +500,26 @@ export class NetScreens {
   private teardownLobby(): void {
     this.unsubChange?.();
     this.unsubError?.();
+    this.unsubStart?.();
     this.unsubChange = null;
     this.unsubError = null;
+    this.unsubStart = null;
     this.lobby = null;
   }
 
-  private wireLobby(lobby: NetLobby): void {
+  private wireLobby(lobby: NetLobby, transport: NetTransport): void {
     this.unsubChange = lobby.onChange(() => this.renderLobby());
     this.unsubError = lobby.onError((err) => this.handleLobbyError(err));
+    this.unsubStart = lobby.onStart((msg: StartMessage) => {
+      this.callbacks.onMatchStart({
+        transport,
+        roster: msg.roster,
+        mode: msg.mode,
+        level: msg.level,
+        inputDelay: msg.inputDelay,
+        selfPeerId: lobby.selfId,
+      });
+    });
   }
 
   private async doHost(name: string): Promise<void> {
@@ -435,7 +544,7 @@ export class NetScreens {
     }
     this.setStatus('');
     this.lobby = lobby;
-    this.wireLobby(lobby);
+    this.wireLobby(lobby, transport);
     this.flow.goToNetLobby();
     this.renderLobby();
   }
@@ -464,7 +573,7 @@ export class NetScreens {
     }
     this.setStatus('');
     this.lobby = lobby;
-    this.wireLobby(lobby);
+    this.wireLobby(lobby, transport);
     this.flow.goToNetLobby();
     this.renderLobby();
   }
