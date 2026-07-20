@@ -375,6 +375,11 @@ body {
   min-width: 16%;
 }
 
+/* A removed (net play M5 disconnect) player's panel — dimmed, no bars */
+.hudmp-panel.hudmp-removed {
+  opacity: 0.45;
+}
+
 .hudmp-center {
   position: absolute;
   left: 50%;
@@ -388,6 +393,25 @@ body {
   letter-spacing: 0.1em;
   font-variant-numeric: tabular-nums;
   text-shadow: 0 0 0.15em rgba(255, 238, 85, 0.6);
+}
+
+/* Dense mode (5-8 players, M5 fix): the panels row wraps to 2+ lines at
+   this many entries, but hudmp-center's absolute `top` above assumes a
+   single panel row (true for the <=4-player non-dense layout it was
+   designed for) — with 8 players it landed on top of the wrapped second
+   row (a real bug, found via the M5 8-player smoke screenshot). Dense mode
+   instead stacks hudmp-top as a column flex (panels, then center below
+   them) so the center block always clears however many rows the panels
+   actually wrapped into, instead of a fixed guessed offset. */
+.hudmp-top.hudmp-dense-mode {
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.hudmp-top.hudmp-dense-mode .hudmp-center {
+  position: static;
+  transform: none;
 }
 
 #crosshair span {

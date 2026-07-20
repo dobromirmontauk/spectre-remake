@@ -643,7 +643,11 @@ export class Screens {
         // reproduces today's "PLAYER N" text byte-for-byte — not a regression.
         const winnerLabel = winner ? winner.name.toUpperCase() : '???';
         this.gameOverTitleEl.textContent = `${winnerLabel} WINS!`;
-        const tally = this.state.players.map((p) => `P${p.slot + 1}: ${p.kills}`).join(' - ');
+        // FFA scoreboard sorted by kills descending (render-side only — see
+        // hud/hudmp.ts's matching in-match tally); a removed (M5 disconnect)
+        // player's frozen kill count still shows, flagged.
+        const ranked = [...this.state.players].sort((a, b) => b.kills - a.kills);
+        const tally = ranked.map((p) => `P${p.slot + 1}: ${p.kills}${p.removed ? ' (left)' : ''}`).join(' - ');
         this.gameOverStatsEl.innerHTML = `<div>Kills: ${tally}</div>`;
         this.initialsFormEl.classList.remove('visible');
         this.gameOverHintEl.style.visibility = 'visible';

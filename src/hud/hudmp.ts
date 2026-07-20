@@ -95,6 +95,24 @@ export class HudMp {
 
   private updatePanel(panel: PlayerPanel, player: PlayerState, dense: boolean, showLives: boolean): void {
     panel.root.classList.toggle('dense', dense);
+    panel.root.classList.toggle('hudmp-removed', player.removed);
+
+    // A removed (net play M5 disconnect) player's panel reads as a plain
+    // "left" marker instead of the usual bars — their shield/ammo were
+    // zeroed by removePlayer() and would otherwise render as a confusing
+    // permanent 0%/empty bar rather than an explained absence.
+    if (player.removed) {
+      const label = `P${player.slot + 1} — left`;
+      if (dense) panel.denseEl.textContent = label;
+      else {
+        panel.livesRow.style.display = 'none';
+        panel.damageFillEl.style.width = '0%';
+        panel.ammoEl.textContent = '—';
+        panel.ammoFillEl.style.width = '0%';
+      }
+      return;
+    }
+
     const shieldPct = Math.round((player.shield / player.maxShield) * 100);
     const ammo = Math.round(player.ammo);
 
@@ -127,7 +145,12 @@ export class HudMp {
     }
 
     if (state.mode === 'duel') {
-      const tally = players.map((p) => `P${p.slot + 1}: ${p.kills}`).join(' · ');
+      // FFA scoreboard: sorted by kills descending (render-side sort only —
+      // slot/array order stays untouched everywhere else, this is display
+      // logic). A removed player's kills freeze (see sim/simulation.ts
+      // removePlayer) but they still show up in the tally, flagged.
+      const ranked = [...players].sort((a, b) => b.kills - a.kills);
+      const tally = ranked.map((p) => `P${p.slot + 1}: ${p.kills}${p.removed ? ' (left)' : ''}`).join(' · ');
       this.centerEl.innerHTML =
         `<div class="hudmp-row">${tally}</div>` + `<div class="hudmp-row">First to ${DUEL_KILL_TARGET}</div>`;
     } else {
