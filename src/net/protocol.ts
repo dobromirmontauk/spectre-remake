@@ -90,8 +90,9 @@ export interface HashMessage {
   hash: number;
 }
 
-// Type only in M3 (host-authoritative disconnect/removal logic lands in
-// M5) — peers that receive this before then can safely ignore it.
+// Host-authoritative player removal (M5, net/CLAUDE.md's disconnect
+// protocol): every peer applies sim/simulation.ts removePlayer(slot) at the
+// identical `effectiveTick` (net/lockstep.ts scheduleDrop/takeDueDrops).
 export interface DropMessage {
   slot: number;
   effectiveTick: number;

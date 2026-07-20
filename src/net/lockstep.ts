@@ -16,8 +16,8 @@
 
 import type { Command } from '../sim/commands.ts';
 import { NEUTRAL_COMMAND } from '../sim/commands.ts';
-import { INPUT_REDUNDANCY, NET_HASH_RING_SIZE } from '../config/constants.ts';
-import { packCommand, unpackCommand, type HashMessage, type InputMessage } from './protocol.ts';
+import { DISCONNECT_GRACE_TICKS, INPUT_REDUNDANCY, NET_HASH_RING_SIZE, SIM_HZ, ZOMBIE_TIMEOUT_MS } from '../config/constants.ts';
+import { packCommand, unpackCommand, type DropMessage, type HashMessage, type InputMessage } from './protocol.ts';
 import type { NetTransport, Unsubscribe } from './transport.ts';
 
 // How many confirmed ticks of buffered commands to keep behind the
@@ -26,10 +26,20 @@ import type { NetTransport, Unsubscribe } from './transport.ts';
 // match doesn't grow the buffers forever.
 const PRUNE_MARGIN_TICKS = 90;
 
+// DISCONNECT_GRACE_TICKS is expressed in ticks (config/constants.ts, so it
+// reads next to the other tick-based tunables) but the grace timer itself
+// MUST be wall-clock (see checkHostDisconnects below) — converted once here.
+const DISCONNECT_GRACE_MS = (DISCONNECT_GRACE_TICKS / SIM_HZ) * 1000;
+
 export interface LockstepOptions {
   inputDelay: number;
   localSlots: number[]; // slots this client samples local input for (length 1 in M3 — one human per net client)
   liveSlots: number[]; // every slot canStep() waits on; dense, from the match roster
+  // M5 disconnect protocol: only the host originates grace-timer/zombie drop
+  // decisions (see checkHostDisconnects); `roster` maps a transport
+  // peer-leave's peerId back to the roster slot it owns.
+  isHost: boolean;
+  roster: { slot: number; peerId: string }[];
 }
 
 export class Lockstep {
@@ -37,34 +47,67 @@ export class Lockstep {
   private readonly inputDelay: number;
   private readonly localSlots: number[];
   private readonly liveSlots: number[];
+  private readonly isHost: boolean;
+  private readonly rosterSlotByPeer = new Map<string, number>();
   private readonly buffers = new Map<number, Map<number, Command>>(); // slot -> tick -> Command
   private readonly ownHashes = new Map<number, number>(); // tick -> hash, trimmed to NET_HASH_RING_SIZE
-  private readonly pendingPeerHashes = new Map<number, number>(); // tick -> hash, awaiting our own hash at that tick
+  // tick -> peerId -> hash, awaiting our own hash at that tick. MUST be keyed
+  // per-peer, not just per-tick: with 3+ players every peer receives a `hash`
+  // from EACH other peer for the same tick, and a single tick-keyed slot
+  // would let one peer's hash silently clobber another's before ours arrives
+  // to compare against it — a real bug found under 3-player testing (M5),
+  // never exercised by M3/M4's 2-peer-only verification.
+  private readonly pendingPeerHashes = new Map<number, Map<string, number>>();
   private nextTick = 0; // next tick this client hasn't yet handed to the sim
+  private lastProcessedTick = -1; // last T actually consumed by commandsForNextTick (see takeDueDrops)
   private lastSampledTick = -1; // last T for which local input was sampled+broadcast
   private desyncTick: number | null = null;
   private desyncHandler: ((tick: number) => void) | null = null;
   private readonly unsubMessage: Unsubscribe;
+  private readonly unsubPeerLeave: Unsubscribe;
   private stallSuppressUntil = 0; // debugStallInject(): suppress outbound input broadcast until this performance.now()
   private suppressedGapStartTick: number | null = null; // earliest scheduleTick withheld during the current suppression, for catch-up on resume
+
+  // --- M5 disconnect protocol (net/CLAUDE.md "Disconnect robustness") ---
+  // A slot whose commands default to NEUTRAL_COMMAND instead of blocking
+  // canStep() — either because its peer's transport connection genuinely
+  // dropped (handleTransportPeerLeave), or because we've received/originated
+  // an authoritative `drop` for it (scheduleDrop). This MUST happen the
+  // instant we learn a slot is gone, independent of tick progress — a silent
+  // peer would otherwise deadlock every peer's canStep() forever (nobody can
+  // advance to the tick that would apply the eventual drop).
+  private readonly orphanedSlots = new Set<number>();
+  // A slot removePlayer() has actually been applied for (see takeDueDrops) —
+  // fully excluded from missingSlots/commandsForNextTick from then on.
+  private readonly droppedSlots = new Set<number>();
+  private readonly pendingDrops = new Map<number, number>(); // slot -> effectiveTick, received (or self-originated) but not yet reached
+  private readonly lastInputAtMs = new Map<number, number>(); // slot -> wall-clock time of its last received `input` (host-side zombie check)
+  private readonly peerLeftAtMs = new Map<number, number>(); // slot -> wall-clock time its transport peer-leave was detected (host-side grace timer)
 
   constructor(transport: NetTransport, opts: LockstepOptions) {
     this.transport = transport;
     this.inputDelay = opts.inputDelay;
     this.localSlots = opts.localSlots;
     this.liveSlots = opts.liveSlots;
+    this.isHost = opts.isHost;
+    for (const r of opts.roster) this.rosterSlotByPeer.set(r.peerId, r.slot);
     for (const slot of this.liveSlots) this.buffers.set(slot, new Map());
     for (let t = 0; t < this.inputDelay; t++) {
       for (const slot of this.liveSlots) this.buffers.get(slot)!.set(t, NEUTRAL_COMMAND);
     }
-    this.unsubMessage = transport.onMessage((kind, payload) => {
+    const now = performance.now();
+    for (const slot of this.liveSlots) this.lastInputAtMs.set(slot, now);
+    this.unsubMessage = transport.onMessage((kind, payload, from) => {
       if (kind === 'input') this.handleInput(payload as InputMessage);
-      else if (kind === 'hash') this.handleHash(payload as HashMessage);
+      else if (kind === 'hash') this.handleHash(payload as HashMessage, from);
+      else if (kind === 'drop') this.handleDropMessage(payload as DropMessage);
     });
+    this.unsubPeerLeave = transport.onPeerLeave((peerId) => this.handleTransportPeerLeave(peerId));
   }
 
   dispose(): void {
     this.unsubMessage();
+    this.unsubPeerLeave();
   }
 
   onDesync(handler: (tick: number) => void): void {
@@ -99,9 +142,11 @@ export class Lockstep {
   }
 
   // Slots canStep() is currently blocked on for `tick` — drives the
-  // "Waiting for NAME…" overlay text (see net/session.ts).
+  // "Waiting for NAME…" overlay text (see net/session.ts). An orphaned or
+  // fully-dropped slot never blocks (see the M5 disconnect-protocol fields
+  // above) — its command defaults to NEUTRAL_COMMAND instead.
   missingSlots(tick: number): number[] {
-    return this.liveSlots.filter((slot) => !this.buffers.get(slot)!.has(tick));
+    return this.liveSlots.filter((slot) => !this.orphanedSlots.has(slot) && !this.droppedSlots.has(slot) && !this.buffers.get(slot)!.has(tick));
   }
 
   // Returns this tick's command-by-slot map and advances, or null if any
@@ -115,6 +160,14 @@ export class Lockstep {
   // (debugStallInject, or a real hiccup) catch up the moment it clears,
   // rather than getting a single shot at the moment of sampling.
   commandsForNextTick(readLocalCommand: (slot: number) => Command): Record<number, Command> | null {
+    // Host-only disconnect bookkeeping (M5) — MUST run on every call, not
+    // just once a tick actually advances: while a slot is silent, canStep()
+    // below can stay false indefinitely, and this is the only thing that
+    // ever clears that (see checkHostDisconnects' doc comment). app.ts calls
+    // commandsForNextTick() at least once per rendered frame regardless of
+    // whether the sim is stalled, so this still runs during a stall.
+    if (this.isHost) this.checkHostDisconnects();
+
     const T = this.nextTick;
     const scheduleTick = T + this.inputDelay;
     if (this.lastSampledTick < T) {
@@ -126,23 +179,129 @@ export class Lockstep {
     this.broadcastInput(scheduleTick);
     if (!this.canStep(T)) return null;
     const commands: Record<number, Command> = {};
-    for (const slot of this.liveSlots) commands[slot] = this.buffers.get(slot)!.get(T)!;
+    for (const slot of this.liveSlots) {
+      if (this.droppedSlots.has(slot)) continue; // fully removed — sim already skips a !alive tank's command lookup
+      commands[slot] = this.buffers.get(slot)!.get(T) ?? NEUTRAL_COMMAND; // orphaned slot (or any gap) fills neutral
+    }
+    this.lastProcessedTick = T;
     this.nextTick = T + 1;
     this.pruneBefore(T - PRUNE_MARGIN_TICKS);
     return commands;
   }
 
+  // Slots to apply sim/simulation.ts removePlayer() to at the tick just
+  // consumed by commandsForNextTick() (see net/session.ts NetSession.dueDrops
+  // and net/CLAUDE.md's drop-application invariant) — called once per
+  // successful (non-null) commandsForNextTick() result, before step() runs
+  // that tick. Idempotent: a slot is only ever returned once, the moment its
+  // pending drop's effectiveTick is reached.
+  takeDueDrops(): number[] {
+    const tick = this.lastProcessedTick;
+    const due: number[] = [];
+    for (const [slot, effectiveTick] of [...this.pendingDrops]) {
+      if (effectiveTick > tick) continue;
+      due.push(slot);
+      this.pendingDrops.delete(slot);
+      this.droppedSlots.add(slot);
+    }
+    return due;
+  }
+
+  get latestScheduledTick(): number {
+    return this.nextTick + this.inputDelay;
+  }
+
+  // A roster peer's transport connection genuinely dropped (crash/tab-close —
+  // see broadcast.ts/trystero.ts onPeerLeave). Every peer (not just the
+  // host) stops waiting on that slot's real input immediately — otherwise
+  // the whole match freezes the instant one peer's connection drops. Only
+  // the host additionally arms a DISCONNECT_GRACE_TICKS wall-clock timer
+  // (checkHostDisconnects) to actually remove the player.
+  private handleTransportPeerLeave(peerId: string): void {
+    const slot = this.rosterSlotByPeer.get(peerId);
+    if (slot === undefined || this.droppedSlots.has(slot) || this.orphanedSlots.has(slot)) return;
+    this.orphanedSlots.add(slot);
+    if (this.isHost) this.peerLeftAtMs.set(slot, performance.now());
+  }
+
+  private handleDropMessage(msg: DropMessage): void {
+    this.scheduleDrop(msg.slot, msg.effectiveTick);
+  }
+
+  // Records a pending drop, whether it arrived over the wire or was just
+  // originated locally by the host (see broadcastDrop) — always marks the
+  // slot orphaned too, since a `drop` message is by itself sufficient
+  // evidence the slot is gone even on a peer that never independently
+  // detected a transport-level leave for it (the host-side zombie path: a
+  // silently-stalled peer's connection never actually closes, so non-host
+  // peers have no signal of their own — the `drop` message IS the signal).
+  private scheduleDrop(slot: number, effectiveTick: number): void {
+    if (this.droppedSlots.has(slot) || this.pendingDrops.has(slot)) return;
+    this.orphanedSlots.add(slot);
+    this.pendingDrops.set(slot, effectiveTick);
+  }
+
+  // Host-only: originates an authoritative drop — broadcasts it AND applies
+  // scheduleDrop() locally (transports never loop a send back to their own
+  // sender — see net/CLAUDE.md — so the host takes the identical path as
+  // every joiner, same pattern as NetLobby.startMatch()). effectiveTick uses
+  // the same "current schedule tick + inputDelay" lead time a normal input
+  // packet gets, so every peer's `drop` handling has time to arrive and
+  // orphan the slot before their own sim reaches that tick.
+  private broadcastDrop(slot: number, effectiveTick: number): void {
+    const msg: DropMessage = { slot, effectiveTick };
+    this.transport.send('drop', msg);
+    this.scheduleDrop(slot, effectiveTick);
+  }
+
+  // Host-only bookkeeping, called on every commandsForNextTick() (i.e. every
+  // rendered frame, even mid-stall — see that method's doc comment): (a) a
+  // slot whose transport peer-leave grace period has elapsed with no
+  // reconnect support to save it — this always fires after
+  // DISCONNECT_GRACE_TICKS, the delay exists purely so the tank doesn't
+  // vanish instantly; (b) a "zombie" slot — transport still reports the
+  // peer connected, but no `input` packet has arrived from it in
+  // ZOMBIE_TIMEOUT_MS (see __game.net.debugStallInject) — dropped
+  // immediately, no additional grace on top of the timeout already waited.
+  private checkHostDisconnects(): void {
+    const nowMs = performance.now();
+
+    for (const [slot, leftAt] of [...this.peerLeftAtMs]) {
+      if (this.droppedSlots.has(slot) || this.pendingDrops.has(slot)) {
+        this.peerLeftAtMs.delete(slot);
+        continue;
+      }
+      if (nowMs - leftAt < DISCONNECT_GRACE_MS) continue;
+      this.peerLeftAtMs.delete(slot);
+      this.broadcastDrop(slot, this.latestScheduledTick);
+    }
+
+    for (const slot of this.liveSlots) {
+      if (this.localSlots.includes(slot)) continue; // never zombie-check ourselves
+      if (this.droppedSlots.has(slot) || this.pendingDrops.has(slot) || this.orphanedSlots.has(slot)) continue;
+      const lastSeen = this.lastInputAtMs.get(slot);
+      if (lastSeen === undefined || nowMs - lastSeen < ZOMBIE_TIMEOUT_MS) continue;
+      this.broadcastDrop(slot, this.latestScheduledTick);
+    }
+  }
+
   // Called by the session once per HASH_INTERVAL_TICKS after a successful
   // step (see net/session.ts NetSession.afterTick) — records our own hash,
-  // broadcasts it, and compares against any peer hash already received for
-  // this tick (or waits for one to arrive and compares then).
+  // broadcasts it, and compares against EVERY peer hash already received for
+  // this tick (one per other peer — see pendingPeerHashes' doc comment; a
+  // 3+ player match means more than one may already be waiting).
   recordAndBroadcastHash(tick: number, hash: number): void {
     this.ownHashes.set(tick, hash);
     this.trimOwnHashes();
     const pending = this.pendingPeerHashes.get(tick);
     if (pending !== undefined) {
       this.pendingPeerHashes.delete(tick);
-      if (pending !== hash) this.raiseDesync(tick);
+      for (const peerHash of pending.values()) {
+        if (peerHash !== hash) {
+          this.raiseDesync(tick);
+          break;
+        }
+      }
     }
     const msg: HashMessage = { tick, hash };
     this.transport.send('hash', msg);
@@ -155,6 +314,7 @@ export class Lockstep {
   }
 
   private handleInput(msg: InputMessage): void {
+    this.lastInputAtMs.set(msg.slot, performance.now()); // host-side zombie-timeout tracking (checkHostDisconnects)
     for (let i = 0; i < msg.cmds.length; i++) {
       const tick = msg.firstTick + i;
       if (tick < 0) continue;
@@ -162,10 +322,15 @@ export class Lockstep {
     }
   }
 
-  private handleHash(msg: HashMessage): void {
+  private handleHash(msg: HashMessage, fromPeerId: string): void {
     const own = this.ownHashes.get(msg.tick);
     if (own === undefined) {
-      this.pendingPeerHashes.set(msg.tick, msg.hash);
+      let bucket = this.pendingPeerHashes.get(msg.tick);
+      if (!bucket) {
+        bucket = new Map();
+        this.pendingPeerHashes.set(msg.tick, bucket);
+      }
+      bucket.set(fromPeerId, msg.hash);
       return;
     }
     if (own !== msg.hash) this.raiseDesync(msg.tick);

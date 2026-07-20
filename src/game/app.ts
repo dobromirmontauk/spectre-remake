@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { SIM_DT, MAX_FRAME_DT_MS, MAX_ACCUMULATED_TICKS, STALL_OVERLAY_MS } from '../config/constants.ts';
+import { SIM_DT, MAX_FRAME_DT_MS, MAX_ACCUMULATED_TICKS, PLAYER_LEFT_TOAST_MS, STALL_OVERLAY_MS } from '../config/constants.ts';
 import {
   createInitialState,
   killAllEnemies,
@@ -65,6 +65,20 @@ stage.appendChild(splitDivider);
 const stallOverlayEl = document.createElement('div');
 stallOverlayEl.className = 'stall-overlay';
 stage.appendChild(stallOverlayEl);
+
+// "NAME left the game" transient toast (M5) — driven by the PlayerLeft sim
+// event (see runTick below), which every peer's removePlayer() emits at the
+// same tick, so this fires in sync across the match rather than at whatever
+// real time each peer happened to notice the transport-level disconnect.
+const playerLeftToastEl = document.createElement('div');
+playerLeftToastEl.className = 'player-left-toast';
+stage.appendChild(playerLeftToastEl);
+let toastHideAtMs = 0;
+
+function showPlayerLeftToast(text: string): void {
+  playerLeftToastEl.textContent = text;
+  toastHideAtMs = performance.now() + PLAYER_LEFT_TOAST_MS;
+}
 
 const flow = new GameFlow();
 
@@ -134,10 +148,12 @@ let frameEvents: SimEvent[] = [];
 
 // The exact sequence net/CLAUDE.md documents as the cross-peer invariant:
 // step() -> flow.handleEvents() -> flow.tick(), identical on every client
-// for a given tick's `commands`. `session.afterTick()` runs after — it only
-// observes `state` (hash exchange for net play), never mutates it.
-function runTick(commands: Record<string, Command>): void {
-  step(state, commands);
+// for a given tick's `commands` AND `drops` (M5 disconnect protocol — the
+// slots session.dueDrops() says to removePlayer() at this exact tick, always
+// empty in local play). `session.afterTick()` runs after — it only observes
+// `state` (hash exchange for net play), never mutates it.
+function runTick(commands: Record<string, Command>, drops: number[]): void {
+  step(state, commands, drops);
   frameEvents.push(...state.events);
   for (const event of state.events) {
     // Duel results are match wins, not a high-score run — skip the
@@ -145,6 +161,10 @@ function runTick(commands: Record<string, Command>): void {
     // local high-score/initials flow either (see game/screens.ts).
     if (event.type === 'GameOver' && session.kind === 'local' && state.mode !== 'duel') {
       screens.notifyGameOver(event.finalScore, event.finalLevel);
+    }
+    if (event.type === 'PlayerLeft') {
+      const name = state.players[event.slot]?.name ?? `Player ${event.slot + 1}`;
+      showPlayerLeftToast(`${name} left the game`);
     }
   }
   flow.handleEvents(state);
@@ -175,7 +195,7 @@ installDebugApi({
     assertLocal('stepTicks'); // ticks are gated by the network in net play
     for (let i = 0; i < n; i++) {
       const commands = session.commandsForNextTick();
-      if (commands) runTick(commands);
+      if (commands) runTick(commands, session.dueDrops());
     }
   },
   pressCommand: (cmd: Partial<Command>, ticks: number) => {
@@ -273,11 +293,12 @@ let previousFrameTime = performance.now();
 let accumulator = 0;
 let stallStartMs: number | null = null; // wall-clock time the current stall began, net play only
 
-// --- Net match lifecycle (M3) ---
+// --- Net match lifecycle (M3, disconnect protocol generalized in M5) ---
 // startNetMatch() fires on every peer (host included) via NetLobby.onStart()
-// (see game/netscreens.ts); the other three tear a NetSession back down to a
-// fresh LocalSession, per the plan's v1 "simple" disconnect/desync handling
-// (full grace/drop protocol is M5).
+// (see game/netscreens.ts). A regular peer leaving mid-match no longer ends
+// the match (see net/lockstep.ts's grace/drop protocol + sim/simulation.ts
+// removePlayer) — only desync and the HOST leaving still tear the session
+// down via showMatchEndedDialog below.
 
 function startNetMatch(info: MatchStartInfo): void {
   resumeAudio();
@@ -290,10 +311,11 @@ function startNetMatch(info: MatchStartInfo): void {
     transport: info.transport,
     roster: info.roster,
     selfPeerId: info.selfPeerId,
+    hostPeerId: info.hostPeerId,
     keyboard,
     inputDelay: info.inputDelay,
     onDesync: () => showMatchEndedDialog('Out Of Sync', 'The game fell out of sync — match ended.'),
-    onPeerLeft: (name) => showMatchEndedDialog('Player Left', `${name} left — match ended.`),
+    onHostLeft: () => showMatchEndedDialog('Host Left', 'The host left — match ended.'),
   });
   stallStartMs = null;
   flow.beginRun();
@@ -406,7 +428,7 @@ function frame(now: number): void {
         stalled = true;
         break;
       }
-      runTick(commands);
+      runTick(commands, session.dueDrops());
       accumulator -= SIM_DT;
     }
   }
@@ -419,6 +441,8 @@ function frame(now: number): void {
   const showStallOverlay = stalled && stallStartMs !== null && now - stallStartMs >= STALL_OVERLAY_MS;
   stallOverlayEl.classList.toggle('visible', showStallOverlay);
   if (showStallOverlay) stallOverlayEl.textContent = `Waiting for ${session.missingNames().join(', ')}…`;
+
+  playerLeftToastEl.classList.toggle('visible', now < toastHideAtMs);
 
   const alpha = simActive ? accumulator / SIM_DT : 1;
   const dtSeconds = simActive ? frameDt / 1000 : 0;

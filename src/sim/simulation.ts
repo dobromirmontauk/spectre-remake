@@ -244,6 +244,14 @@ export function resetGameWithRoster(state: GameState, specs: PlayerSpec[], level
   state.score = 0;
   state.winner = null;
   state.gameOver = false;
+  // A fresh match must start entity ids at 0 on every peer alike (net play,
+  // M5 finding): this was previously left carried over from whatever the
+  // SAME browser tab's state had last (e.g. a local match played before
+  // joining, or a prior net match) — harmless to hash.ts today (it doesn't
+  // hash id strings) but still wrong, and exactly the kind of per-peer
+  // divergent starting condition that's worth closing off on general
+  // principle for a value every peer must agree on.
+  state.nextEntityId = 0;
   rebuildLevel(state, level); // spawns + refills shield/ammo to the new maxes (REFILL_ON_LEVEL_START)
 }
 

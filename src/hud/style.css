@@ -1219,3 +1219,28 @@ body {
 .stall-overlay.visible {
   display: block;
 }
+
+/* ============================================================
+   Net play: "NAME left the game" transient toast (M5)
+   ============================================================ */
+
+.player-left-toast {
+  position: absolute;
+  top: 10cqw;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.75);
+  color: #ff8866;
+  text-shadow: 0 0 0.2em rgba(255, 136, 102, 0.6);
+  padding: 0.6em 1.2em;
+  font-size: 1.3cqw;
+  border: 1px solid #ff8866;
+  display: none;
+  z-index: 36;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.player-left-toast.visible {
+  display: block;
+}

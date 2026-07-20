@@ -24,6 +24,11 @@ export interface PlaySession {
   // isn't ready to advance yet (net play only — a live slot's command
   // hasn't arrived; the accumulator loop must freeze, not skip a tick).
   commandsForNextTick(): Record<string, Command> | null;
+  // Player slots to apply sim/simulation.ts removePlayer() to for the tick
+  // commandsForNextTick() just returned (M5 disconnect protocol) — call once
+  // per successful (non-null) commandsForNextTick(), before step() runs that
+  // tick (see net/CLAUDE.md). Always empty in local play.
+  dueDrops(): number[];
   // Player slots this client renders/controls a camera for — [0] in solo
   // and net play (net always renders one viewport, following the local
   // player, per plan §3), [0,1] in local split-screen 2P.
@@ -86,6 +91,10 @@ export class LocalSession implements PlaySession {
     return commands;
   }
 
+  dueDrops(): number[] {
+    return [];
+  }
+
   afterTick(): void {
     // no-op — nothing to exchange in local play
   }
@@ -105,10 +114,15 @@ export interface NetSessionOptions {
   transport: NetTransport;
   roster: RosterEntry[]; // host-assigned slots, need not be sorted
   selfPeerId: string;
+  hostPeerId: string; // M5: distinguishes "the host left" (still ends the match) from a regular peer leaving (grace/drop protocol — see net/lockstep.ts)
   keyboard: KeyboardInput;
   inputDelay: number;
   onDesync: (tick: number) => void;
-  onPeerLeft: (name: string) => void;
+  // Host leaving mid-match still ends the match for everyone outright (M3
+  // behavior, unchanged) — a regular (non-host) peer leaving now goes
+  // through the grace/drop protocol instead (see net/lockstep.ts) rather
+  // than ending the match immediately.
+  onHostLeft: () => void;
 }
 
 export class NetSession implements PlaySession {
@@ -118,7 +132,7 @@ export class NetSession implements PlaySession {
   private readonly mySlot: number;
   private readonly namesBySlot = new Map<number, string>();
   private commandOverride: { command: Command; ticksRemaining: number } | null = null;
-  private readonly onPeerLeftCb: (name: string) => void;
+  private readonly onHostLeftCb: () => void;
   private readonly unsubLeave: Unsubscribe;
   private disposed = false;
 
@@ -129,18 +143,24 @@ export class NetSession implements PlaySession {
     const mine = opts.roster.find((r) => r.peerId === opts.selfPeerId);
     if (!mine) throw new Error('NetSession: local peer is not in the roster');
     this.mySlot = mine.slot;
+    const isHost = opts.selfPeerId === opts.hostPeerId;
     this.lockstep = new Lockstep(opts.transport, {
       inputDelay: opts.inputDelay,
       localSlots: [this.mySlot],
       liveSlots,
+      isHost,
+      roster: opts.roster.map((r) => ({ slot: r.slot, peerId: r.peerId })),
     });
     this.lockstep.onDesync((tick) => opts.onDesync(tick));
-    this.onPeerLeftCb = opts.onPeerLeft;
-    const roster = opts.roster;
+    this.onHostLeftCb = opts.onHostLeft;
+    // Regular peer leaves (M5) are handled entirely inside Lockstep (grace
+    // window, NEUTRAL-fill, host-authoritative drop — see net/lockstep.ts).
+    // This subscription only cares about the ONE case that still ends the
+    // match outright: the host itself leaving (unchanged from M3).
+    const hostPeerId = opts.hostPeerId;
     this.unsubLeave = opts.transport.onPeerLeave((peerId) => {
       if (this.disposed) return;
-      const entry = roster.find((r) => r.peerId === peerId);
-      this.onPeerLeftCb(entry?.name ?? 'A player');
+      if (peerId === hostPeerId && !isHost) this.onHostLeftCb();
     });
   }
 
@@ -174,6 +194,12 @@ export class NetSession implements PlaySession {
     const commands: Record<string, Command> = {};
     for (const [slot, cmd] of Object.entries(bySlot)) commands[playerIdForSlot(Number(slot))] = cmd;
     return commands;
+  }
+
+  // See PlaySession.dueDrops — must be called once per successful
+  // commandsForNextTick(), before step() runs that tick (see net/CLAUDE.md).
+  dueDrops(): number[] {
+    return this.lockstep.takeDueDrops();
   }
 
   // Called by app.ts right after a successful step()->handleEvents()->

@@ -22,6 +22,7 @@ export interface MatchStartInfo {
   level: number;
   inputDelay: number;
   selfPeerId: string;
+  hostPeerId: string; // M5: distinguishes "host left" (ends the match) from a regular disconnect (grace/drop protocol)
 }
 
 export interface NetScreensCallbacks {
@@ -526,6 +527,10 @@ export class NetScreens {
         level: msg.level,
         inputDelay: msg.inputDelay,
         selfPeerId: lobby.selfId,
+        // lobby.hostPeerId is set by the time a match can start (host()
+        // sets it on itself; join() adopts it from the host's first `lobby`
+        // broadcast) — the selfId fallback only guards a theoretical unset.
+        hostPeerId: lobby.hostPeerId ?? lobby.selfId,
       });
     });
   }
