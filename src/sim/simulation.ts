@@ -226,6 +226,8 @@ export function resetGame(state: GameState): void {
   state.score = 0;
   state.winner = null;
   state.gameOver = false;
+  state.nextEntityId = 0;
+  state.rng = createRng(LEVELGEN_SEED_BASE ^ 1); // "fresh game" means reproducible from level alone, like createInitialState
   for (const player of state.players) {
     player.lives = PLAYER_LIVES_START;
     player.kills = 0;
@@ -244,14 +246,20 @@ export function resetGameWithRoster(state: GameState, specs: PlayerSpec[], level
   state.score = 0;
   state.winner = null;
   state.gameOver = false;
-  // A fresh match must start entity ids at 0 on every peer alike (net play,
-  // M5 finding): this was previously left carried over from whatever the
-  // SAME browser tab's state had last (e.g. a local match played before
-  // joining, or a prior net match) — harmless to hash.ts today (it doesn't
-  // hash id strings) but still wrong, and exactly the kind of per-peer
-  // divergent starting condition that's worth closing off on general
-  // principle for a value every peer must agree on.
+  // A fresh match must start entity ids AND the gameplay rng at the same
+  // point on every peer alike (net play, M5 finding — a REAL desync,
+  // reproduced with two peers where one tab had already played a prior
+  // match and the other hadn't): both were previously left carried over
+  // from whatever the SAME browser tab's state had last (a local match
+  // played before joining, or a prior net match on the same page), rather
+  // than reseeded from `level` like createInitialState does. nextEntityId
+  // is harmless to hash.ts (it doesn't hash id strings) but rng.state is
+  // hashed directly — two peers starting a match with different leftover
+  // rng.state diverge the instant the first enemy fire-cooldown jitter (or
+  // any other rng.next() call) is drawn, even though every command and
+  // every position stayed byte-identical up to that point.
   state.nextEntityId = 0;
+  state.rng = createRng(LEVELGEN_SEED_BASE ^ level);
   rebuildLevel(state, level); // spawns + refills shield/ammo to the new maxes (REFILL_ON_LEVEL_START)
 }
 
