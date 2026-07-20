@@ -1,8 +1,9 @@
 # Spectre (1991) Browser Replica
 
 Faithful recreation of the Peninsula Gameworks Mac tank game. V1 (single-player) is complete.
-Planned iterations: "more modern & more fun" pass, then networked multiplayer (the disabled
-Net Play menu button). The architecture exists to serve that: **never break sim purity** (below).
+Networked multiplayer (up to 8 players, no server to run/deploy — see `src/net/CLAUDE.md`) is also
+complete, built on the fact that the sim was always deterministic: **never break sim purity**
+(below) — it's not just an academic nicety, it's the entire multiplayer contract.
 
 ## Commands
 
@@ -38,7 +39,22 @@ Playwright against the dev server + `window.__game` debug API:
 `setLevel(n)`, `collectAllFlags()`, `setGod(b)`, `spawnEnemyAt(x,z,kind)`, `killAllEnemies()`,
 `setLives(n)`, `cycleCamera()`, `restart()`, `gotoMenu()`, `startGame(loadout?, {mode, loadout2}?)`,
 `setFilled(b)`, `setMuted(b)`, `hashState()` (deterministic state checksum, `sim/hash.ts` — the
-desync-detection primitive for lockstep multiplayer).
+desync-detection primitive for lockstep multiplayer). Most of these throw in net play (state is
+network-synchronized — see `src/net/CLAUDE.md`); `pressCommand`/`fire` instead route through the
+active session's local input regardless of local/net.
+
+**Net play** (`window.__game.net` — see `game/debug.ts`/`src/net/CLAUDE.md` for the full protocol):
+`host(name)`/`join(code, name, debugOverride?)`/`leave()`/`roomCode()`/`roster()`/`startMatch()`
+drive the lobby without DOM scraping; `confirmedTick()`/`hashAtTick(tick)` read the lockstep-synced
+state and its hash ring for cross-peer comparison; `debugStallInject(ms)` suppresses one client's
+outbound input broadcast (verifies the stall overlay AND, left running past `ZOMBIE_TIMEOUT_MS`,
+the host's zombie-drop path); `debugCorruptState()` nudges `rng.state` to provoke a desync
+deliberately. `?net=bc` forces `BroadcastChannelTransport` (same-origin, no real network round
+trip) — the deterministic multi-tab test path; open several pages in ONE browser context/tab set
+(BroadcastChannel doesn't cross Playwright contexts) to drive a 2-8 player match by hand, e.g.
+`host()` on one page, `join(code)` on the rest, `startMatch()`, then compare `hashAtTick()` across
+pages at a shared tick boundary to confirm agreement (aging out of the 10-entry hash ring is normal
+under heavy background-tab tick catch-up — just re-read a fresher boundary).
 
 Drive real keyboard keys for input-layer checks (the debug API bypasses `keyboard.ts`).
 Visual ground truth: `reference/original/` (original-game screenshots + side-by-side). Past verification shots: `reference/verification/`.

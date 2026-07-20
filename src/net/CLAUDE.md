@@ -79,11 +79,19 @@ transport.ts (interface)  ──implemented by──>  broadcast.ts / loopback.t
   channel) — *except* right after a withheld/suppressed send (see lockstep.ts below), when it
   widens to cover the whole gap instead.
 - **`hash` message** (`HashMessage {tick, hash}`): `sim/hash.ts`'s `hashState()` at every
-  `HASH_INTERVAL_TICKS` (60) tick boundary. Compared against the peer's hash for the same tick
-  the instant both are known (whichever arrives second triggers the compare); mismatch raises
-  desync via `Lockstep.onDesync()`.
-- **`drop` message** (`DropMessage {slot, effectiveTick}`): type only in M3 — the host-authoritative
-  grace/drop protocol is M5. Peers that receive it today can ignore it.
+  `HASH_INTERVAL_TICKS` (60) tick boundary. Compared against every OTHER peer's hash for the same
+  tick the instant both are known (whichever arrives second triggers the compare per-peer);
+  mismatch raises desync via `Lockstep.onDesync()`. `pendingPeerHashes` is keyed
+  `Map<tick, Map<peerId, hash>>`, not just `Map<tick, hash>` — **a real bug found under M5's
+  3-player testing**: with only 2 peers there's exactly one other hash to wait for per tick, so a
+  single-slot map happened to work, but with 3+ players every peer receives a `hash` from EACH
+  other peer for the same tick, and a tick-only key let one peer's hash silently clobber another's
+  before the local hash arrived to compare against it — producing a false-positive "Out of Sync"
+  the moment the wrong (clobbering) peer's hash got compared instead. Never exercised by M3/M4,
+  which only ever tested two-peer matches.
+- **`drop` message** (`DropMessage {slot, effectiveTick}`): host-authoritative player removal (M5,
+  see "Disconnect robustness" below) — every peer applies `sim/simulation.ts` `removePlayer(slot)`
+  at the identical `effectiveTick`.
 - **`start` message** (already shaped in M2): `{mode, level, roster, inputDelay}` — `inputDelay`
   is `NET_INPUT_DELAY_TICKS` (config/constants.ts), carried on the wire so a future adaptive-delay
   scheme doesn't need a protocol change.
@@ -151,20 +159,74 @@ transport.ts (interface)  ──implemented by──>  broadcast.ts / loopback.t
   `createInitialState`/`resetGameWithRoster`, so every peer builds the identical players array
   regardless of join order.
 
-## Disconnect/desync handling (M3 v1 — "simple"; full grace/drop protocol is M5)
+## Disconnect robustness (M5 — replaces M3's "simple" peer-left-ends-match)
 
-- **Peer leave mid-match** (transport `onPeerLeave`, which already covers both an explicit `bye`
-  and a crash/tab-close — see broadcast.ts): shows "\<name\> left — match ended" and ends the
-  match for everyone, same path whether the peer who left was host or not (gameplay itself is
-  symmetric — no host authority needed once a match is running).
-- **Desync** (`Lockstep.onDesync`): "The game fell out of sync — match ended."
-- Both dialogs' OK, and the voluntary Esc "Leave match?" confirm, do the same full teardown:
+A regular peer leaving mid-match no longer ends the match — only the **host** leaving still does
+(unchanged from M3) and a hash mismatch still does (**Desync**, `Lockstep.onDesync`: "The game
+fell out of sync — match ended."). `NetSession` tells these apart via a dedicated `onHostLeft`
+callback (compares the departing peerId against `hostPeerId`, threaded through `MatchStartInfo`)
+— a regular peer departing goes through the grace/drop protocol below instead of a dialog.
+
+- **Detection, immediate (every peer)**: `Lockstep`'s own `transport.onPeerLeave` subscription
+  marks that roster slot **orphaned** the instant it fires — `missingSlots`/`canStep` stop waiting
+  on it and `commandsForNextTick` fills `NEUTRAL_COMMAND` for any tick it has no real buffered
+  command for. This has to happen unconditionally and immediately, not gated on host authority:
+  a genuinely silent slot would otherwise block `canStep()` for every peer forever (nobody can
+  advance past the tick where a required slot's command never arrives), which would also prevent
+  ever reaching the tick where a drop could apply.
+- **Grace timer (host-only)**: on that same detection, the host additionally arms a wall-clock
+  timer (`DISCONNECT_GRACE_TICKS`, 150 ticks worth of ms — deliberately wall-clock, not tick-based,
+  since it must keep running even while `canStep()` is genuinely blocked and ticks aren't
+  advancing). Once elapsed, the host broadcasts an authoritative `drop {slot, effectiveTick}`
+  (`effectiveTick` = the host's current `nextTick + inputDelay`, the same lead time a normal input
+  packet gets so every peer's handling has time to arrive before their own sim reaches that tick).
+- **Zombie detection (host-only)**: a slot whose transport connection is still technically open
+  but has sent no `input` packet in `ZOMBIE_TIMEOUT_MS` (10s — see `__game.net.debugStallInject`,
+  which suppresses a client's own outbound broadcast to simulate exactly this) gets dropped
+  immediately, no additional grace layered on top of the timeout already waited out.
+- **Both host-side checks run inside `Lockstep.commandsForNextTick()`**, not a tick-gated callback
+  — `app.ts` calls this once per rendered frame regardless of whether the sim is stalled, which is
+  the only way the host's own bookkeeping can keep running while it too is blocked waiting on the
+  silent slot (an `afterTick`-style hook, gated on a tick actually completing, would never fire).
+- **Application**: every peer that receives (or, for the host, originates) a `drop` records it via
+  `scheduleDrop` (which also marks the slot orphaned, covering the zombie case for non-host peers
+  that have no independent signal — their connection to the stalled peer never closes, so the
+  `drop` message IS their only evidence). `Lockstep.takeDueDrops()` — called from
+  `NetSession.dueDrops()`, in turn called by `game/app.ts`'s accumulator loop right after a
+  successful `commandsForNextTick()`, before `step()` runs that tick — returns any slot whose
+  `effectiveTick` has been reached, and `step(state, commands, drops)` applies
+  `sim/simulation.ts`'s `removePlayer(state, slot, events)` for it at the very start of that tick,
+  same deterministic-message-driven pattern as commands themselves (see sim/CLAUDE.md).
+- **"NAME left the game" toast** (`PLAYER_LEFT_TOAST_MS`, ~3s, `game/app.ts`): driven by the
+  `PlayerLeft` sim event `removePlayer` emits — fires at the identical tick on every peer, not at
+  whatever real time each one happened to notice the disconnect.
+- Esc "Leave match?" confirm and the Host-Left/Desync dialogs' OK do the same full teardown:
   dispose the `NetSession`, `NetLobby.leave()`, back to NetMenu. A **normal** GameOver instead
   returns everyone to NetLobby with the room/transport still alive (`markMatchEnded()` +
   `flow.goToNetLobby()`) so the host can Start another — state is fully rebuilt every match, so
-  this is safe.
+  this is safe (but see the rng-reseed note below: it must ACTUALLY be fully rebuilt).
 
-## M2/M3/M4 verification notes
+## M5 note: a fresh match must reseed `state.rng`, not just reset ids
+
+`resetGameWithRoster` (every net match's entry point) resets `tick`/`score`/`nextEntityId` but,
+until M5, never touched `state.rng` — it kept whatever mulberry32 state the SAME browser tab's
+long-lived `state` object had left over from any prior match (a local game played before joining
+Net Play, or an earlier net match on the same page). Two peers starting a new match with different
+leftover `rng.state` look byte-identical at every tick (same commands, same positions, same enemy
+roster/spawns — none of that touches `state.rng`) right up until the first `state.rng.next()` call
+(an enemy fire-cooldown jitter, a respawn edge-point pick, an unstick-direction roll) — which then
+draws a DIFFERENT value on each peer, and `hash.ts` hashes `rng.state` directly, so the very next
+`HASH_INTERVAL_TICKS` boundary raises a false "Out of Sync" even though nothing about the match
+itself was wrong. Found via the 8-player smoke test (4 tabs mid-reuse, 4 freshly loaded — full
+state dumps at the frozen tick were identical in every field except `rng.state` and one enemy's
+`fireCooldown`); fixed by reseeding via `createRng(LEVELGEN_SEED_BASE ^ level)` in both
+`resetGameWithRoster` and the debug `resetGame` (restart hook), matching `createInitialState`.
+**Implication for hand-driven verification**: reusing the same browser tab/page across multiple
+test matches is exactly the scenario that used to trigger this — no longer a problem now that it's
+fixed, but worth remembering if a *future* change reintroduces some other un-reseeded piece of
+state that `hash.ts` depends on.
+
+## M2/M3/M4/M5 verification notes
 
 `BroadcastChannel` doesn't cross Playwright *browser contexts*, only *pages within one context*
 (same origin, same partition). Two-tab choreography tests with `?net=bc` must open two pages in a

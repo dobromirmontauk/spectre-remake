@@ -19,6 +19,21 @@ network replay both depend on it.
 local 2P = 2, net play M2+ up to 8). Tank ids stay the strings `'player'`/`'player2'` for slots 0/1
 (events, kill credit, and Playwright expectations all key off those two); slot ≥2 uses `'player3'..'player8'`.
 
+**`removePlayer(state, slot, events)` (M5, `simulation.ts`) is part of the deterministic replay**,
+exactly like a `Command` — it's driven by a `drop` network message every peer applies at the
+identical tick (`step()`'s `drops` parameter), never by local disconnect detection. The player
+stays IN `state.players` (slot/array index and `PLAYER_TANK_COLOR_SLOTS` mapping must stay stable
+for the HUD/duel scoreboard) but is flagged `removed: true`: dead, out of lives, shield zeroed,
+and skipped by `resetPlayerForLevel` forever after so a mid-level co-op disconnect isn't silently
+revived on the next level clear. Duel: dropping to the last connected player ends the match with
+them as the winner, same `GameOver` shape as reaching `DUEL_KILL_TARGET`. See net/CLAUDE.md's
+"Disconnect robustness" for the full grace/zombie/drop protocol that decides *when* to call it.
+
+**A fresh match must reseed `state.rng`, not just reset tick/score/ids** — `resetGameWithRoster`
+learned this the hard way (M5): leaving `rng` un-reseeded is invisible right up until the first
+`state.rng.next()` call produces a different draw on two peers with different leftover state, and
+`hash.ts` hashes `rng.state` directly. See net/CLAUDE.md for the full story.
+
 ## Tick order (`simulation.ts` step)
 
 1. Build commands (player command passed in; `ai.ts` produces enemy commands — same `Command` type)
@@ -40,6 +55,11 @@ local 2P = 2, net play M2+ up to 8). Tank ids stay the strings `'player'`/`'play
   All linear speeds/accels (enemy, projectile, friction) are scaled together — rescale in lockstep or balance breaks.
 - **Projectiles**: swept segment tests per tick (fast, would tunnel otherwise). Segment start-inside-circle/AABB
   counts as a hit at t=0 (point-blank bug regression); shooter excluded by owner id, not spatially.
+- **Grenades in duel** (M5, `weapons.ts` `explodeGrenade`/`damageDuelPlayers`): the blast damages
+  non-owner alive PLAYERS too, gated strictly on `state.mode === 'duel'` — co-op/solo grenades
+  still can't hurt players at all (same no-friendly-fire rule as cannon shots). Duel also grants
+  grenades from the start (`GRENADES_IN_DUEL`) since duel has no levels, so `levelConfig(1)`'s
+  `grenadesUnlocked` (level ≥ 10) would otherwise never open.
 - **Events**: `state.events` is per-tick scratch, overwritten each tick. Emit events for anything
   render/audio/HUD must react to; never call out of the sim.
 - **Collision is 2D** (y is cosmetic): tanks/flags/pickups = circles, walls = AABBs, arena = 4 half-planes.

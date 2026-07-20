@@ -8,16 +8,26 @@
       `DUEL_KILL_TARGET` kills), separate from "2P Co-op" (shared flags vs AI)
 - [x] Split-screen = two cameras + two scissored viewports in the renderer; radar per player
 
-## 2. Web multiplayer (the real Spectre soul — up to 8 players over the network)
-- [ ] Transport: WebRTC data channels (peer-to-peer, low latency) with a tiny signaling server,
-      or plain WebSocket relay as the simpler first cut
-- [ ] Model: lockstep command exchange — the sim is already deterministic
-      (seeded rng, fixed tick, plain-data state, same `Command` type for every tank);
-      exchange per-tick commands, hash state periodically to detect desync
-- [ ] Lobby: host creates a game (level seed + mode), others join; wire up the disabled
-      "Net Play" menu button
-- [ ] Remote players render as tanks with name tags; join-in-progress via state snapshot
-      (GameState is JSON-serializable by design)
+## 2. Web multiplayer (the real Spectre soul — up to 8 players over the network) — DONE (M1-M5)
+- [x] Transport: WebRTC data channels via Trystero over public Nostr relays (no signaling server to
+      run/deploy) — `net/trystero.ts`; `net/broadcast.ts` (BroadcastChannel) as the deterministic
+      same-origin test path, `net/loopback.ts` for same-page multi-peer harnesses
+- [x] Model: lockstep command exchange (`net/lockstep.ts`) — delayed-input, periodic hash exchange
+      (`sim/hash.ts`) detects desync; fixed a real 3+-peer hash-comparison bug (M5) and a real
+      rng-reseed bug (M5) found under multi-player testing, see net/CLAUDE.md
+- [x] Lobby: host creates a room (room code + mode pick), joiners connect; "Net Play" menu wired up
+      (`game/netscreens.ts`)
+- [x] Remote players render as tanks with name tags (net play always follows the local player in a
+      single viewport); join-in-progress isn't supported — every match starts fresh from
+      `{level, mode, roster}`, no mid-match snapshot join
+- [x] 3-8 players end-to-end (roster/spawns/HUD/AI already generalized in M1); disconnect
+      robustness — grace period + host-authoritative drop + zombie-peer timeout
+      (`DISCONNECT_GRACE_TICKS`/`ZOMBIE_TIMEOUT_MS`), "NAME left" toast, duel last-player-standing
+      win, co-op continues solo
+- [ ] Adaptive input delay (measure lobby RTT, pick 2-6 instead of the fixed
+      `NET_INPUT_DELAY_TICKS`) — deferred, M5's optional stretch goal
+- [ ] Worker-driven background pump for hidden/backgrounded tabs — deferred, M5's optional stretch
+      goal (rAF throttling in a backgrounded tab is still the top real-world risk noted in the plan)
 
 ## 3. Deploy to a web server
 - [ ] `vite build` already produces a static `dist/` with `base: './'` — deployable anywhere

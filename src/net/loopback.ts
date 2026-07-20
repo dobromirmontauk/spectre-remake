@@ -1,10 +1,12 @@
 // In-memory transport for driving several peers from one page — no
-// BroadcastChannel/network involved. Used by the M5 8-peer test harness and
-// handy for unit-testing net/lobby.ts without a real browser message
-// channel. A static registry of "buses" keyed by room code stands in for the
-// room; every LoopbackTransport that joins the same code shares the same bus
-// and receives other members' messages/presence via queueMicrotask (so
-// ordering behaves like a real async transport, not same-tick reentrancy).
+// BroadcastChannel/network involved. Intended for a same-page multi-peer
+// test harness (M5's 8-player verification instead used 8 real
+// BroadcastChannel pages, which was sufficient — see net/CLAUDE.md) and for
+// unit-testing net/lobby.ts without a real browser message channel. A
+// static registry of "buses" keyed by room code stands in for the room;
+// every LoopbackTransport that joins the same code shares the same bus and
+// receives other members' messages/presence via queueMicrotask (so ordering
+// behaves like a real async transport, not same-tick reentrancy).
 
 import type { MessageHandler, NetTransport, PeerHandler, Unsubscribe } from './transport.ts';
 
