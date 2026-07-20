@@ -25,6 +25,15 @@ reset prev = current or the entity visibly slides across the arena for one frame
   (`TANK_ROOF_INSET_NOSE` 0.8 vs `_SIDE` 0.1) — even side insets read as a "gem", not a tank.
 - **Chase camera**: aims at `tankPos + forward × CHASE_LOOKAHEAD` (28), NOT at the tank — pitch
   ~13° keeps the horizon in frame below the black HUD strip and the tank in the lower third.
+  **Collision pull-in** (`cameras.ts` `clearFraction`, fed `state.obstacles` from `app.ts`): the eye
+  slides in along the tank→eye ground ray by the fraction that stays inside the arena and clear of
+  obstacles (reuses the sim's pure `segmentVsAABB`/`segmentVsCircle`, expanded by `CAMERA_SURFACE_MARGIN`),
+  so it never ends up behind a wall/pylon or outside the arena staring into the horizon band. Height stays
+  full and the look-ahead scales by the same fraction, so a jammed camera tilts toward the tank (down to
+  top-down in the degenerate "flat against a wall facing inward" corner) instead of dropping the tank
+  off-screen; a hard `±(halfSize−1)` clamp on the eye x/z is the final guarantee it can't leave the arena.
+  Camera smoothing uses render `dt` — it freezes while paused (`dt=0`), so a paused-then-`stepTicks`
+  reposition won't move the eye; resume briefly (or drive live) before trusting a chase screenshot.
 - **Windmills**: blades in the VERTICAL plane (fan-style, horizontal spin axis), angle from sim state.
 - Effects (`effects.ts`) are event-driven cosmetics only — muzzle/impact/explosions/grenade arc.
 - `retro.ts` pixelation (`PIXELATE` flag) is default-OFF: at 2× it muddied edges and silhouettes.

@@ -563,6 +563,16 @@ export class Screens {
     this.initialsInputEl = el('input', 'initials-input');
     this.initialsInputEl.maxLength = 3;
     this.initialsInputEl.autocapitalize = 'characters';
+    // The global keyboard handler ignores keystrokes while this field is
+    // focused (so letters type normally), so Enter-to-submit is wired here.
+    // Blurring afterward hands focus back to the body, re-enabling the card's
+    // "Press Enter to return to menu" shortcut (app.ts edge-key handler).
+    this.initialsInputEl.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter') return;
+      e.preventDefault();
+      this.submitInitials();
+      this.initialsInputEl.blur();
+    });
     this.initialsFormEl.appendChild(this.initialsInputEl);
     const submitBtn = this.menuButton('Submit', () => this.submitInitials());
     this.initialsFormEl.appendChild(submitBtn);

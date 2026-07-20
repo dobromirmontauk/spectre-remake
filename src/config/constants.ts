@@ -159,6 +159,10 @@ export const PROJECTILE_RANGE = 300; // > arena diagonal (~283): shots fly until
 export const PROJECTILE_MAX_TICKS = Math.ceil(PROJECTILE_RANGE / PROJECTILE_SPEED / SIM_DT);
 export const PLAYER_DAMAGE_PER_SHOT = 12; // player maxShield is a 0-100 scale
 export const ENEMY_DAMAGE_PER_SHOT = 1; // enemy shield is a small hit-point count
+// Whether an enemy's cannon shot damages OTHER enemies it flies into (default
+// on — an enemy caught in a crossfire takes real damage, which the original's
+// dumb drones did to each other too). Toggle live via __game.setEnemyFriendlyFire.
+export const ENEMY_FRIENDLY_FIRE_DEFAULT = true;
 
 // --- Weapons: grenades (unlocked level 10+) ---
 export const GRENADE_AMMO_COST = 10;

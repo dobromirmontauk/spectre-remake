@@ -27,6 +27,7 @@ import {
   DUEL_RESPAWN_INVULN_TICKS,
   DUEL_RESPAWN_TICKS,
   DUEL_SPAWN_POINTS,
+  ENEMY_FRIENDLY_FIRE_DEFAULT,
   ENEMY_RESPAWN_TICKS,
   ENEMY_SEED_SALT,
   ENEMY_TANK_RADIUS,
@@ -168,6 +169,7 @@ export function createInitialState(level: number, specs: PlayerSpec[], mode: Gam
     winner: null,
     gameOver: false,
     god: false,
+    enemyFriendlyFire: ENEMY_FRIENDLY_FIRE_DEFAULT,
     nextEntityId: 0,
     events: [],
   };
@@ -260,6 +262,11 @@ export function resetGameWithRoster(state: GameState, specs: PlayerSpec[], level
   // every position stayed byte-identical up to that point.
   state.nextEntityId = 0;
   state.rng = createRng(LEVELGEN_SEED_BASE ^ level);
+  // Reset to the default so a fresh match is deterministic on every peer — a
+  // local game where the debug setter turned this off must not silently carry
+  // into a subsequent net match (net derives state from {level,mode,loadouts}
+  // and can't communicate this per-peer, so it would desync).
+  state.enemyFriendlyFire = ENEMY_FRIENDLY_FIRE_DEFAULT;
   rebuildLevel(state, level); // spawns + refills shield/ammo to the new maxes (REFILL_ON_LEVEL_START)
 }
 

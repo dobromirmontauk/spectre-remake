@@ -40,6 +40,7 @@ export interface DebugHooks {
   setLevel(n: number): void;
   collectAllFlags(): void;
   setGod(on: boolean): void;
+  setEnemyFriendlyFire(on: boolean): void;
   spawnEnemyAt(x: number, z: number, kind?: EnemyKind): void;
   killAllEnemies(): void;
   setLives(n: number): void;

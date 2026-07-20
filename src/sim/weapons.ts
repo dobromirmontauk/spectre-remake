@@ -39,7 +39,17 @@ function noseOf(tank: TankState, aheadDistance: number): Vec2 {
 }
 
 export function fireProjectile(state: GameState, owner: TankState, heading: number, events: SimEvent[]): void {
-  const position = noseOf(owner, TANK_RADIUS + 0.5);
+  // Collision starts at the owner's CENTER, not the nose. The nose offset
+  // (TANK_RADIUS + 0.5 = 2.1) is larger than a shot's hit radius against a
+  // tank (TANK_RADIUS + PROJECTILE_RADIUS = 1.9), so at point-blank — where
+  // tank-vs-tank push-out hasn't separated the overlapping pair yet this tick
+  // (see simulation.ts tick order) — a nose-spawned shot starts PAST the
+  // target's far edge and its forward-only sweep never touches it: the "bullets
+  // pass straight through at point-blank" bug. Center-spawning guarantees the
+  // first swept segment (center -> center+travel) crosses any overlapping
+  // target; the owner itself is excluded by id in updateProjectiles, and the
+  // muzzle flash still reads from the nose via the ShotFired event below.
+  const position = { x: owner.position.x, z: owner.position.z };
   state.projectiles.push({
     id: nextId(state, 'shot'),
     ownerId: owner.id,
@@ -49,7 +59,7 @@ export function fireProjectile(state: GameState, owner: TankState, heading: numb
     speed: PROJECTILE_SPEED,
     ticksRemaining: PROJECTILE_MAX_TICKS,
   });
-  events.push({ type: 'ShotFired', ownerId: owner.id, position, heading });
+  events.push({ type: 'ShotFired', ownerId: owner.id, position: noseOf(owner, TANK_RADIUS + 0.5), heading });
 }
 
 export function fireGrenade(state: GameState, owner: TankState, heading: number, events: SimEvent[]): void {
@@ -103,12 +113,16 @@ export function updateProjectiles(state: GameState, events: SimEvent[]): void {
 
     for (const target of allTanks(state)) {
       if (target.id === shot.ownerId || !target.alive) continue;
+      const isPlayerTarget = isPlayerTankId(state, target.id);
+      const isPlayerOwner = isPlayerTankId(state, shot.ownerId);
       // Co-op has no friendly fire: a shot from one player passes straight
       // through the other rather than registering a hit.
-      if (state.mode === 'coop' && isPlayerTankId(state, target.id) && isPlayerTankId(state, shot.ownerId)) continue;
+      if (state.mode === 'coop' && isPlayerTarget && isPlayerOwner) continue;
+      // Enemy-vs-enemy friendly fire is a match option (default on): when off,
+      // an enemy's shot flies harmlessly through other enemies.
+      if (!isPlayerTarget && !isPlayerOwner && !state.enemyFriendlyFire) continue;
       const hit = segmentVsCircle(shot.prevPosition, shot.position, target.position, TANK_RADIUS + PROJECTILE_RADIUS);
       if (!hit.hit) continue;
-      const isPlayerTarget = isPlayerTankId(state, target.id);
       damageTank(state, target, shot.ownerId, isPlayerTarget);
       events.push({ type: 'ShotHit', position: hit.point, targetKind: isPlayerTarget ? 'player' : 'enemy' });
       consumed = true;

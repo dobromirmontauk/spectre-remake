@@ -1,9 +1,47 @@
 import * as THREE from 'three';
 import { ARENA_HALF_SIZE, CHASE_DISTANCE, CHASE_HEIGHT, CHASE_LOOKAHEAD, CHASE_SMOOTHING, TANK_RADIUS } from '../config/constants.ts';
+import { segmentVsAABB, segmentVsCircle } from '../sim/collision.ts';
+import type { Obstacle } from '../sim/types.ts';
 
 const FORWARD = new THREE.Vector3();
 const DESIRED_POS = new THREE.Vector3();
 const DESIRED_LOOK_AT = new THREE.Vector3();
+
+// Keep the chase eye this far off any surface, and never let it collapse
+// entirely onto the tank (which would clip inside the hull).
+const CAMERA_SURFACE_MARGIN = 3;
+const CAMERA_MIN_FRACTION = 0.12;
+
+// Fraction of the tank->desired-eye ray (in the 2D ground plane) that stays
+// inside the arena and clear of every obstacle. The chase camera pulls its eye
+// in by this much so it never ends up behind a wall/pylon or outside the arena
+// where the player can't see their own tank. Reuses the sim's pure swept tests
+// (read-only — no state mutation), expanding each collider by the margin.
+function clearFraction(from: THREE.Vector3, to: THREE.Vector3, obstacles: Obstacle[], halfSize: number): number {
+  const a = { x: from.x, z: from.z };
+  const b = { x: to.x, z: to.z };
+  const dx = b.x - a.x;
+  const dz = b.z - a.z;
+  let t = 1;
+
+  // Arena boundary (shrunk by the margin so the eye stops just inside).
+  const lim = halfSize - CAMERA_SURFACE_MARGIN;
+  if (dx > 1e-6) t = Math.min(t, (lim - a.x) / dx);
+  else if (dx < -1e-6) t = Math.min(t, (-lim - a.x) / dx);
+  if (dz > 1e-6) t = Math.min(t, (lim - a.z) / dz);
+  else if (dz < -1e-6) t = Math.min(t, (-lim - a.z) / dz);
+
+  const m = CAMERA_SURFACE_MARGIN;
+  for (const o of obstacles) {
+    const hit =
+      o.kind === 'wall'
+        ? segmentVsAABB(a, b, { x: o.min.x - m, z: o.min.z - m }, { x: o.max.x + m, z: o.max.z + m })
+        : segmentVsCircle(a, b, o.position, o.pylonRadius + m);
+    if (hit.hit) t = Math.min(t, hit.t);
+  }
+
+  return Math.max(CAMERA_MIN_FRACTION, Math.min(1, t));
+}
 
 // Above-and-behind chase camera that follows the player smoothly via
 // exponential (frame-rate independent) position/look-at lerping.
@@ -23,11 +61,34 @@ export class ChaseCamera {
     this.camera.updateProjectionMatrix();
   }
 
-  update(targetPosition: THREE.Vector3, targetHeading: number, dt: number): void {
+  update(targetPosition: THREE.Vector3, targetHeading: number, dt: number, obstacles: Obstacle[] = [], halfSize: number = ARENA_HALF_SIZE): void {
     FORWARD.set(Math.sin(targetHeading), 0, Math.cos(targetHeading));
     DESIRED_POS.copy(targetPosition).addScaledVector(FORWARD, -CHASE_DISTANCE);
     DESIRED_POS.y += CHASE_HEIGHT;
-    DESIRED_LOOK_AT.copy(targetPosition).addScaledVector(FORWARD, CHASE_LOOKAHEAD);
+
+    // Pull the eye in HORIZONTALLY toward the tank if the straight line from
+    // the tank to it would exit the arena or cross an obstacle (e.g. the tank
+    // backed flat against a wall facing inward — no room behind it). Height is
+    // kept at full CHASE_HEIGHT so the jammed camera looks DOWN at the tank and
+    // the surrounding floor rather than straight into the perimeter horizon
+    // band, and the look-ahead shrinks by the same fraction so the aim tilts
+    // toward the tank instead of far across the arena — together that keeps the
+    // tank framed near the bottom third instead of dropping off-screen.
+    const clear = clearFraction(targetPosition, DESIRED_POS, obstacles, halfSize);
+    DESIRED_POS.x = targetPosition.x + (DESIRED_POS.x - targetPosition.x) * clear;
+    DESIRED_POS.z = targetPosition.z + (DESIRED_POS.z - targetPosition.z) * clear;
+
+    // Hard safety clamp: the eye must never sit outside the arena, even in the
+    // degenerate case where the tank is jammed flat against a wall facing
+    // inward (the min-fraction floor above can otherwise leave the eye just
+    // past the boundary, staring into the perimeter horizon band). When this
+    // pins the eye near/ahead of the tank, the shrunk look-ahead below turns
+    // the view top-down — you still see the tank and the floor around it.
+    const eyeLim = halfSize - 1;
+    DESIRED_POS.x = Math.max(-eyeLim, Math.min(eyeLim, DESIRED_POS.x));
+    DESIRED_POS.z = Math.max(-eyeLim, Math.min(eyeLim, DESIRED_POS.z));
+
+    DESIRED_LOOK_AT.copy(targetPosition).addScaledVector(FORWARD, CHASE_LOOKAHEAD * clear);
     DESIRED_LOOK_AT.y = 0;
 
     if (!this.initialized) {
@@ -176,10 +237,10 @@ export class CameraRig {
     }
   }
 
-  update(targetPosition: THREE.Vector3, targetHeading: number, dt: number): void {
+  update(targetPosition: THREE.Vector3, targetHeading: number, dt: number, obstacles: Obstacle[] = []): void {
     switch (this.mode) {
       case 'chase':
-        this.chase.update(targetPosition, targetHeading, dt);
+        this.chase.update(targetPosition, targetHeading, dt, obstacles);
         break;
       case 'first-person':
         this.firstPerson.update(targetPosition, targetHeading);

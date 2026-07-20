@@ -1,5 +1,15 @@
 import type { Command } from '../sim/commands.ts';
 
+// True when a keystroke should belong to a focused text field rather than the
+// game (typing initials, etc.). Covers <input>, <textarea>, <select>, and any
+// contentEditable host.
+function isEditableTarget(target: EventTarget | null): boolean {
+  const el = target as HTMLElement | null;
+  if (!el || typeof el.tagName !== 'string') return false;
+  const tag = el.tagName;
+  return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el.isContentEditable === true;
+}
+
 // Keys the game handles itself; the browser's default action (scroll, focus
 // change, menu, etc.) is suppressed for these. P1 = arrows + Space (fire) +
 // Alt/G (grenade); P2 (2P modes only) = WASD (W thrust, S reverse, A/D turn)
@@ -48,6 +58,12 @@ export class KeyboardInput {
   }
 
   private onKeyDown = (e: KeyboardEvent): void => {
+    // When the user is typing into a text field (e.g. the high-score initials
+    // box), stay out of the way entirely: don't preventDefault (which would
+    // swallow the character — several game keys are ordinary letters like
+    // W/A/S/D/F/Q) and don't latch the key as a held command. The field wires
+    // up its own Enter handler; global shortcuts resume once focus leaves it.
+    if (isEditableTarget(e.target)) return;
     if (GAME_KEYS.has(e.key)) e.preventDefault();
     if (!this.held.has(e.key)) this.edgePresses.add(e.key);
     this.held.add(e.key);

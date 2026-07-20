@@ -55,6 +55,17 @@ learned this the hard way (M5): leaving `rng` un-reseeded is invisible right up 
   All linear speeds/accels (enemy, projectile, friction) are scaled together — rescale in lockstep or balance breaks.
 - **Projectiles**: swept segment tests per tick (fast, would tunnel otherwise). Segment start-inside-circle/AABB
   counts as a hit at t=0 (point-blank bug regression); shooter excluded by owner id, not spatially.
+  A shot's collision segment **spawns at the owner's CENTER, not its nose** (`fireProjectile`): the nose
+  offset (`TANK_RADIUS + 0.5` = 2.1) exceeds the tank hit radius (`TANK_RADIUS + PROJECTILE_RADIUS` = 1.9),
+  so at point-blank — where tank-vs-tank push-out hasn't separated the overlapping pair yet this tick — a
+  nose-spawned shot starts past the target's far edge and its forward-only sweep misses ("bullets pass
+  through at point-blank"). Center-spawn guarantees an overlapping target is swept; the muzzle flash still
+  reads the nose position from the `ShotFired` event.
+- **Enemy friendly fire** (`state.enemyFriendlyFire`, default `ENEMY_FRIENDLY_FIRE_DEFAULT` = true): when
+  off, `updateProjectiles` skips enemy→enemy hits (same guard shape as co-op's player→player skip). It's a
+  match-constant reset to the default by `createInitialState` AND `resetGameWithRoster`, so every net peer
+  agrees without protocol changes (a local toggle can't leak into a later net match and desync it) — hence
+  the `__game.setEnemyFriendlyFire` debug setter throws in net play.
 - **Grenades in duel** (M5, `weapons.ts` `explodeGrenade`/`damageDuelPlayers`): the blast damages
   non-owner alive PLAYERS too, gated strictly on `state.mode === 'duel'` — co-op/solo grenades
   still can't hurt players at all (same no-friendly-fire rule as cannon shots). Duel also grants

@@ -222,6 +222,10 @@ installDebugApi({
     assertLocal('setGod');
     state.god = on;
   },
+  setEnemyFriendlyFire: (on: boolean) => {
+    assertLocal('setEnemyFriendlyFire'); // net play derives state from {level,mode,loadouts}; can't diverge this per-peer mid-match
+    state.enemyFriendlyFire = on;
+  },
   spawnEnemyAt: (x: number, z: number, kind: EnemyKind = 'drone') => {
     assertLocal('spawnEnemyAt');
     spawnEnemyAt(state, x, z, kind);
@@ -389,12 +393,12 @@ function renderSplitScreen(dtSeconds: number): void {
 
   threeRenderer.setViewport(0, 0, halfW, canvasHeightPx);
   threeRenderer.setScissor(0, 0, halfW, canvasHeightPx);
-  if (pose0) cameraRig.chase.update(pose0.position, pose0.heading, dtSeconds);
+  if (pose0) cameraRig.chase.update(pose0.position, pose0.heading, dtSeconds, state.obstacles);
   threeRenderer.render(scene, cameraRig.chase.camera);
 
   threeRenderer.setViewport(halfW, 0, rightW, canvasHeightPx);
   threeRenderer.setScissor(halfW, 0, rightW, canvasHeightPx);
-  if (pose1) cameraRig2.chase.update(pose1.position, pose1.heading, dtSeconds);
+  if (pose1) cameraRig2.chase.update(pose1.position, pose1.heading, dtSeconds, state.obstacles);
   threeRenderer.render(scene, cameraRig2.chase.camera);
 
   threeRenderer.setScissorTest(false);
@@ -497,7 +501,7 @@ function frame(now: number): void {
     threeRenderer.setScissorTest(false);
     threeRenderer.setViewport(0, 0, canvasWidthPx, canvasHeightPx);
     const pose0 = gameRenderer.getPlayerRenderPose(myPlayer?.id ?? 'player');
-    if (pose0) cameraRig.update(pose0.position, pose0.heading, dtSeconds);
+    if (pose0) cameraRig.update(pose0.position, pose0.heading, dtSeconds, state.obstacles);
     threeRenderer.render(scene, cameraRig.activeCamera);
   }
 }

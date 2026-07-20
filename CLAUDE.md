@@ -36,7 +36,8 @@ input/keyboard.ts → Command → sim/ (pure, 30 Hz fixed tick) → state + even
 
 Playwright against the dev server + `window.__game` debug API:
 `getState()` (JSON snapshot), `pause/resume`, `stepTicks(n)`, `pressCommand(cmd, ticks)`, `fire()`,
-`setLevel(n)`, `collectAllFlags()`, `setGod(b)`, `spawnEnemyAt(x,z,kind)`, `killAllEnemies()`,
+`setLevel(n)`, `collectAllFlags()`, `setGod(b)`, `setEnemyFriendlyFire(b)` (enemy-vs-enemy shots,
+default on), `spawnEnemyAt(x,z,kind)`, `killAllEnemies()`,
 `setLives(n)`, `cycleCamera()`, `restart()`, `gotoMenu()`, `startGame(loadout?, {mode, loadout2}?)`,
 `setFilled(b)`, `setMuted(b)`, `hashState()` (deterministic state checksum, `sim/hash.ts` — the
 desync-detection primitive for lockstep multiplayer). Most of these throw in net play (state is
@@ -57,6 +58,9 @@ pages at a shared tick boundary to confirm agreement (aging out of the 10-entry 
 under heavy background-tab tick catch-up — just re-read a fresher boundary).
 
 Drive real keyboard keys for input-layer checks (the debug API bypasses `keyboard.ts`).
+`keyboard.ts` stays hands-off while a text field is focused (`isEditableTarget`) — no
+`preventDefault`, no held/edge latching — so the Game Over initials box accepts letters that
+double as game keys (W/A/S/D/F/Q…); that box wires its own Enter-to-submit + blur.
 Visual ground truth: `reference/original/` (original-game screenshots + side-by-side). Past verification shots: `reference/verification/`.
 
 ## Fidelity spec (corrected from original screenshots — trust this over prose descriptions)
@@ -70,6 +74,9 @@ bezel-less radar dot-cluster upper-right · "Filled" wireframe toggle · menu = 
 
 - Enemies respawn infinitely (~4s, arena edge). **The original had a finite roster** — destroying all
   tanks completed the level. Faithful change (finite roster + kill-all-wins, respawn behind a flag) is designed but not built.
+- Enemy-vs-enemy friendly fire is ON by default and toggleable (`state.enemyFriendlyFire`,
+  `ENEMY_FRIENDLY_FIRE_DEFAULT`, `__game.setEnemyFriendlyFire`). It's a match-constant option set at
+  `createInitialState` — no net-protocol plumbing, so the debug setter throws in net play.
 - Bonus formula (500 start, −1 per 8 ticks, added on level clear) is a guess; original undocumented.
 - Loadout presets are hand-tuned and don't sum to the Custom point budget (intentional).
 - Score: flags +100, kills +200 (tunable guesses).

@@ -170,6 +170,7 @@ export interface GameState {
   winner: string | null; // duel-only: id of the player who reached DUEL_KILL_TARGET
   gameOver: boolean;
   god: boolean; // debug: slot-0 player takes no damage
+  enemyFriendlyFire: boolean; // whether an enemy shot can damage other enemies (default true)
   nextEntityId: number; // monotonic counter for enemy/projectile/grenade ids
   events: SimEvent[]; // this tick's events; consumers drain per render frame
 }
