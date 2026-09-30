@@ -4,6 +4,7 @@
 import type { GameState, TankState, Vec2 } from './types.ts';
 import type { SimEvent } from './events.ts';
 import { segmentVsAABB, segmentVsCircle } from './collision.ts';
+import { friendlyInProjectilePath } from './fire-safety.ts';
 import { dcos, dsin } from './dmath.ts';
 import {
   ARENA_HALF_SIZE,
@@ -56,7 +57,7 @@ export function safeExternalEnemyShot(state: GameState, owner: TankState): boole
       : segmentVsCircle(owner.position, end, obstacle.position, obstacle.pylonRadius + PROJECTILE_RADIUS);
     if (hit.hit && hit.t <= first) { first = hit.t; opposing = false; }
   }
-  return opposing;
+  return opposing && !friendlyInProjectilePath(state, owner);
 }
 
 export function fireProjectile(state: GameState, owner: TankState, heading: number, events: SimEvent[]): void {

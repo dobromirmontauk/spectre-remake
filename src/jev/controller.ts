@@ -1,4 +1,5 @@
 import type { GameState, Vec2 } from '../sim/types.ts';
+import { friendlyInProjectilePath } from '../sim/fire-safety.ts';
 import type { Command } from '../sim/commands.ts';
 import { dsin,dcos,datan2 } from '../sim/dmath.ts';
 import { segmentVsCircle, segmentVsAABB } from '../sim/collision.ts';
@@ -192,11 +193,14 @@ export function commandForPlan(state:GameState,tankId:string,plan:TacticalPlan|n
  }
  }
 
- let fire=false;if(plan.fire&&visibleTarget&&Math.abs(angleDelta(datan2(visibleTarget.position.x-tank.position.x,visibleTarget.position.z-tank.position.z),tank.heading))<.08){const end={x:tank.position.x+dsin(tank.heading)*PROJECTILE_RANGE,z:tank.position.z+dcos(tank.heading)*PROJECTILE_RANGE};
- const targetHit=segmentVsCircle(tank.position,end,visibleTarget.position,TANK_RADIUS+PROJECTILE_RADIUS);
+ // Validate against the actual heading and position produced by this command.
+ const firingPose={...tank,position:{...tank.position},prevPosition:{...tank.prevPosition}};
+ applyMovement(firingPose,{turn,thrust,fire:false,grenade:false},params);
+ let fire=false;if(plan.fire&&visibleTarget&&Math.abs(angleDelta(datan2(visibleTarget.position.x-firingPose.position.x,visibleTarget.position.z-firingPose.position.z),firingPose.heading))<.08){const end={x:firingPose.position.x+dsin(firingPose.heading)*PROJECTILE_RANGE,z:firingPose.position.z+dcos(firingPose.heading)*PROJECTILE_RANGE};
+ const targetHit=segmentVsCircle(firingPose.position,end,visibleTarget.position,TANK_RADIUS+PROJECTILE_RADIUS);
  let impact=targetHit.hit?targetHit.t:1;
- for(const obstacle of state.obstacles){const hit=obstacle.kind==='wall'?segmentVsAABB(tank.position,end,{x:obstacle.min.x-PROJECTILE_RADIUS,z:obstacle.min.z-PROJECTILE_RADIUS},{x:obstacle.max.x+PROJECTILE_RADIUS,z:obstacle.max.z+PROJECTILE_RADIUS}):segmentVsCircle(tank.position,end,obstacle.position,obstacle.pylonRadius+PROJECTILE_RADIUS);if(hit.hit)impact=Math.min(impact,hit.t);}
- const allies=player?state.players:state.enemies;fire=targetHit.hit&&!allies.some(t=>{if(t.id===tankId||!t.alive)return false;const hit=segmentVsCircle(tank.position,end,t.position,TANK_RADIUS+PROJECTILE_RADIUS+SAFETY_MARGIN);return hit.hit&&hit.t<=impact;});}
+ for(const obstacle of state.obstacles){const hit=obstacle.kind==='wall'?segmentVsAABB(firingPose.position,end,{x:obstacle.min.x-PROJECTILE_RADIUS,z:obstacle.min.z-PROJECTILE_RADIUS},{x:obstacle.max.x+PROJECTILE_RADIUS,z:obstacle.max.z+PROJECTILE_RADIUS}):segmentVsCircle(firingPose.position,end,obstacle.position,obstacle.pylonRadius+PROJECTILE_RADIUS);if(hit.hit)impact=Math.min(impact,hit.t);}
+ fire=targetHit.hit&&targetHit.t<=impact&&!friendlyInProjectilePath(state,firingPose);}
  if(plan.fire&&visibleTarget&&!fire&&diagnostics&&Math.abs(angleDelta(datan2(visibleTarget.position.x-tank.position.x,visibleTarget.position.z-tank.position.z),tank.heading))<.08)diagnostics.allyShotAvoided++;
  return {turn,thrust,fire,grenade:false};
 }
