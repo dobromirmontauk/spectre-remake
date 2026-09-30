@@ -16,3 +16,17 @@ test('reports measured decisions and counters without inferring missing ones', (
 test('baseline never claims model inference', () => {
  assert.equal(summarizeRun({...run,config:{enabled:false},samples:[{metrics:{decisions:10}}]}).inferenceEvidence,'no-model-decisions-observed');
 });
+import { safeHttpFailure, sampledKPIs } from './sampled.mjs';
+test('command coverage uses model plus fallback command counts', () => {
+ const r=summarizeRun({...run,samples:[{metrics:{modelCommandTicks:90,fallbackTicks:30,observedTicks:10,acceptedHzPerTank:1.7}}]});
+ assert.equal(r.modelDrivenTickFraction,0.75);assert.equal(r.effectiveAcceptedHzPerTank,1.7);
+});
+test('sampled recoveries exclude death resets and respawn teleports', () => {
+ const sample=(time,x,shield,lives=3,alive=true)=>({elapsedSeconds:time,state:{level:1,players:[{id:'player',position:{x,z:0},shield,maxShield:100,lives,alive}]}});
+ const r=sampledKPIs([sample(0,0,20),sample(0.2,1,70),sample(0.4,2,20),sample(0.6,100,100,2)]).tanks.player;
+ assert.equal(r.lowShieldEpisodes,2);assert.equal(r.lowShieldRecoveries,1);assert.equal(r.distance,2);
+});
+test('HTTP diagnostics cannot expose arbitrary body text or credential codes', () => {
+ assert.deepEqual(safeHttpFailure(500,'{"code":"sk-secret", "error":"Bearer SECRET"}'),{status:500,code:null,bodyOmitted:true});
+ assert.equal(safeHttpFailure(429,'{"code":"rate_limited"}').code,'rate_limited');
+});

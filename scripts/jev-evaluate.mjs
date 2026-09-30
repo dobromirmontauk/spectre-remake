@@ -1,5 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { safeHttpFailure } from './jev-eval/sampled.mjs';
 import { summarizeRun } from './jev-eval/report.mjs';
 
 const args = Object.fromEntries(process.argv.slice(2).map(arg => {
@@ -10,7 +11,7 @@ const args = Object.fromEntries(process.argv.slice(2).map(arg => {
 const config = {
   url: args.url ?? 'http://localhost:5173/', duration: Number(args.duration ?? 30),
   enabled: args.enabled === 'true', offline: args.offline === 'true', autopilot: args.autopilot !== 'false',
-  level: Number(args.level ?? 1), seed: Number(args.seed ?? 1991), hz: Number(args.hz ?? 5),
+  level: Number(args.level ?? 1), seed: Number(args.seed ?? 1991), hz: Number(args.hz ?? 2),
   seedApplied: false, seedNote: 'Requested seed recorded; game start uses built-in deterministic seed', maxEnemies: 3, god: false, video: args.video === 'true',
 };
 if (!Number.isFinite(config.duration) || config.duration <= 0 || config.duration > 300) throw new Error('Duration must be 0–300 seconds');
@@ -26,6 +27,7 @@ const context = await browser.newContext({viewport:{width:1280,height:800}, ...(
 const page = await context.newPage();
 const network = { requested:0, responses:0, httpFailures:0, transportFailures:0, statuses:{} };
 const errors = [];
+const diagnosticTasks = [];
 if (config.offline) {
   if (!config.enabled) throw new Error('Offline safe baseline requires --enabled=true');
   await page.route('**/api/jev**', route => route.abort('blockedbyclient'));
@@ -33,7 +35,7 @@ if (config.offline) {
 const isDecision = url => /\/api\/jev(?:[/?]|$)/.test(url);
 page.on('request',r => { if (isDecision(r.url())) network.requested++; });
 page.on('requestfailed',r => { if (isDecision(r.url())) network.transportFailures++; });
-page.on('response',r => { if (isDecision(r.url())) {network.responses++;network.statuses[r.status()] = (network.statuses[r.status()] ?? 0)+1;if (!r.ok()) network.httpFailures++;} });
+page.on('response',r => { if (isDecision(r.url())) {network.responses++;network.statuses[r.status()] = (network.statuses[r.status()] ?? 0)+1;if (!r.ok()) {network.httpFailures++; if (!network.firstHttpError) { network.firstHttpError={status:r.status(),bodyOmitted:true}; diagnosticTasks.push(r.text().then(body => {network.firstHttpError=safeHttpFailure(r.status(),body);}).catch(() => {})); }}} });
 page.on('pageerror',e => errors.push(e.message));
 let start = Date.now();
 let stoppedReason = 'duration';
@@ -67,6 +69,7 @@ try {
 } finally {
   const elapsedSeconds = (Date.now()-start)/1000;
   await context.close();await browser.close();
+  await Promise.allSettled(diagnosticTasks);
   const report = summarizeRun({config,samples,network,errors,stoppedReason,elapsedSeconds});
   await writeFile(resolve(output,'report.json'), JSON.stringify(report,null,2)+'\n');
   console.log(JSON.stringify({output,stoppedReason,inferenceEvidence:report.inferenceEvidence,network,errors}));
