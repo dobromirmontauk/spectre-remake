@@ -1,0 +1,2 @@
+test/validation/jev-ai/group-tactics/*.mp4 filter=lfs diff=lfs merge=lfs -text
+test/validation/jev-ai/group-tactics/*.png filter=lfs diff=lfs merge=lfs -text
