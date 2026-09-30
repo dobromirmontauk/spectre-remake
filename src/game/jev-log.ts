@@ -1,5 +1,4 @@
 import { SIM_DT } from '../config/constants.ts';
-import type { TankObservation } from '../jev/types.ts';
 import type { JevSession } from './jev-session.ts';
 import type { DecisionAudit } from './jev-audit.ts';
 
@@ -65,16 +64,12 @@ export class JevDecisionLog {
   }
 }
 function summarize(record: DecisionAudit): string {
-  const head = `${record.at.slice(11, 23)} UTC · Level ${record.level} · game ${(record.tick * SIM_DT).toFixed(2)}s / tick ${record.tick} · batch ${record.sequence} · ${record.outcome}${record.latencyMs === undefined ? '' : ` · ${Math.round(record.latencyMs)} ms`}`;
-  const request = record.request as { tanks?: { tankId: string; observation: TankObservation }[] };
+  const head = `${record.at.slice(11, 23)} UTC · L${record.level} · game ${(record.tick * SIM_DT).toFixed(2)}s · ${record.outcome}${record.latencyMs === undefined ? '' : ` · ${Math.round(record.latencyMs)} ms`}`;
   const lines = record.decisions.map(d => {
-    const observation = request.tanks?.find(t => t.tankId === d.tankId)?.observation;
-    const sightings = [...(observation?.contacts ?? []), ...(observation?.memory ?? [])].filter(c => c.kind === 'tank').slice(0, 2).map(c => {
-      const seen = c.seenSeconds ?? c.seenTick * SIM_DT;
-      const age = c.ageSeconds ?? Math.max(0, record.tick * SIM_DT - seen);
-      return `${c.id} ${c.source ?? 'own'} sighting at ${seen.toFixed(2)}s; age ${age.toFixed(2)}s at decision; position (${c.position.x.toFixed(1)}, ${c.position.z.toFixed(1)}); heading ${c.heading === undefined ? 'unknown' : Math.round(c.heading * 180 / Math.PI) + '°'}`;
-    });
-    return `${d.role} ${d.tankId}: ${d.strategy ?? d.choice.split(':')[0]} — ${d.description}${d.confidence === undefined ? '' : ` · confidence ${(d.confidence * 100).toFixed(1)}%`} [${d.applied ? `applied at tick ${d.appliedTick}` : d.accepted ? d.notAppliedReason ? `accepted; not executed (${d.notAppliedReason})` : 'accepted; awaiting execution' : 'discarded'}]` + (sightings.length ? '\n  ' + sightings.join('\n  ') : '\n  No tank sighting in this captured observation.');
+    const action = d.description.split(';')[0]!.replace(/^Strategy \w+:\s*/, '').replace(/\s+at\s*\d+-unit radius|\s+from a\s*\d+-unit stand-off vantage/g, '');
+    const shortAction = action.length > 60 ? action.slice(0, 57) + '…' : action;
+    const execution = d.applied ? 'applied' : d.accepted ? d.notAppliedReason ? `not executed: ${d.notAppliedReason}` : 'accepted' : 'discarded';
+    return `${d.tankId} · ${d.strategy ?? d.choice.split(':')[0]} · ${shortAction}${d.confidence === undefined ? '' : ` · ${(d.confidence * 100).toFixed(0)}%`} · ${execution}`;
   });
   return head + '\n' + (lines.length ? lines.join('\n') : record.error ?? 'Waiting for model response.');
 }

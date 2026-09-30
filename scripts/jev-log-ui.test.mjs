@@ -15,8 +15,10 @@ try {
  assert.match(await page.locator('.jev-log-body').innerText(),/No Jev requests yet/);
  await page.evaluate(()=>{window.__game.jev.configure({enabled:true,playerAutopilot:true});window.__game.startGame();window.__game.setLevel(5);});
  await page.waitForFunction(()=>window.__game.jev.getDecisionLog().some(r=>r.decisions.some(d=>d.applied)));
+ const defaultSummary=(await page.locator('.jev-log-row > div').allTextContents()).join('\n');assert.doesNotMatch(defaultSummary,/; travel|position \(|heading |age .* at decision/,'all position/direction/sighting detail stays inside collapsed exact state');
  assert.equal(await page.locator('.jev-log details[open]').count(),0,'exact inputs collapsed by default');assert.equal(history,0,'provider history only loaded after expansion');
  assert.ok(!(await page.locator('.jev-log-body').innerText()).includes('No Jev requests yet'),'empty placeholder cleared');
+ await page.waitForFunction(()=>window.__game.jev.getDecisionLog().length>=3);
  await page.evaluate(()=>{const stamp=document.createElement('div');stamp.textContent='Mock API fixture · UI verification only · no paid calls';stamp.style='position:absolute;top:0;left:0;color:#ffd583;background:#182024;padding:4px;z-index:99;font:13px monospace';document.body.appendChild(stamp);});
  mkdirSync('reference/verification/jev-v2',{recursive:true});await page.screenshot({path:'reference/verification/jev-v2/decision-log-collapsed-mock.png'});
  const id=await page.locator('.jev-log-row').first().getAttribute('data-audit-id');const row=page.locator(`.jev-log-row[data-audit-id="${id}"]`);await row.locator('details>summary').click();
