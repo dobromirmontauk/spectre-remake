@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "node scripts/check-sim-purity.mjs && tsc && vite build",
     "preview": "vite preview",
-    "verify:dmath": "node scripts/dmath-accuracy.mjs"
+    "verify:dmath": "node scripts/dmath-accuracy.mjs",
+    "deploy": "npm run build && npx --yes wrangler@4.144.0 pages deploy dist --project-name=spectre-remake --branch=main"
   },
   "dependencies": {
     "three": "^0.180.0",

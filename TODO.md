@@ -1,5 +1,18 @@
 # Roadmap
 
+## Current Objective
+
+Publish a blog post / LinkedIn post announcing Spectre at https://spectre-remake.pages.dev.
+
+## Next Steps
+
+- [ ] **Publish a blog post / LinkedIn post about Spectre.** Include the live game link, a gameplay screenshot, the inspiration from the 1991 Mac game, and local/network multiplayer. Draft for user review before posting.
+
+## Last Progress
+
+- 2026-09-29 — Published https://spectre-remake.pages.dev on Cloudflare Pages. Production build passes (sim purity, TypeScript, Vite); opened production in Chrome and started single-player gameplay. Screenshot: `reference/verification/deployment/cloudflare-2026-09-29.png`. Repeat deploy with `npm run deploy`. Network multiplayer and mobile were not re-tested.
+
+
 ## 1. Local multiplayer (same machine)
 - [x] Two players, split keyboard (arrows+Space/Alt-G vs WASD+F/Q), split-screen
 - [x] Sim already supports it: a second human is just another `Command` source with a tank id —
@@ -30,9 +43,8 @@
       goal (rAF throttling in a backgrounded tab is still the top real-world risk noted in the plan)
 
 ## 3. Deploy to a web server
-- [ ] `vite build` already produces a static `dist/` with `base: './'` — deployable anywhere
-- [ ] Pick host: GitHub Pages / Netlify / Cloudflare Pages (static is enough until multiplayer
-      needs a signaling server; Cloudflare Workers or a tiny Node process can host that later)
+- [x] `vite build` already produces a static `dist/` with `base: './'` — deployable anywhere
+- [x] Host chosen: Cloudflare Pages (`spectre-remake`); multiplayer uses public relay signaling and requires no deployed server.
 - [ ] Add favicon (kills the only console error), page title/meta, and a deploy script or CI step
 - [ ] Playtest on a phone — decide whether touch controls are in scope
 
