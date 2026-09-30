@@ -207,7 +207,7 @@ export class JevSession {
   }
   command(state: GameState, tank: TankState): Command {
     const plan = this.plans[tank.id];
-    if (!plan || plan.expiresTick < state.tick) { if (plan) this.finishUnapplied(tank.id, 'expired'); this.counters.fallbackTicks++; return commandForPlan(state, tank.id, null, this.interventions); }
+    if (!plan || plan.expiresTick < state.tick) { if (plan) this.finishUnapplied(tank.id, 'expired'); this.counters.fallbackTicks++; return commandForPlan(state, tank.id, plan ?? null, this.interventions); }
     if (this.appliedSerial[tank.id] !== this.selectionSerial[tank.id]) {
       this.appliedSerial[tank.id] = this.selectionSerial[tank.id]!;
       const role = state.players.some(p => p.id === tank.id) ? 'player' : 'enemy';
