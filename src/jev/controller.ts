@@ -63,7 +63,21 @@ export function commandForPlan(state:GameState,tankId:string,plan:TacticalPlan|n
   const reversing=Math.abs(reverseDelta)<Math.abs(forwardDelta);const steering=reversing?reverseDelta:forwardDelta;
   turn=Math.abs(steering)<.045?0:steering>0?1:-1;thrust=Math.abs(steering)<.7?(reversing?-1:1):0;
  }
- const safe=(cmd:Command)=>{const ghost={...tank,position:{...tank.position},prevPosition:{...tank.prevPosition}};const horizon=Math.ceil(LOOKAHEAD_SECONDS*30);for(let i=0;i<horizon+300;i++){if(i>=horizon&&Math.abs(ghost.speed)<.001)break;const before={...ghost.position};applyMovement(ghost,i<horizon?cmd:{...cmd,thrust:0},params);if(Math.abs(ghost.position.x)>ARENA_HALF_SIZE-TANK_RADIUS-SAFETY_MARGIN||Math.abs(ghost.position.z)>ARENA_HALF_SIZE-TANK_RADIUS-SAFETY_MARGIN||blocked(before,ghost.position,state.obstacles,TANK_RADIUS+SAFETY_MARGIN)||all.some(t=>{
+ // Arena geometry is public local safety knowledge; step inward before the edge can trap a hull.
+ const edgeX=Math.abs(tank.position.x)>96||(Math.abs(tank.position.x)>90&&Math.abs(plan.waypoint.x)>96);
+ const edgeZ=Math.abs(tank.position.z)>96||(Math.abs(tank.position.z)>90&&Math.abs(plan.waypoint.z)>96);
+ if(edgeX||edgeZ){
+  const inward=datan2(edgeX?-Math.sign(tank.position.x):0,edgeZ?-Math.sign(tank.position.z):0);
+  const forward=angleDelta(inward,tank.heading),reverse=angleDelta(inward+Math.PI,tank.heading);
+  const backing=Math.abs(reverse)<Math.abs(forward);const steering=backing?reverse:forward;
+  turn=Math.abs(steering)<.045?0:steering>0?1:-1;thrust=Math.abs(steering)<.7?(backing?-1:1):0;
+ }
+ const withinBounds=(a:Vec2,b:Vec2,margin=SAFETY_MARGIN)=>{
+  const physical=ARENA_HALF_SIZE-TANK_RADIUS,clearance=physical-margin;
+  if(Math.abs(b.x)>physical+1e-8||Math.abs(b.z)>physical+1e-8)return false;
+  return (Math.abs(a.x)>clearance?Math.abs(b.x)<=Math.abs(a.x)+1e-8:Math.abs(b.x)<=clearance)&&(Math.abs(a.z)>clearance?Math.abs(b.z)<=Math.abs(a.z)+1e-8:Math.abs(b.z)<=clearance);
+ };
+ const safe=(cmd:Command)=>{const ghost={...tank,position:{...tank.position},prevPosition:{...tank.prevPosition}};const horizon=Math.ceil(LOOKAHEAD_SECONDS*30);for(let i=0;i<horizon+300;i++){if(i>=horizon&&Math.abs(ghost.speed)<.001)break;const before={...ghost.position};applyMovement(ghost,i<horizon?cmd:{...cmd,thrust:0},params);if(!withinBounds(before,ghost.position)||blocked(before,ghost.position,state.obstacles,TANK_RADIUS+SAFETY_MARGIN)||all.some(t=>{
  if(t.id===tankId||!t.alive)return false;
  const physical=TANK_RADIUS*2;const clearance=physical+SAFETY_MARGIN;
  // Relative swept segment predicts observed heading/speed rather than a stationary hull.
@@ -85,11 +99,11 @@ export function commandForPlan(state:GameState,tankId:string,plan:TacticalPlan|n
  // Future model replans can change turning, so a curved coast rollout alone is insufficient.
  const stoppingRoom=(cmd:Command)=>{
   const ghost={...tank,position:{...tank.position},prevPosition:{...tank.prevPosition}};
-  const staticSafe=(a:Vec2,b:Vec2)=>Math.abs(b.x)<=ARENA_HALF_SIZE-TANK_RADIUS-SAFETY_MARGIN&&Math.abs(b.z)<=ARENA_HALF_SIZE-TANK_RADIUS-SAFETY_MARGIN&&!blocked(a,b,state.obstacles,TANK_RADIUS+SAFETY_MARGIN);
+  const staticSafe=(a:Vec2,b:Vec2)=>withinBounds(a,b)&&!blocked(a,b,state.obstacles,TANK_RADIUS+SAFETY_MARGIN);
   let before={...ghost.position};applyMovement(ghost,cmd,params);if(!staticSafe(before,ghost.position))return false;
   for(let i=0;i<300&&Math.abs(ghost.speed)>.001;i++){
    before={...ghost.position};const previousSpeed=ghost.speed;
-   applyMovement(ghost,{turn:0,thrust:previousSpeed<0?1:-1,fire:false,grenade:false},params);
+   applyMovement(ghost,{turn:0,thrust:Math.abs(previousSpeed)<=(previousSpeed<0?params.thrustAccel:params.reverseAccel)/30?0:previousSpeed<0?1:-1,fire:false,grenade:false},params);
    if(!staticSafe(before,ghost.position))return false;
    if(previousSpeed*ghost.speed<=0)break;
   }
@@ -105,8 +119,8 @@ export function commandForPlan(state:GameState,tankId:string,plan:TacticalPlan|n
    const ghost={...tank,position:{...tank.position},prevPosition:{...tank.prevPosition}};
    for(let i=0;i<300&&Math.abs(ghost.speed)>.001;i++){
     const before={...ghost.position},v=ghost.speed;
-    applyMovement(ghost,{turn:emergencyTurn,thrust:v<0?1:-1,fire:false,grenade:false},params);
-    if(Math.abs(ghost.position.x)>ARENA_HALF_SIZE-TANK_RADIUS||Math.abs(ghost.position.z)>ARENA_HALF_SIZE-TANK_RADIUS||blocked(before,ghost.position,state.obstacles,TANK_RADIUS+.05))return false;
+    applyMovement(ghost,{turn:emergencyTurn,thrust:Math.abs(v)<=(v<0?params.thrustAccel:params.reverseAccel)/30?0:v<0?1:-1,fire:false,grenade:false},params);
+    if(!withinBounds(before,ghost.position,0)||blocked(before,ghost.position,state.obstacles,TANK_RADIUS+.05))return false;
     if(v*ghost.speed<=0)break;
    }
    return true;

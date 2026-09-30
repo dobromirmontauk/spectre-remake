@@ -104,3 +104,9 @@ assert.equal(supplyObs.contacts.find(c=>c.id==='heal')?.pickupKind,'shield','vis
 player.heading=Math.PI;player.shield=player.maxShield;player.ammo=player.maxAmmo;
 assert(!buildCandidates(observeTank(s,'player',supplyMemory)).some(c=>c.id.includes('heal')||c.id.includes('refill')),'remembered supplies also suppressed whenfull');
 s.pickups.push({id:'hiddenSupply',kind:'shield',position:{x:0,z:90},amount:100,collected:false});assert(!JSON.stringify(observeTank(s,'player',{seen:{}})).includes('hiddenSupply'),'hidden supplymetadata never leaks');
+// Exact arena boundary-margin trap must escape without teleporting velocity.
+s.players[0]!.position={x:0,z:0};s.enemies=[e];s.obstacles=[];e.position={x:-77.19349551230343,z:98.4};e.heading=Math.PI;e.speed=0;
+for(let tick=0;tick<180;tick++){s.tick=tick;const cmd=commandForPlan(s,e.id,{...plan,targetId:undefined,fire:false,waypoint:{x:-77,z:110},expiresTick:tick+30});applyMovement(e,cmd,movementParamsForEnemy(e.kind,levelConfig(s.level)));assert(e.position.z<=98.4,'edge recovery never exits physical arena');}
+assert(e.position.z<96,'outer margin recovers inward within6seconds');console.log('Arena-margin exact fixture recovered inward to z='+e.position.z.toFixed(2));
+e.position={x:-77,z:94};e.heading=Math.PI;e.speed=-10;
+for(let tick=0;tick<180;tick++){s.tick=tick;const cmd=commandForPlan(s,e.id,{...plan,targetId:undefined,fire:false,waypoint:Math.floor(tick/15)%2?{x:-77,z:110}:{x:-50,z:90},expiresTick:tick+30});applyMovement(e,cmd,movementParamsForEnemy(e.kind,levelConfig(s.level)));assert(e.position.z<98.4,'2Hz guard replans never touch physical arena boundary');}
