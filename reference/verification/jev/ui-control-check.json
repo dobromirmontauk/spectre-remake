@@ -1,0 +1,11 @@
+{
+  "scenario": "Actual Play → 1 Player → Start → Jev AI → Player autopilot checkboxes; all backend routes deliberately blocked",
+  "disabledRequests": 0,
+  "requestsAfterOff": 0,
+  "enabled": true,
+  "playerAutopilot": true,
+  "hz": 2,
+  "modelDecisions": 0,
+  "status": "Offline fallback · Failed to fetch",
+  "cap": 3
+}
