@@ -21,7 +21,21 @@ export function buildCandidates(o:TankObservation,motorOrigin?:Vec2):TacticalPla
   const benefit=Math.min(c.amount,missing);if(benefit<=0)return;
   add((remembered?'remember:':'pickup:')+c.id,'Collect '+(remembered?'previously seen':'visible')+' '+c.pickupKind+' supply '+c.id+'; restore up to '+benefit+' '+c.pickupKind+' of '+missing+' missing; '+(c.pickupKind==='shield'?'improve survival':'enable more cannon shots'),c.position);
  };
- for(const c of o.contacts){if(c.kind==='tank'&&c.team!==o.own.team){const d=distance(origin,c.position);const dx=(origin.x-c.position.x)/Math.max(d,1),dz=(origin.z-c.position.z)/Math.max(d,1);add('hold:'+c.id,'Hold current vantage, aim and fire at visible target '+c.id,origin,true,c.id);add('engage:'+c.id,'Engage visible target '+c.id+' while maintaining separation',{x:c.position.x+dx*12,z:c.position.z+dz*12},true,c.id);for(const s of [-1,1])add('flank:'+c.id+':'+s,'Flank '+(s===1?'left':'right')+' of visible target '+c.id,{x:c.position.x+dx*18-dz*s*14,z:c.position.z+dz*18+dx*s*14},true,c.id);add('retreat:'+c.id,'Create distance from visible target '+c.id,{x:origin.x+dx*15,z:origin.z+dz*15},true,c.id);}else if(c.kind==='flag'&&o.own.team==='player')add('flag:'+c.id,'Collect visible flag '+c.id,c.position);else if(c.kind==='pickup')supply(c);}
+ for(const c of o.contacts){
+  if(c.kind==='tank'&&c.team!==o.own.team){
+   const d=distance(origin,c.position),dx=(origin.x-c.position.x)/Math.max(d,1),dz=(origin.z-c.position.z)/Math.max(d,1);
+   const ownSight=c.source===undefined||c.source==='own';
+   const targetDescription=ownSight?'visible target '+c.id:'spotter-reported target '+c.id+' at last reported position (age '+(c.ageSeconds??Math.max(0,(o.own.tick-c.seenTick)/30))+' seconds)';
+   if(ownSight&&!blocked(origin,c.position,o.geometry)){
+    add('hold:'+c.id,'Hold current vantage, aim and fire at '+targetDescription,origin,true,c.id);
+    const hold=plans.find(p=>p.id==='hold:'+c.id);
+    if(hold)hold.lookAt={...c.position};
+   }
+   add('engage:'+c.id,'Engage '+targetDescription+' while maintaining separation',{x:c.position.x+dx*12,z:c.position.z+dz*12},true,c.id);
+   for(const s of [-1,1])add('flank:'+c.id+':'+s,'Flank '+(s===1?'left':'right')+' of '+targetDescription,{x:c.position.x+dx*18-dz*s*14,z:c.position.z+dz*18+dx*s*14},true,c.id);
+   add('retreat:'+c.id,'Create distance from '+targetDescription,{x:origin.x+dx*15,z:origin.z+dz*15},true,c.id);
+  }else if(c.kind==='flag'&&o.own.team==='player')add('flag:'+c.id,'Collect visible flag '+c.id,c.position);else if(c.kind==='pickup')supply(c);
+ }
  for(const c of o.memory)if(o.own.team==='player'){if(c.kind==='flag')add('remember:'+c.id,'Collect previously seen flag '+c.id,c.position);else if(c.kind==='pickup')supply(c,true);}
  const opponents=o.contacts.filter(c=>c.kind==='tank'&&c.team!==o.own.team);
  const knownFlags=[...o.contacts,...o.memory].filter(c=>c.kind==='flag').sort((a,b)=>distance(origin,a.position)-distance(origin,b.position));
