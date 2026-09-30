@@ -2,6 +2,8 @@
   "mocked": true,
   "tiers": {
     "first": {
+      "remainingFlags": 2,
+      "totalFlags": 2,
       "level": 1,
       "nowSeconds": 0,
       "visited": [
@@ -60,6 +62,8 @@
       "bounds": 100
     },
     "stale": {
+      "remainingFlags": 2,
+      "totalFlags": 2,
       "level": 1,
       "nowSeconds": 3,
       "visited": [
@@ -118,6 +122,8 @@
       "bounds": 100
     },
     "mapped": {
+      "remainingFlags": 2,
+      "totalFlags": 2,
       "level": 3,
       "nowSeconds": 3,
       "visited": [
@@ -188,6 +194,8 @@
       "bounds": 100
     },
     "hidden": {
+      "remainingFlags": 2,
+      "totalFlags": 2,
       "level": 5,
       "nowSeconds": 3,
       "visited": [
@@ -273,6 +281,8 @@
       "bounds": 100
     },
     "shared": {
+      "remainingFlags": 2,
+      "totalFlags": 2,
       "level": 5,
       "nowSeconds": 3,
       "visited": [
@@ -374,12 +384,12 @@
   },
   "rows": [
     {
-      "id": "0be4f190-cb76-42d3-8bb9-39cc9cbdd48d:1",
-      "browserSessionId": "0be4f190-cb76-42d3-8bb9-39cc9cbdd48d",
+      "id": "0e717bc2-1502-468d-9a2f-20285a725902:1",
+      "browserSessionId": "0e717bc2-1502-468d-9a2f-20285a725902",
       "sequence": 1,
       "tick": 0,
       "level": 5,
-      "at": "2026-09-30T16:11:33.478Z",
+      "at": "2026-09-30T16:25:02.201Z",
       "request": {
         "version": 1,
         "sequence": 1,
@@ -389,6 +399,8 @@
             "tankId": "enemy-L5-0",
             "role": "enemy",
             "observation": {
+              "remainingFlags": 10,
+              "totalFlags": 10,
               "level": 5,
               "nowSeconds": 0,
               "visited": [
@@ -707,52 +719,12 @@
             },
             "candidates": [
               {
-                "id": "patrol:flag-8:1",
-                "description": "Strategy patrol: Circle clockwise around known flag flag-8 at18-unit radius; continuously survey for opponents; travel 21 units at -163 degrees relative heading; known obstacle route clear"
+                "id": "patrol:flag-8:approach:0",
+                "description": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-8; keep moving then circle and survey; travel 12 units at -126 degrees relative heading; known obstacle route clear"
               },
               {
-                "id": "patrol:flag-9:1",
-                "description": "Strategy patrol: Circle clockwise around known flag flag-9 at18-unit radius; continuously survey for opponents; travel 83 units at 131 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-0",
-                "description": "Strategy protect: Guard visible flag flag-0 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 164 units at 168 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-2",
-                "description": "Strategy protect: Guard visible flag flag-2 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 108 units at 146 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-3",
-                "description": "Strategy protect: Guard visible flag flag-3 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 173 units at -158 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-4",
-                "description": "Strategy protect: Guard visible flag flag-4 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 146 units at 148 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-5",
-                "description": "Strategy protect: Guard visible flag flag-5 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 180 units at 157 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-6",
-                "description": "Strategy protect: Guard visible flag flag-6 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 124 units at -173 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-7",
-                "description": "Strategy protect: Guard visible flag flag-7 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 159 units at 178 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-8",
-                "description": "Strategy protect: Guard visible flag flag-8 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 18 units at -126 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-9",
-                "description": "Strategy protect: Guard visible flag flag-9 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 83 units at 140 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "regroup:enemy-L5-2",
-                "description": "Strategy regroup: Regroup8 units from known ally enemy-L5-2; coordinate with ally strategy unknown without colliding; travel 106 units at 96 degrees relative heading; known obstacle route clear"
+                "id": "patrol:flag-9:approach:0",
+                "description": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-9; keep moving then circle and survey; travel 24 units at 140 degrees relative heading; known obstacle route clear"
               },
               {
                 "id": "explore:2",
@@ -769,6 +741,10 @@
               {
                 "id": "explore:5",
                 "description": "Strategy explore: Search unvisited clear sector 5 for opposing player; reacquire visual contact; travel 24 units at -135 degrees relative heading; known obstacle route clear"
+              },
+              {
+                "id": "explore:6",
+                "description": "Strategy explore: Search unvisited clear sector 6 for opposing player; reacquire visual contact; travel 24 units at -90 degrees relative heading; known obstacle route clear"
               }
             ]
           },
@@ -776,6 +752,8 @@
             "tankId": "enemy-L5-1",
             "role": "enemy",
             "observation": {
+              "remainingFlags": 10,
+              "totalFlags": 10,
               "level": 5,
               "nowSeconds": 0,
               "visited": [
@@ -1110,52 +1088,8 @@
                 "description": "Strategy patrol: Circle counterclockwise around known flag flag-1 at18-unit radius; continuously survey for opponents; travel 13 units at -43 degrees relative heading; known obstacle route clear"
               },
               {
-                "id": "patrol:flag-9:1",
-                "description": "Strategy patrol: Circle clockwise around known flag flag-9 at18-unit radius; continuously survey for opponents; travel 51 units at -138 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-0",
-                "description": "Strategy protect: Guard visible flag flag-0 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 142 units at -150 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-1",
-                "description": "Strategy protect: Guard visible flag flag-1 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 5 units at -116 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-2",
-                "description": "Strategy protect: Guard visible flag flag-2 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 64 units at -143 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-3",
-                "description": "Strategy protect: Guard visible flag flag-3 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 214 units at -126 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-4",
-                "description": "Strategy protect: Guard visible flag flag-4 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 88 units at -163 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-5",
-                "description": "Strategy protect: Guard visible flag flag-5 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 131 units at -164 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-6",
-                "description": "Strategy protect: Guard visible flag flag-6 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 150 units at -126 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-7",
-                "description": "Strategy protect: Guard visible flag flag-7 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 158 units at -141 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-8",
-                "description": "Strategy protect: Guard visible flag flag-8 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 127 units at -81 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-9",
-                "description": "Strategy protect: Guard visible flag flag-9 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 50 units at -123 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "regroup:enemy-L5-2",
-                "description": "Strategy regroup: Regroup8 units from known ally enemy-L5-2; coordinate with ally strategy unknown without colliding; travel 19 units at 0 degrees relative heading; known obstacle route clear"
+                "id": "patrol:flag-9:approach:0",
+                "description": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-9; keep moving then circle and survey; travel 24 units at -123 degrees relative heading; known obstacle route clear"
               },
               {
                 "id": "explore:0",
@@ -1168,6 +1102,14 @@
               {
                 "id": "explore:5",
                 "description": "Strategy explore: Search unvisited clear sector 5 for opposing player; reacquire visual contact; travel 24 units at -135 degrees relative heading; known obstacle route clear"
+              },
+              {
+                "id": "explore:6",
+                "description": "Strategy explore: Search unvisited clear sector 6 for opposing player; reacquire visual contact; travel 24 units at -90 degrees relative heading; known obstacle route clear"
+              },
+              {
+                "id": "explore:7",
+                "description": "Strategy explore: Search unvisited clear sector 7 for opposing player; reacquire visual contact; travel 24 units at -45 degrees relative heading; known obstacle route clear"
               }
             ]
           },
@@ -1175,6 +1117,8 @@
             "tankId": "enemy-L5-2",
             "role": "enemy",
             "observation": {
+              "remainingFlags": 10,
+              "totalFlags": 10,
               "level": 5,
               "nowSeconds": 0,
               "visited": [
@@ -1481,52 +1425,12 @@
             },
             "candidates": [
               {
-                "id": "patrol:flag-1:1",
-                "description": "Strategy patrol: Circle clockwise around known flag flag-1 at18-unit radius; continuously survey for opponents; travel 28 units at 176 degrees relative heading; known obstacle route clear"
+                "id": "patrol:flag-1:approach:0",
+                "description": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-1; keep moving then circle and survey; travel 19 units at -156 degrees relative heading; known obstacle route clear"
               },
               {
-                "id": "patrol:flag-9:1",
-                "description": "Strategy patrol: Circle clockwise around known flag flag-9 at18-unit radius; continuously survey for opponents; travel 68 units at -150 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-0",
-                "description": "Strategy protect: Guard visible flag flag-0 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 166 units at -154 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-1",
-                "description": "Strategy protect: Guard visible flag flag-1 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 25 units at -156 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-2",
-                "description": "Strategy protect: Guard visible flag flag-2 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 87 units at -153 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-3",
-                "description": "Strategy protect: Guard visible flag flag-3 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 231 units at -131 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-4",
-                "description": "Strategy protect: Guard visible flag flag-4 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 114 units at -166 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-5",
-                "description": "Strategy protect: Guard visible flag flag-5 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 157 units at -167 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-6",
-                "description": "Strategy protect: Guard visible flag flag-6 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 167 units at -133 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-7",
-                "description": "Strategy protect: Guard visible flag flag-7 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 180 units at -146 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-9",
-                "description": "Strategy protect: Guard visible flag flag-9 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 67 units at -139 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "regroup:enemy-L5-1",
-                "description": "Strategy regroup: Regroup8 units from known ally enemy-L5-1; coordinate with ally strategy unknown without colliding; travel 19 units at 180 degrees relative heading; known obstacle route clear"
+                "id": "patrol:flag-9:approach:0",
+                "description": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-9; keep moving then circle and survey; travel 24 units at -139 degrees relative heading; known obstacle route clear"
               },
               {
                 "id": "explore:4",
@@ -1542,6 +1446,8 @@
             "tankId": "player",
             "role": "player",
             "observation": {
+              "remainingFlags": 10,
+              "totalFlags": 10,
               "level": 5,
               "nowSeconds": 0,
               "visited": [
@@ -1958,8 +1864,8 @@
         {
           "tankId": "enemy-L5-0",
           "role": "enemy",
-          "choice": "patrol:flag-8:1",
-          "description": "Strategy patrol: Circle clockwise around known flag flag-8 at18-unit radius; continuously survey for opponents; travel 21 units at -163 degrees relative heading; known obstacle route clear",
+          "choice": "patrol:flag-8:approach:0",
+          "description": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-8; keep moving then circle and survey; travel 12 units at -126 degrees relative heading; known obstacle route clear",
           "strategy": "patrol",
           "confidence": 0.85,
           "accepted": true,
@@ -1980,8 +1886,8 @@
         {
           "tankId": "enemy-L5-2",
           "role": "enemy",
-          "choice": "patrol:flag-1:1",
-          "description": "Strategy patrol: Circle clockwise around known flag flag-1 at18-unit radius; continuously survey for opponents; travel 28 units at 176 degrees relative heading; known obstacle route clear",
+          "choice": "patrol:flag-1:approach:0",
+          "description": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-1; keep moving then circle and survey; travel 19 units at -156 degrees relative heading; known obstacle route clear",
           "strategy": "patrol",
           "confidence": 0.85,
           "accepted": true,
@@ -2006,7 +1912,7 @@
         "decisions": [
           {
             "tankId": "enemy-L5-0",
-            "choice": "patrol:flag-8:1",
+            "choice": "patrol:flag-8:approach:0",
             "confidence": 0.85
           },
           {
@@ -2016,7 +1922,7 @@
           },
           {
             "tankId": "enemy-L5-2",
-            "choice": "patrol:flag-1:1",
+            "choice": "patrol:flag-1:approach:0",
             "confidence": 0.85
           },
           {
@@ -2030,15 +1936,15 @@
         },
         "spentUsd": 0.001
       },
-      "latencyMs": 1463
+      "latencyMs": 1453
     },
     {
-      "id": "0be4f190-cb76-42d3-8bb9-39cc9cbdd48d:2",
-      "browserSessionId": "0be4f190-cb76-42d3-8bb9-39cc9cbdd48d",
+      "id": "0e717bc2-1502-468d-9a2f-20285a725902:2",
+      "browserSessionId": "0e717bc2-1502-468d-9a2f-20285a725902",
       "sequence": 2,
       "tick": 10,
       "level": 5,
-      "at": "2026-09-30T16:11:34.946Z",
+      "at": "2026-09-30T16:25:03.658Z",
       "request": {
         "version": 1,
         "sequence": 2,
@@ -2048,6 +1954,8 @@
             "tankId": "enemy-L5-0",
             "role": "enemy",
             "observation": {
+              "remainingFlags": 10,
+              "totalFlags": 10,
               "level": 5,
               "nowSeconds": 0.3333333333333333,
               "visited": [
@@ -2369,52 +2277,12 @@
             },
             "candidates": [
               {
-                "id": "patrol:flag-8:1",
-                "description": "Strategy patrol: Circle clockwise around known flag flag-8 at18-unit radius; continuously survey for opponents; travel 21 units at 161 degrees relative heading; known obstacle route clear"
+                "id": "patrol:flag-8:approach:0",
+                "description": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-8; keep moving then circle and survey; travel 12 units at -162 degrees relative heading; known obstacle route clear"
               },
               {
-                "id": "patrol:flag-9:1",
-                "description": "Strategy patrol: Circle clockwise around known flag flag-9 at18-unit radius; continuously survey for opponents; travel 83 units at 95 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-0",
-                "description": "Strategy protect: Guard visible flag flag-0 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 164 units at 132 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-2",
-                "description": "Strategy protect: Guard visible flag flag-2 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 108 units at 110 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-3",
-                "description": "Strategy protect: Guard visible flag flag-3 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 173 units at 166 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-4",
-                "description": "Strategy protect: Guard visible flag flag-4 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 146 units at 112 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-5",
-                "description": "Strategy protect: Guard visible flag flag-5 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 180 units at 121 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-6",
-                "description": "Strategy protect: Guard visible flag flag-6 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 124 units at 151 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-7",
-                "description": "Strategy protect: Guard visible flag flag-7 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 159 units at 142 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-8",
-                "description": "Strategy protect: Guard visible flag flag-8 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 18 units at -162 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-9",
-                "description": "Strategy protect: Guard visible flag flag-9 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 83 units at 104 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "regroup:enemy-L5-2",
-                "description": "Strategy regroup: Regroup8 units from known ally enemy-L5-2; coordinate with ally strategy patrol without colliding; travel 106 units at 60 degrees relative heading; known obstacle route clear"
+                "id": "patrol:flag-9:approach:0",
+                "description": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-9; keep moving then circle and survey; travel 24 units at 104 degrees relative heading; known obstacle route clear"
               },
               {
                 "id": "explore:2",
@@ -2438,6 +2306,8 @@
             "tankId": "enemy-L5-1",
             "role": "enemy",
             "observation": {
+              "remainingFlags": 10,
+              "totalFlags": 10,
               "level": 5,
               "nowSeconds": 0.3333333333333333,
               "visited": [
@@ -2763,52 +2633,8 @@
                 "description": "Strategy patrol: Circle counterclockwise around known flag flag-1 at18-unit radius; continuously survey for opponents; travel 13 units at -79 degrees relative heading; known obstacle route clear"
               },
               {
-                "id": "patrol:flag-9:1",
-                "description": "Strategy patrol: Circle clockwise around known flag flag-9 at18-unit radius; continuously survey for opponents; travel 51 units at -174 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-0",
-                "description": "Strategy protect: Guard visible flag flag-0 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 142 units at 174 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-1",
-                "description": "Strategy protect: Guard visible flag flag-1 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 5 units at -152 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-2",
-                "description": "Strategy protect: Guard visible flag flag-2 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 64 units at -179 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-3",
-                "description": "Strategy protect: Guard visible flag flag-3 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 214 units at -162 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-4",
-                "description": "Strategy protect: Guard visible flag flag-4 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 88 units at 161 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-5",
-                "description": "Strategy protect: Guard visible flag flag-5 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 131 units at 160 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-6",
-                "description": "Strategy protect: Guard visible flag flag-6 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 150 units at -162 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-7",
-                "description": "Strategy protect: Guard visible flag flag-7 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 158 units at -177 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-8",
-                "description": "Strategy protect: Guard visible flag flag-8 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 127 units at -117 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-9",
-                "description": "Strategy protect: Guard visible flag flag-9 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 50 units at -159 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "regroup:enemy-L5-2",
-                "description": "Strategy regroup: Regroup8 units from known ally enemy-L5-2; coordinate with ally strategy patrol without colliding; travel 19 units at -36 degrees relative heading; known obstacle route clear"
+                "id": "patrol:flag-9:approach:0",
+                "description": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-9; keep moving then circle and survey; travel 24 units at -159 degrees relative heading; known obstacle route clear"
               },
               {
                 "id": "explore:4",
@@ -2821,6 +2647,10 @@
               {
                 "id": "explore:6",
                 "description": "Strategy explore: Search unvisited clear sector 6 for opposing player; reacquire visual contact; travel 24 units at -90 degrees relative heading; known obstacle route clear"
+              },
+              {
+                "id": "explore:7",
+                "description": "Strategy explore: Search unvisited clear sector 7 for opposing player; reacquire visual contact; travel 24 units at -45 degrees relative heading; known obstacle route clear"
               }
             ]
           },
@@ -2828,6 +2658,8 @@
             "tankId": "enemy-L5-2",
             "role": "enemy",
             "observation": {
+              "remainingFlags": 10,
+              "totalFlags": 10,
               "level": 5,
               "nowSeconds": 0.3333333333333333,
               "visited": [
@@ -3124,60 +2956,12 @@
             },
             "candidates": [
               {
-                "id": "patrol:flag-1:1",
-                "description": "Strategy patrol: Circle clockwise around known flag flag-1 at18-unit radius; continuously survey for opponents; travel 28 units at 140 degrees relative heading; known obstacle route clear"
+                "id": "patrol:flag-1:approach:0",
+                "description": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-1; keep moving then circle and survey; travel 19 units at 168 degrees relative heading; known obstacle route clear"
               },
               {
-                "id": "patrol:flag-9:1",
-                "description": "Strategy patrol: Circle clockwise around known flag flag-9 at18-unit radius; continuously survey for opponents; travel 68 units at 174 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-0",
-                "description": "Strategy protect: Guard visible flag flag-0 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 166 units at 170 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-1",
-                "description": "Strategy protect: Guard visible flag flag-1 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 25 units at 168 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-2",
-                "description": "Strategy protect: Guard visible flag flag-2 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 87 units at 171 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-3",
-                "description": "Strategy protect: Guard visible flag flag-3 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 231 units at -167 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-4",
-                "description": "Strategy protect: Guard visible flag flag-4 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 114 units at 158 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-5",
-                "description": "Strategy protect: Guard visible flag flag-5 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 157 units at 157 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-6",
-                "description": "Strategy protect: Guard visible flag flag-6 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 167 units at -169 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-7",
-                "description": "Strategy protect: Guard visible flag flag-7 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 180 units at 178 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-8",
-                "description": "Strategy protect: Guard visible flag flag-8 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 125 units at -128 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-9",
-                "description": "Strategy protect: Guard visible flag flag-9 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 67 units at -175 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "regroup:enemy-L5-0",
-                "description": "Strategy regroup: Regroup8 units from known ally enemy-L5-0; coordinate with ally strategy patrol without colliding; travel 106 units at -120 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "regroup:enemy-L5-1",
-                "description": "Strategy regroup: Regroup8 units from known ally enemy-L5-1; coordinate with ally strategy patrol without colliding; travel 19 units at 144 degrees relative heading; known obstacle route clear"
+                "id": "patrol:flag-9:approach:0",
+                "description": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-9; keep moving then circle and survey; travel 24 units at -175 degrees relative heading; known obstacle route clear"
               },
               {
                 "id": "explore:4",
@@ -3193,6 +2977,8 @@
             "tankId": "player",
             "role": "player",
             "observation": {
+              "remainingFlags": 10,
+              "totalFlags": 10,
               "level": 5,
               "nowSeconds": 0.3333333333333333,
               "visited": [
@@ -3613,8 +3399,8 @@
         {
           "tankId": "enemy-L5-0",
           "role": "enemy",
-          "choice": "patrol:flag-8:1",
-          "description": "Strategy patrol: Circle clockwise around known flag flag-8 at18-unit radius; continuously survey for opponents; travel 21 units at 161 degrees relative heading; known obstacle route clear",
+          "choice": "patrol:flag-8:approach:0",
+          "description": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-8; keep moving then circle and survey; travel 12 units at -162 degrees relative heading; known obstacle route clear",
           "strategy": "patrol",
           "confidence": 0.85,
           "accepted": true,
@@ -3635,8 +3421,8 @@
         {
           "tankId": "enemy-L5-2",
           "role": "enemy",
-          "choice": "patrol:flag-1:1",
-          "description": "Strategy patrol: Circle clockwise around known flag flag-1 at18-unit radius; continuously survey for opponents; travel 28 units at 140 degrees relative heading; known obstacle route clear",
+          "choice": "patrol:flag-1:approach:0",
+          "description": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-1; keep moving then circle and survey; travel 19 units at 168 degrees relative heading; known obstacle route clear",
           "strategy": "patrol",
           "confidence": 0.85,
           "accepted": true,
@@ -3661,7 +3447,7 @@
         "decisions": [
           {
             "tankId": "enemy-L5-0",
-            "choice": "patrol:flag-8:1",
+            "choice": "patrol:flag-8:approach:0",
             "confidence": 0.85
           },
           {
@@ -3671,7 +3457,7 @@
           },
           {
             "tankId": "enemy-L5-2",
-            "choice": "patrol:flag-1:1",
+            "choice": "patrol:flag-1:approach:0",
             "confidence": 0.85
           },
           {
@@ -3685,15 +3471,15 @@
         },
         "spentUsd": 0.001
       },
-      "latencyMs": 6.9000000059604645
+      "latencyMs": 5.5999999940395355
     },
     {
-      "id": "0be4f190-cb76-42d3-8bb9-39cc9cbdd48d:3",
-      "browserSessionId": "0be4f190-cb76-42d3-8bb9-39cc9cbdd48d",
+      "id": "0e717bc2-1502-468d-9a2f-20285a725902:3",
+      "browserSessionId": "0e717bc2-1502-468d-9a2f-20285a725902",
       "sequence": 3,
       "tick": 25,
       "level": 5,
-      "at": "2026-09-30T16:11:35.445Z",
+      "at": "2026-09-30T16:25:04.175Z",
       "request": {
         "version": 1,
         "sequence": 3,
@@ -3703,6 +3489,8 @@
             "tankId": "enemy-L5-0",
             "role": "enemy",
             "observation": {
+              "remainingFlags": 10,
+              "totalFlags": 10,
               "level": 5,
               "nowSeconds": 0.8333333333333334,
               "visited": [
@@ -3718,7 +3506,7 @@
                   "x": -19.054110675118864,
                   "z": 94
                 },
-                "heading": 1.5707963267948972,
+                "heading": -0.3141592653589793,
                 "speed": 0,
                 "shieldFraction": 1,
                 "ammo": 999999,
@@ -3996,96 +3784,28 @@
               "memory": [],
               "geometry": [
                 {
-                  "id": "wall-5",
+                  "id": "wall-0",
                   "kind": "wall",
                   "min": {
-                    "x": 30.087048772489652,
-                    "z": 56.98302025580779
+                    "x": -72.68515452486463,
+                    "z": 80.76240441156551
                   },
                   "max": {
-                    "x": 34.323286425555125,
-                    "z": 61.26450396841392
+                    "x": -68.44037090125494,
+                    "z": 89.24009149195626
                   }
-                },
-                {
-                  "id": "wall-7",
-                  "kind": "wall",
-                  "min": {
-                    "x": -22.95976282353513,
-                    "z": 57.43695752113126
-                  },
-                  "max": {
-                    "x": -16.64040420507081,
-                    "z": 66.51372298807837
-                  }
-                },
-                {
-                  "id": "windmill-3",
-                  "kind": "windmill",
-                  "position": {
-                    "x": 5.81032632663846,
-                    "z": 85.65863162092865
-                  },
-                  "pylonRadius": 1.2,
-                  "bladeLength": 6,
-                  "bladeAngle": 4.862452011668475,
-                  "prevBladeAngle": 4.810092134108645
                 }
               ],
               "bounds": 100
             },
             "candidates": [
               {
-                "id": "patrol:flag-8:1",
-                "description": "Strategy patrol: Circle clockwise around known flag flag-8 at18-unit radius; continuously survey for opponents; travel 21 units at 107 degrees relative heading; known obstacle route clear"
+                "id": "patrol:flag-8:approach:0",
+                "description": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-8; keep moving then circle and survey; travel 12 units at -108 degrees relative heading; known obstacle route clear"
               },
               {
-                "id": "patrol:flag-9:1",
-                "description": "Strategy patrol: Circle clockwise around known flag flag-9 at18-unit radius; continuously survey for opponents; travel 83 units at 41 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-0",
-                "description": "Strategy protect: Guard visible flag flag-0 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 164 units at 78 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-2",
-                "description": "Strategy protect: Guard visible flag flag-2 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 108 units at 56 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-3",
-                "description": "Strategy protect: Guard visible flag flag-3 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 173 units at 112 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-4",
-                "description": "Strategy protect: Guard visible flag flag-4 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 146 units at 58 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-5",
-                "description": "Strategy protect: Guard visible flag flag-5 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 180 units at 67 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-8",
-                "description": "Strategy protect: Guard visible flag flag-8 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 18 units at 144 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-9",
-                "description": "Strategy protect: Guard visible flag flag-9 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 83 units at 50 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "regroup:enemy-L5-2",
-                "description": "Strategy regroup: Regroup8 units from known ally enemy-L5-2; coordinate with ally strategy patrol without colliding; travel 106 units at 6 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "explore:0",
-                "description": "Strategy explore: Search unvisited clear sector 0 for opposing player; reacquire visual contact; travel 24 units at 0 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "explore:1",
-                "description": "Strategy explore: Search unvisited clear sector 1 for opposing player; reacquire visual contact; travel 24 units at 45 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "explore:2",
-                "description": "Strategy explore: Search unvisited clear sector 2 for opposing player; reacquire visual contact; travel 24 units at 90 degrees relative heading; known obstacle route clear"
+                "id": "patrol:flag-9:approach:0",
+                "description": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-9; keep moving then circle and survey; travel 24 units at 158 degrees relative heading; known obstacle route clear"
               },
               {
                 "id": "explore:3",
@@ -4093,7 +3813,15 @@
               },
               {
                 "id": "explore:4",
-                "description": "Strategy explore: Search unvisited clear sector 4 for opposing player; reacquire visual contact; travel 24 units at -180 degrees relative heading; known obstacle route clear"
+                "description": "Strategy explore: Search unvisited clear sector 4 for opposing player; reacquire visual contact; travel 24 units at 180 degrees relative heading; known obstacle route clear"
+              },
+              {
+                "id": "explore:5",
+                "description": "Strategy explore: Search unvisited clear sector 5 for opposing player; reacquire visual contact; travel 24 units at -135 degrees relative heading; known obstacle route clear"
+              },
+              {
+                "id": "explore:6",
+                "description": "Strategy explore: Search unvisited clear sector 6 for opposing player; reacquire visual contact; travel 24 units at -90 degrees relative heading; known obstacle route clear"
               }
             ]
           },
@@ -4101,6 +3829,8 @@
             "tankId": "enemy-L5-1",
             "role": "enemy",
             "observation": {
+              "remainingFlags": 10,
+              "totalFlags": 10,
               "level": 5,
               "nowSeconds": 0.8333333333333334,
               "visited": [
@@ -4383,7 +4113,7 @@
                     "x": -19.054110675118864,
                     "z": 94
                   },
-                  "heading": 1.5707963267948972,
+                  "heading": -0.3141592653589793,
                   "seenTick": 25,
                   "source": "shared",
                   "strategy": "patrol",
@@ -4438,52 +4168,8 @@
                 "description": "Strategy patrol: Circle counterclockwise around known flag flag-1 at18-unit radius; continuously survey for opponents; travel 13 units at -27 degrees relative heading; known obstacle route clear"
               },
               {
-                "id": "patrol:flag-9:1",
-                "description": "Strategy patrol: Circle clockwise around known flag flag-9 at18-unit radius; continuously survey for opponents; travel 51 units at -120 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-0",
-                "description": "Strategy protect: Guard visible flag flag-0 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 143 units at -132 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-1",
-                "description": "Strategy protect: Guard visible flag flag-1 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 5 units at -99 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-2",
-                "description": "Strategy protect: Guard visible flag flag-2 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 64 units at -125 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-3",
-                "description": "Strategy protect: Guard visible flag flag-3 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 214 units at -108 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-4",
-                "description": "Strategy protect: Guard visible flag flag-4 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 88 units at -145 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-5",
-                "description": "Strategy protect: Guard visible flag flag-5 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 131 units at -146 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-6",
-                "description": "Strategy protect: Guard visible flag flag-6 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 150 units at -108 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-7",
-                "description": "Strategy protect: Guard visible flag flag-7 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 158 units at -123 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-8",
-                "description": "Strategy protect: Guard visible flag flag-8 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 126 units at -63 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-9",
-                "description": "Strategy protect: Guard visible flag flag-9 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 50 units at -105 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "regroup:enemy-L5-2",
-                "description": "Strategy regroup: Regroup8 units from known ally enemy-L5-2; coordinate with ally strategy patrol without colliding; travel 18 units at 18 degrees relative heading; known obstacle route clear"
+                "id": "patrol:flag-9:approach:0",
+                "description": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-9; keep moving then circle and survey; travel 24 units at -105 degrees relative heading; known obstacle route clear"
               },
               {
                 "id": "explore:5",
@@ -4503,6 +4189,8 @@
             "tankId": "enemy-L5-2",
             "role": "enemy",
             "observation": {
+              "remainingFlags": 10,
+              "totalFlags": 10,
               "level": 5,
               "nowSeconds": 0.8333333333333334,
               "visited": [
@@ -4785,7 +4473,7 @@
                     "x": -19.054110675118864,
                     "z": 94
                   },
-                  "heading": 1.5707963267948972,
+                  "heading": -0.3141592653589793,
                   "seenTick": 25,
                   "source": "shared",
                   "strategy": "patrol",
@@ -4812,52 +4500,12 @@
             },
             "candidates": [
               {
-                "id": "patrol:flag-1:1",
-                "description": "Strategy patrol: Circle clockwise around known flag flag-1 at18-unit radius; continuously survey for opponents; travel 28 units at 86 degrees relative heading; known obstacle route clear"
+                "id": "patrol:flag-1:approach:0",
+                "description": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-1; keep moving then circle and survey; travel 19 units at 114 degrees relative heading; known obstacle route clear"
               },
               {
-                "id": "patrol:flag-9:-1",
-                "description": "Strategy patrol: Circle counterclockwise around known flag flag-9 at18-unit radius; continuously survey for opponents; travel 68 units at 141 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-1",
-                "description": "Strategy protect: Guard visible flag flag-1 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 25 units at 114 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-3",
-                "description": "Strategy protect: Guard visible flag flag-3 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 231 units at 139 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-4",
-                "description": "Strategy protect: Guard visible flag flag-4 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 114 units at 104 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-5",
-                "description": "Strategy protect: Guard visible flag flag-5 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 157 units at 103 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-6",
-                "description": "Strategy protect: Guard visible flag flag-6 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 167 units at 137 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-7",
-                "description": "Strategy protect: Guard visible flag flag-7 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 180 units at 124 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-8",
-                "description": "Strategy protect: Guard visible flag flag-8 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 125 units at 178 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-9",
-                "description": "Strategy protect: Guard visible flag flag-9 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 67 units at 131 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "regroup:enemy-L5-1",
-                "description": "Strategy regroup: Regroup8 units from known ally enemy-L5-1; coordinate with ally strategy patrol without colliding; travel 18 units at 90 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "regroup:enemy-L5-0",
-                "description": "Strategy regroup: Regroup8 units from known ally enemy-L5-0; coordinate with ally strategy patrol without colliding; travel 106 units at -174 degrees relative heading; known obstacle route clear"
+                "id": "patrol:flag-9:approach:0",
+                "description": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-9; keep moving then circle and survey; travel 24 units at 131 degrees relative heading; known obstacle route clear"
               },
               {
                 "id": "explore:2",
@@ -4877,6 +4525,8 @@
             "tankId": "player",
             "role": "player",
             "observation": {
+              "remainingFlags": 10,
+              "totalFlags": 10,
               "level": 5,
               "nowSeconds": 0.8333333333333334,
               "visited": [
@@ -5144,7 +4794,7 @@
                     "x": -19.054110675118864,
                     "z": 94
                   },
-                  "heading": 1.5707963267948972,
+                  "heading": -0.3141592653589793,
                   "seenTick": 25,
                   "source": "shared",
                   "strategy": "patrol",
@@ -5285,8 +4935,8 @@
         {
           "tankId": "enemy-L5-0",
           "role": "enemy",
-          "choice": "patrol:flag-8:1",
-          "description": "Strategy patrol: Circle clockwise around known flag flag-8 at18-unit radius; continuously survey for opponents; travel 21 units at 107 degrees relative heading; known obstacle route clear",
+          "choice": "patrol:flag-8:approach:0",
+          "description": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-8; keep moving then circle and survey; travel 12 units at -108 degrees relative heading; known obstacle route clear",
           "strategy": "patrol",
           "confidence": 0.85,
           "accepted": true,
@@ -5307,8 +4957,8 @@
         {
           "tankId": "enemy-L5-2",
           "role": "enemy",
-          "choice": "patrol:flag-1:1",
-          "description": "Strategy patrol: Circle clockwise around known flag flag-1 at18-unit radius; continuously survey for opponents; travel 28 units at 86 degrees relative heading; known obstacle route clear",
+          "choice": "patrol:flag-1:approach:0",
+          "description": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-1; keep moving then circle and survey; travel 19 units at 114 degrees relative heading; known obstacle route clear",
           "strategy": "patrol",
           "confidence": 0.85,
           "accepted": true,
@@ -5333,7 +4983,7 @@
         "decisions": [
           {
             "tankId": "enemy-L5-0",
-            "choice": "patrol:flag-8:1",
+            "choice": "patrol:flag-8:approach:0",
             "confidence": 0.85
           },
           {
@@ -5343,7 +4993,7 @@
           },
           {
             "tankId": "enemy-L5-2",
-            "choice": "patrol:flag-1:1",
+            "choice": "patrol:flag-1:approach:0",
             "confidence": 0.85
           },
           {
@@ -5357,26 +5007,28 @@
         },
         "spentUsd": 0.001
       },
-      "latencyMs": 18.30000001192093
+      "latencyMs": 12
     },
     {
-      "id": "0be4f190-cb76-42d3-8bb9-39cc9cbdd48d:4",
-      "browserSessionId": "0be4f190-cb76-42d3-8bb9-39cc9cbdd48d",
+      "id": "0e717bc2-1502-468d-9a2f-20285a725902:4",
+      "browserSessionId": "0e717bc2-1502-468d-9a2f-20285a725902",
       "sequence": 4,
-      "tick": 39,
+      "tick": 40,
       "level": 5,
-      "at": "2026-09-30T16:11:35.946Z",
+      "at": "2026-09-30T16:25:04.690Z",
       "request": {
         "version": 1,
         "sequence": 4,
-        "tick": 39,
+        "tick": 40,
         "tanks": [
           {
             "tankId": "enemy-L5-0",
             "role": "enemy",
             "observation": {
+              "remainingFlags": 10,
+              "totalFlags": 10,
               "level": 5,
-              "nowSeconds": 1.3,
+              "nowSeconds": 1.3333333333333333,
               "visited": [
                 {
                   "x": -19.054110675118864,
@@ -5390,7 +5042,7 @@
                   "x": -19.054110675118864,
                   "z": 94
                 },
-                "heading": 2.4504422698000403,
+                "heading": -1.2566370614359175,
                 "speed": 0,
                 "shieldFraction": 1,
                 "ammo": 999999,
@@ -5398,7 +5050,7 @@
                 "shield": 3,
                 "maxShield": 3,
                 "fireReady": true,
-                "tick": 39,
+                "tick": 40,
                 "lastStrategy": "patrol"
               },
               "contacts": [
@@ -5409,9 +5061,9 @@
                     "x": 17.31922663934529,
                     "z": -78.42652659676969
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5421,9 +5073,9 @@
                     "x": 79.10710690915585,
                     "z": 48.13521848991513
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5433,9 +5085,9 @@
                     "x": 48.474374156445265,
                     "z": -5.380623249337077
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5445,9 +5097,9 @@
                     "x": -88.83585252985358,
                     "z": -77.50427957251668
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5457,9 +5109,9 @@
                     "x": 64.14217022806406,
                     "z": -40.005798352882266
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5469,9 +5121,9 @@
                     "x": 55.52214901894331,
                     "z": -82.46493305452168
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5481,9 +5133,9 @@
                     "x": -36.7149197999388,
                     "z": -40.62740289606154
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5493,9 +5145,9 @@
                     "x": -12.355919681489468,
                     "z": -77.13110386766493
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5505,9 +5157,9 @@
                     "x": -42.883547792211175,
                     "z": 76.58331468887627
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5517,9 +5169,9 @@
                     "x": 42.234303968027234,
                     "z": 21.931909224018455
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5531,9 +5183,9 @@
                     "x": 80.8338748048991,
                     "z": -54.29587615840137
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5545,9 +5197,9 @@
                     "x": -35.91294688731432,
                     "z": -85.99042478948832
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5559,9 +5211,9 @@
                     "x": 56.47337435744703,
                     "z": 48.18805932253599
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5573,9 +5225,9 @@
                     "x": -70.4236500710249,
                     "z": -15.28566568903625
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5587,9 +5239,9 @@
                     "x": -45.98952777124941,
                     "z": -20.382914999499917
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5601,9 +5253,9 @@
                     "x": 31.098116721957922,
                     "z": 88.90555928647518
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5615,9 +5267,9 @@
                     "x": 25.451837776228786,
                     "z": 38.72869201004505
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5629,9 +5281,9 @@
                     "x": -60.145766384899616,
                     "z": -85.12069047987461
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5639,14 +5291,14 @@
                   "kind": "tank",
                   "team": "enemy",
                   "position": {
-                    "x": 90.0792016602428,
-                    "z": 59.984938358870814
+                    "x": 89.58674285416257,
+                    "z": 60.447387959320416
                   },
                   "heading": -0.816814089933346,
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "shared",
                   "strategy": "patrol",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5654,29 +5306,29 @@
                   "kind": "tank",
                   "team": "enemy",
                   "position": {
-                    "x": 94.02266396407995,
-                    "z": 82.22343306209183
+                    "x": 94,
+                    "z": 82.25082908850163
                   },
-                  "heading": 2.4504422698000403,
-                  "seenTick": 39,
+                  "heading": 2.5132741228718363,
+                  "seenTick": 40,
                   "source": "shared",
                   "strategy": "patrol",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 }
               ],
               "memory": [],
               "geometry": [
                 {
-                  "id": "wall-5",
+                  "id": "wall-0",
                   "kind": "wall",
                   "min": {
-                    "x": 30.087048772489652,
-                    "z": 56.98302025580779
+                    "x": -72.68515452486463,
+                    "z": 80.76240441156551
                   },
                   "max": {
-                    "x": 34.323286425555125,
-                    "z": 61.26450396841392
+                    "x": -68.44037090125494,
+                    "z": 89.24009149195626
                   }
                 },
                 {
@@ -5700,76 +5352,32 @@
                   },
                   "pylonRadius": 1.2,
                   "bladeLength": 6,
-                  "bladeAngle": 3.908527293091355,
-                  "prevBladeAngle": 3.8561674155315253
-                },
-                {
-                  "id": "windmill-3",
-                  "kind": "windmill",
-                  "position": {
-                    "x": 5.81032632663846,
-                    "z": 85.65863162092865
-                  },
-                  "pylonRadius": 1.2,
-                  "bladeLength": 6,
-                  "bladeAngle": 5.595490297506098,
-                  "prevBladeAngle": 5.543130419946268
+                  "bladeAngle": 3.960887170651185,
+                  "prevBladeAngle": 3.908527293091355
                 }
               ],
               "bounds": 100
             },
             "candidates": [
               {
-                "id": "patrol:flag-8:1",
-                "description": "Strategy patrol: Circle clockwise around known flag flag-8 at18-unit radius; continuously survey for opponents; travel 21 units at 56 degrees relative heading; known obstacle route clear"
+                "id": "patrol:flag-8:approach:0",
+                "description": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-8; keep moving then circle and survey; travel 12 units at -54 degrees relative heading; known obstacle route clear"
               },
               {
-                "id": "patrol:flag-9:1",
-                "description": "Strategy patrol: Circle clockwise around known flag flag-9 at18-unit radius; continuously survey for opponents; travel 83 units at -10 degrees relative heading; known obstacle route clear"
+                "id": "patrol:flag-9:approach:0",
+                "description": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-9; keep moving then circle and survey; travel 24 units at -148 degrees relative heading; known obstacle route clear"
               },
               {
-                "id": "guard:flag-0",
-                "description": "Strategy protect: Guard visible flag flag-0 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 164 units at 28 degrees relative heading; known obstacle route clear"
+                "id": "explore:4",
+                "description": "Strategy explore: Search unvisited clear sector 4 for opposing player; reacquire visual contact; travel 24 units at 180 degrees relative heading; known obstacle route clear"
               },
               {
-                "id": "guard:flag-2",
-                "description": "Strategy protect: Guard visible flag flag-2 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 108 units at 5 degrees relative heading; known obstacle route clear"
+                "id": "explore:5",
+                "description": "Strategy explore: Search unvisited clear sector 5 for opposing player; reacquire visual contact; travel 24 units at -135 degrees relative heading; known obstacle route clear"
               },
               {
-                "id": "guard:flag-3",
-                "description": "Strategy protect: Guard visible flag flag-3 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 173 units at 62 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-4",
-                "description": "Strategy protect: Guard visible flag flag-4 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 146 units at 8 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-5",
-                "description": "Strategy protect: Guard visible flag flag-5 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 180 units at 17 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-8",
-                "description": "Strategy protect: Guard visible flag flag-8 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 18 units at 93 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-9",
-                "description": "Strategy protect: Guard visible flag flag-9 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 83 units at -1 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "regroup:enemy-L5-2",
-                "description": "Strategy regroup: Regroup8 units from known ally enemy-L5-2; coordinate with ally strategy patrol without colliding; travel 106 units at -44 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "explore:0",
-                "description": "Strategy explore: Search unvisited clear sector 0 for opposing player; reacquire visual contact; travel 24 units at 0 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "explore:1",
-                "description": "Strategy explore: Search unvisited clear sector 1 for opposing player; reacquire visual contact; travel 24 units at 45 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "explore:2",
-                "description": "Strategy explore: Search unvisited clear sector 2 for opposing player; reacquire visual contact; travel 24 units at 90 degrees relative heading; known obstacle route clear"
+                "id": "explore:6",
+                "description": "Strategy explore: Search unvisited clear sector 6 for opposing player; reacquire visual contact; travel 24 units at -90 degrees relative heading; known obstacle route clear"
               },
               {
                 "id": "explore:7",
@@ -5781,8 +5389,10 @@
             "tankId": "enemy-L5-1",
             "role": "enemy",
             "observation": {
+              "remainingFlags": 10,
+              "totalFlags": 10,
               "level": 5,
-              "nowSeconds": 1.3,
+              "nowSeconds": 1.3333333333333333,
               "visited": [
                 {
                   "x": 94,
@@ -5793,18 +5403,18 @@
                 "id": "enemy-L5-1",
                 "team": "enemy",
                 "position": {
-                  "x": 90.0792016602428,
-                  "z": 59.984938358870814
+                  "x": 89.58674285416257,
+                  "z": 60.447387959320416
                 },
                 "heading": -0.816814089933346,
-                "speed": 19.2,
+                "speed": 20.266666666666666,
                 "shieldFraction": 1,
                 "ammo": 999999,
                 "maxAmmo": 999999,
                 "shield": 3,
                 "maxShield": 3,
                 "fireReady": true,
-                "tick": 39,
+                "tick": 40,
                 "lastStrategy": "patrol"
               },
               "contacts": [
@@ -5812,15 +5422,15 @@
                   "id": "enemy-L5-2",
                   "kind": "tank",
                   "position": {
-                    "x": 94.02266396407995,
-                    "z": 82.22343306209183
+                    "x": 94,
+                    "z": 82.25082908850163
                   },
-                  "heading": 2.4504422698000403,
-                  "seenTick": 39,
+                  "heading": 2.5132741228718363,
+                  "seenTick": 40,
                   "source": "own",
                   "team": "enemy",
                   "strategy": "patrol",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5830,9 +5440,9 @@
                     "x": 17.31922663934529,
                     "z": -78.42652659676969
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5842,9 +5452,9 @@
                     "x": 79.10710690915585,
                     "z": 48.13521848991513
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5854,9 +5464,9 @@
                     "x": 48.474374156445265,
                     "z": -5.380623249337077
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5866,9 +5476,9 @@
                     "x": -88.83585252985358,
                     "z": -77.50427957251668
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5878,9 +5488,9 @@
                     "x": 64.14217022806406,
                     "z": -40.005798352882266
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5890,9 +5500,9 @@
                     "x": 55.52214901894331,
                     "z": -82.46493305452168
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5902,9 +5512,9 @@
                     "x": -36.7149197999388,
                     "z": -40.62740289606154
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5914,9 +5524,9 @@
                     "x": -12.355919681489468,
                     "z": -77.13110386766493
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5926,9 +5536,9 @@
                     "x": -42.883547792211175,
                     "z": 76.58331468887627
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5938,9 +5548,9 @@
                     "x": 42.234303968027234,
                     "z": 21.931909224018455
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5952,9 +5562,9 @@
                     "x": 80.8338748048991,
                     "z": -54.29587615840137
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5966,9 +5576,9 @@
                     "x": -35.91294688731432,
                     "z": -85.99042478948832
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5980,9 +5590,9 @@
                     "x": 56.47337435744703,
                     "z": 48.18805932253599
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -5994,9 +5604,9 @@
                     "x": -70.4236500710249,
                     "z": -15.28566568903625
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6008,9 +5618,9 @@
                     "x": -45.98952777124941,
                     "z": -20.382914999499917
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6022,9 +5632,9 @@
                     "x": 31.098116721957922,
                     "z": 88.90555928647518
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6036,9 +5646,9 @@
                     "x": 25.451837776228786,
                     "z": 38.72869201004505
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6050,9 +5660,9 @@
                     "x": -60.145766384899616,
                     "z": -85.12069047987461
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6063,11 +5673,11 @@
                     "x": -19.054110675118864,
                     "z": 94
                   },
-                  "heading": 2.4504422698000403,
-                  "seenTick": 39,
+                  "heading": -1.2566370614359175,
+                  "seenTick": 40,
                   "source": "shared",
                   "strategy": "patrol",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 }
               ],
@@ -6118,8 +5728,8 @@
                   },
                   "pylonRadius": 1.2,
                   "bladeLength": 6,
-                  "bladeAngle": 5.803545694819942,
-                  "prevBladeAngle": 5.751185817260112
+                  "bladeAngle": 5.855905572379772,
+                  "prevBladeAngle": 5.803545694819942
                 }
               ],
               "bounds": 100
@@ -6127,39 +5737,11 @@
             "candidates": [
               {
                 "id": "patrol:flag-1:-1",
-                "description": "Strategy patrol: Circle counterclockwise around known flag flag-1 at18-unit radius; continuously survey for opponents; travel 13 units at -15 degrees relative heading; known obstacle route clear"
+                "description": "Strategy patrol: Circle counterclockwise around known flag flag-1 at18-unit radius; continuously survey for opponents; travel 13 units at -18 degrees relative heading; known obstacle route clear"
               },
               {
-                "id": "patrol:flag-9:-1",
-                "description": "Strategy patrol: Circle counterclockwise around known flag flag-9 at18-unit radius; continuously survey for opponents; travel 50 units at -67 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-1",
-                "description": "Strategy protect: Guard visible flag flag-1 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 4 units at -90 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-3",
-                "description": "Strategy protect: Guard visible flag flag-3 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 214 units at -81 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-4",
-                "description": "Strategy protect: Guard visible flag flag-4 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 91 units at -119 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-5",
-                "description": "Strategy protect: Guard visible flag flag-5 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 135 units at -120 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-6",
-                "description": "Strategy protect: Guard visible flag flag-6 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 150 units at -82 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-9",
-                "description": "Strategy protect: Guard visible flag flag-9 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 49 units at -82 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "regroup:enemy-L5-2",
-                "description": "Strategy regroup: Regroup8 units from known ally enemy-L5-2; coordinate with ally strategy patrol without colliding; travel 15 units at 57 degrees relative heading; known obstacle route clear"
+                "id": "patrol:flag-9:approach:0",
+                "description": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-9; keep moving then circle and survey; travel 24 units at -82 degrees relative heading; known obstacle route clear"
               },
               {
                 "id": "explore:0",
@@ -6187,8 +5769,10 @@
             "tankId": "enemy-L5-2",
             "role": "enemy",
             "observation": {
+              "remainingFlags": 10,
+              "totalFlags": 10,
               "level": 5,
-              "nowSeconds": 1.3,
+              "nowSeconds": 1.3333333333333333,
               "visited": [
                 {
                   "x": 94,
@@ -6199,18 +5783,18 @@
                 "id": "enemy-L5-2",
                 "team": "enemy",
                 "position": {
-                  "x": 94.02266396407995,
-                  "z": 82.22343306209183
+                  "x": 94,
+                  "z": 82.25082908850163
                 },
-                "heading": 2.4504422698000403,
-                "speed": 1.0666666666666667,
+                "heading": 2.5132741228718363,
+                "speed": 0,
                 "shieldFraction": 1,
                 "ammo": 999999,
                 "maxAmmo": 999999,
                 "shield": 3,
                 "maxShield": 3,
                 "fireReady": true,
-                "tick": 39,
+                "tick": 40,
                 "lastStrategy": "patrol"
               },
               "contacts": [
@@ -6218,15 +5802,15 @@
                   "id": "enemy-L5-1",
                   "kind": "tank",
                   "position": {
-                    "x": 90.0792016602428,
-                    "z": 59.984938358870814
+                    "x": 89.58674285416257,
+                    "z": 60.447387959320416
                   },
                   "heading": -0.816814089933346,
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "own",
                   "team": "enemy",
                   "strategy": "patrol",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6236,9 +5820,9 @@
                     "x": 17.31922663934529,
                     "z": -78.42652659676969
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6248,9 +5832,9 @@
                     "x": 79.10710690915585,
                     "z": 48.13521848991513
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6260,9 +5844,9 @@
                     "x": 48.474374156445265,
                     "z": -5.380623249337077
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6272,9 +5856,9 @@
                     "x": -88.83585252985358,
                     "z": -77.50427957251668
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6284,9 +5868,9 @@
                     "x": 64.14217022806406,
                     "z": -40.005798352882266
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6296,9 +5880,9 @@
                     "x": 55.52214901894331,
                     "z": -82.46493305452168
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6308,9 +5892,9 @@
                     "x": -36.7149197999388,
                     "z": -40.62740289606154
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6320,9 +5904,9 @@
                     "x": -12.355919681489468,
                     "z": -77.13110386766493
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6332,9 +5916,9 @@
                     "x": -42.883547792211175,
                     "z": 76.58331468887627
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6344,9 +5928,9 @@
                     "x": 42.234303968027234,
                     "z": 21.931909224018455
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6358,9 +5942,9 @@
                     "x": 80.8338748048991,
                     "z": -54.29587615840137
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6372,9 +5956,9 @@
                     "x": -35.91294688731432,
                     "z": -85.99042478948832
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6386,9 +5970,9 @@
                     "x": 56.47337435744703,
                     "z": 48.18805932253599
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6400,9 +5984,9 @@
                     "x": -70.4236500710249,
                     "z": -15.28566568903625
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6414,9 +5998,9 @@
                     "x": -45.98952777124941,
                     "z": -20.382914999499917
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6428,9 +6012,9 @@
                     "x": 31.098116721957922,
                     "z": 88.90555928647518
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6442,9 +6026,9 @@
                     "x": 25.451837776228786,
                     "z": 38.72869201004505
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6456,9 +6040,9 @@
                     "x": -60.145766384899616,
                     "z": -85.12069047987461
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6469,11 +6053,11 @@
                     "x": -19.054110675118864,
                     "z": 94
                   },
-                  "heading": 2.4504422698000403,
-                  "seenTick": 39,
+                  "heading": -1.2566370614359175,
+                  "seenTick": 40,
                   "source": "shared",
                   "strategy": "patrol",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 }
               ],
@@ -6490,58 +6074,30 @@
                     "x": 73.45089478651062,
                     "z": 31.59100688691251
                   }
+                },
+                {
+                  "id": "windmill-1",
+                  "kind": "windmill",
+                  "position": {
+                    "x": 83.70280100218952,
+                    "z": 80.08490033634007
+                  },
+                  "pylonRadius": 1.2,
+                  "bladeLength": 6,
+                  "bladeAngle": 5.855905572379772,
+                  "prevBladeAngle": 5.803545694819942
                 }
               ],
               "bounds": 100
             },
             "candidates": [
               {
-                "id": "patrol:flag-1:1",
-                "description": "Strategy patrol: Circle clockwise around known flag flag-1 at18-unit radius; continuously survey for opponents; travel 28 units at 36 degrees relative heading; known obstacle route clear"
+                "id": "patrol:flag-1:approach:0",
+                "description": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-1; keep moving then circle and survey; travel 19 units at 60 degrees relative heading; known obstacle route clear"
               },
               {
-                "id": "patrol:flag-9:-1",
-                "description": "Strategy patrol: Circle counterclockwise around known flag flag-9 at18-unit radius; continuously survey for opponents; travel 68 units at 91 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-1",
-                "description": "Strategy protect: Guard visible flag flag-1 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 25 units at 63 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-3",
-                "description": "Strategy protect: Guard visible flag flag-3 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 231 units at 88 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-4",
-                "description": "Strategy protect: Guard visible flag flag-4 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 114 units at 53 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-5",
-                "description": "Strategy protect: Guard visible flag flag-5 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 157 units at 53 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-6",
-                "description": "Strategy protect: Guard visible flag flag-6 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 167 units at 86 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-7",
-                "description": "Strategy protect: Guard visible flag flag-7 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 180 units at 73 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-8",
-                "description": "Strategy protect: Guard visible flag flag-8 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 125 units at 127 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "guard:flag-9",
-                "description": "Strategy protect: Guard visible flag flag-9 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 67 units at 80 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "regroup:enemy-L5-1",
-                "description": "Strategy regroup: Regroup8 units from known ally enemy-L5-1; coordinate with ally strategy patrol without colliding; travel 15 units at 50 degrees relative heading; known obstacle route clear"
-              },
-              {
-                "id": "regroup:enemy-L5-0",
-                "description": "Strategy regroup: Regroup8 units from known ally enemy-L5-0; coordinate with ally strategy patrol without colliding; travel 106 units at 136 degrees relative heading; known obstacle route clear"
+                "id": "patrol:flag-9:approach:0",
+                "description": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-9; keep moving then circle and survey; travel 24 units at 77 degrees relative heading; known obstacle route clear"
               },
               {
                 "id": "explore:1",
@@ -6561,8 +6117,10 @@
             "tankId": "player",
             "role": "player",
             "observation": {
+              "remainingFlags": 10,
+              "totalFlags": 10,
               "level": 5,
-              "nowSeconds": 1.3,
+              "nowSeconds": 1.3333333333333333,
               "visited": [
                 {
                   "x": 0,
@@ -6573,8 +6131,8 @@
                 "id": "player",
                 "team": "player",
                 "position": {
-                  "x": 1.3597757966904696,
-                  "z": -5.030828437510513
+                  "x": 1.490661741528396,
+                  "z": -5.616378494673761
                 },
                 "heading": 2.921681167838506,
                 "speed": 18,
@@ -6584,7 +6142,7 @@
                 "shield": 100,
                 "maxShield": 100,
                 "fireReady": true,
-                "tick": 39,
+                "tick": 40,
                 "lastStrategy": "explore"
               },
               "contacts": [
@@ -6595,9 +6153,9 @@
                     "x": 17.31922663934529,
                     "z": -78.42652659676969
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6607,9 +6165,9 @@
                     "x": 79.10710690915585,
                     "z": 48.13521848991513
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6619,9 +6177,9 @@
                     "x": 48.474374156445265,
                     "z": -5.380623249337077
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6631,9 +6189,9 @@
                     "x": -88.83585252985358,
                     "z": -77.50427957251668
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6643,9 +6201,9 @@
                     "x": 64.14217022806406,
                     "z": -40.005798352882266
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6655,9 +6213,9 @@
                     "x": 55.52214901894331,
                     "z": -82.46493305452168
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6667,9 +6225,9 @@
                     "x": -36.7149197999388,
                     "z": -40.62740289606154
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6679,9 +6237,9 @@
                     "x": -12.355919681489468,
                     "z": -77.13110386766493
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6691,9 +6249,9 @@
                     "x": -42.883547792211175,
                     "z": 76.58331468887627
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6703,9 +6261,9 @@
                     "x": 42.234303968027234,
                     "z": 21.931909224018455
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6717,9 +6275,9 @@
                     "x": 80.8338748048991,
                     "z": -54.29587615840137
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6731,9 +6289,9 @@
                     "x": -35.91294688731432,
                     "z": -85.99042478948832
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6745,9 +6303,9 @@
                     "x": 56.47337435744703,
                     "z": 48.18805932253599
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6759,9 +6317,9 @@
                     "x": -70.4236500710249,
                     "z": -15.28566568903625
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6773,9 +6331,9 @@
                     "x": -45.98952777124941,
                     "z": -20.382914999499917
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6787,9 +6345,9 @@
                     "x": 31.098116721957922,
                     "z": 88.90555928647518
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6801,9 +6359,9 @@
                     "x": 25.451837776228786,
                     "z": 38.72869201004505
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6815,9 +6373,9 @@
                     "x": -60.145766384899616,
                     "z": -85.12069047987461
                   },
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "map",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6828,11 +6386,11 @@
                     "x": -19.054110675118864,
                     "z": 94
                   },
-                  "heading": 2.4504422698000403,
-                  "seenTick": 39,
+                  "heading": -1.2566370614359175,
+                  "seenTick": 40,
                   "source": "shared",
                   "strategy": "patrol",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6840,14 +6398,14 @@
                   "kind": "tank",
                   "team": "enemy",
                   "position": {
-                    "x": 90.0792016602428,
-                    "z": 59.984938358870814
+                    "x": 89.58674285416257,
+                    "z": 60.447387959320416
                   },
                   "heading": -0.816814089933346,
-                  "seenTick": 39,
+                  "seenTick": 40,
                   "source": "shared",
                   "strategy": "patrol",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 },
                 {
@@ -6855,14 +6413,14 @@
                   "kind": "tank",
                   "team": "enemy",
                   "position": {
-                    "x": 94.02266396407995,
-                    "z": 82.22343306209183
+                    "x": 94,
+                    "z": 82.25082908850163
                   },
-                  "heading": 2.4504422698000403,
-                  "seenTick": 39,
+                  "heading": 2.5132741228718363,
+                  "seenTick": 40,
                   "source": "shared",
                   "strategy": "patrol",
-                  "seenSeconds": 1.3,
+                  "seenSeconds": 1.3333333333333333,
                   "ageSeconds": 0
                 }
               ],
@@ -6894,19 +6452,19 @@
               },
               {
                 "id": "flag:flag-2",
-                "description": "Strategy explore: Collect visible flag flag-2; travel 47 units at -77 degrees relative heading; known obstacle route clear"
+                "description": "Strategy explore: Collect visible flag flag-2; travel 47 units at -78 degrees relative heading; known obstacle route clear"
               },
               {
                 "id": "flag:flag-3",
-                "description": "Strategy explore: Collect visible flag flag-3; travel 116 units at 64 degrees relative heading; known obstacle route clear"
+                "description": "Strategy explore: Collect visible flag flag-3; travel 115 units at 64 degrees relative heading; known obstacle route clear"
               },
               {
                 "id": "flag:flag-4",
-                "description": "Strategy explore: Collect visible flag flag-4; travel 72 units at -48 degrees relative heading; known obstacle route clear"
+                "description": "Strategy explore: Collect visible flag flag-4; travel 71 units at -49 degrees relative heading; known obstacle route clear"
               },
               {
                 "id": "flag:flag-5",
-                "description": "Strategy explore: Collect visible flag flag-5; travel 94 units at -22 degrees relative heading; known obstacle route clear"
+                "description": "Strategy explore: Collect visible flag flag-5; travel 94 units at -23 degrees relative heading; known obstacle route clear"
               },
               {
                 "id": "flag:flag-6",
@@ -6914,7 +6472,7 @@
               },
               {
                 "id": "flag:flag-7",
-                "description": "Strategy explore: Collect visible flag flag-7; travel 73 units at 23 degrees relative heading; known obstacle route clear"
+                "description": "Strategy explore: Collect visible flag flag-7; travel 73 units at 24 degrees relative heading; known obstacle route clear"
               },
               {
                 "id": "flag:flag-8",
@@ -6926,19 +6484,19 @@
               },
               {
                 "id": "hold:enemy-L5-0",
-                "description": "Strategy protect: Hold current vantage, aim and fire at visible target enemy-L5-0; travel 0 units at -167 degrees relative heading; known obstacle route clear; destination target range 101 units"
+                "description": "Strategy protect: Hold current vantage, aim and fire at visible target enemy-L5-0; travel 0 units at -167 degrees relative heading; known obstacle route clear; destination target range 102 units"
               },
               {
                 "id": "engage:enemy-L5-0",
-                "description": "Strategy pursue: Engage visible target enemy-L5-0 while maintaining separation; travel 89 units at -179 degrees relative heading; known obstacle route clear; destination target range 12 units"
+                "description": "Strategy pursue: Engage visible target enemy-L5-0 while maintaining separation; travel 90 units at -179 degrees relative heading; known obstacle route clear; destination target range 12 units"
               },
               {
                 "id": "flank:enemy-L5-0:-1",
-                "description": "Strategy pursue: Flank right of visible target enemy-L5-0; travel 84 units at 171 degrees relative heading; known obstacle route clear; destination target range 23 units"
+                "description": "Strategy pursue: Flank right of visible target enemy-L5-0; travel 85 units at 171 degrees relative heading; known obstacle route clear; destination target range 23 units"
               },
               {
                 "id": "flank:enemy-L5-0:1",
-                "description": "Strategy pursue: Flank left of visible target enemy-L5-0; travel 84 units at -169 degrees relative heading; known obstacle route clear; destination target range 23 units"
+                "description": "Strategy pursue: Flank left of visible target enemy-L5-0; travel 85 units at -170 degrees relative heading; known obstacle route clear; destination target range 23 units"
               },
               {
                 "id": "hold:enemy-L5-1",
@@ -6957,35 +6515,35 @@
         {
           "tankId": "enemy-L5-0",
           "role": "enemy",
-          "choice": "patrol:flag-8:1",
-          "description": "Strategy patrol: Circle clockwise around known flag flag-8 at18-unit radius; continuously survey for opponents; travel 21 units at 56 degrees relative heading; known obstacle route clear",
+          "choice": "patrol:flag-8:approach:0",
+          "description": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-8; keep moving then circle and survey; travel 12 units at -54 degrees relative heading; known obstacle route clear",
           "strategy": "patrol",
           "confidence": 0.85,
           "accepted": true,
           "applied": true,
-          "appliedTick": 40
+          "appliedTick": 41
         },
         {
           "tankId": "enemy-L5-1",
           "role": "enemy",
           "choice": "patrol:flag-1:-1",
-          "description": "Strategy patrol: Circle counterclockwise around known flag flag-1 at18-unit radius; continuously survey for opponents; travel 13 units at -15 degrees relative heading; known obstacle route clear",
+          "description": "Strategy patrol: Circle counterclockwise around known flag flag-1 at18-unit radius; continuously survey for opponents; travel 13 units at -18 degrees relative heading; known obstacle route clear",
           "strategy": "patrol",
           "confidence": 0.85,
           "accepted": true,
           "applied": true,
-          "appliedTick": 40
+          "appliedTick": 41
         },
         {
           "tankId": "enemy-L5-2",
           "role": "enemy",
-          "choice": "patrol:flag-1:1",
-          "description": "Strategy patrol: Circle clockwise around known flag flag-1 at18-unit radius; continuously survey for opponents; travel 28 units at 36 degrees relative heading; known obstacle route clear",
+          "choice": "patrol:flag-1:approach:0",
+          "description": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-1; keep moving then circle and survey; travel 19 units at 60 degrees relative heading; known obstacle route clear",
           "strategy": "patrol",
           "confidence": 0.85,
           "accepted": true,
           "applied": true,
-          "appliedTick": 40
+          "appliedTick": 41
         },
         {
           "tankId": "player",
@@ -6996,16 +6554,16 @@
           "confidence": 0.85,
           "accepted": true,
           "applied": true,
-          "appliedTick": 40
+          "appliedTick": 41
         }
       ],
       "response": {
         "sequence": 4,
-        "tick": 39,
+        "tick": 40,
         "decisions": [
           {
             "tankId": "enemy-L5-0",
-            "choice": "patrol:flag-8:1",
+            "choice": "patrol:flag-8:approach:0",
             "confidence": 0.85
           },
           {
@@ -7015,7 +6573,7 @@
           },
           {
             "tankId": "enemy-L5-2",
-            "choice": "patrol:flag-1:1",
+            "choice": "patrol:flag-1:approach:0",
             "confidence": 0.85
           },
           {
@@ -7029,7 +6587,7 @@
         },
         "spentUsd": 0.001
       },
-      "latencyMs": 9.399999976158142
+      "latencyMs": 8.5
     }
   ],
   "errors": []
