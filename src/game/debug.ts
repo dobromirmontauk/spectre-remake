@@ -32,6 +32,12 @@ export interface NetDebugHooks {
 
 // window.__game hooks used for deterministic Playwright verification.
 export interface DebugHooks {
+  jev: {
+    configure(opts: Partial<{ enabled: boolean; playerAutopilot: boolean; autopilot: boolean; hz: number }>): void;
+    getStats(): ReturnType<import('./jev-session.ts').JevSession['getStats']>;
+    getMetrics(): ReturnType<import('./jev-session.ts').JevSession['getStats']>;
+    getObservation(id: string): unknown;
+  };
   getState(): unknown;
   pause(): void;
   resume(): void;

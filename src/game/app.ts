@@ -28,6 +28,7 @@ import { Screens } from './screens.ts';
 import { NetScreens, type MatchStartInfo } from './netscreens.ts';
 import { installDebugApi } from './debug.ts';
 import { isMuted, resumeAudio, setMuted, toggleMuted, updateEngine, updateSfx } from '../audio/sfx.ts';
+import { JevSession } from './jev-session.ts';
 import { LocalSession, NetSession, type PlaySession } from '../net/session.ts';
 
 const canvas = document.getElementById('viewport') as HTMLCanvasElement;
@@ -81,6 +82,16 @@ function showPlayerLeftToast(text: string): void {
 }
 
 const flow = new GameFlow();
+const jev = new JevSession();
+const jevPanel = document.createElement('div');
+jevPanel.className = 'jev-panel';
+jevPanel.innerHTML = '<label><input id="jev-enabled" type="checkbox"> Jev AI</label><label><input id="jev-player" type="checkbox"> Player autopilot</label><span id="jev-status"></span>';
+stage.appendChild(jevPanel);
+const jevEnabled = jevPanel.querySelector<HTMLInputElement>('#jev-enabled')!;
+const jevPlayer = jevPanel.querySelector<HTMLInputElement>('#jev-player')!;
+const jevStatus = jevPanel.querySelector<HTMLSpanElement>('#jev-status')!;
+jevEnabled.addEventListener('change', () => jev.configure({ enabled: jevEnabled.checked }));
+jevPlayer.addEventListener('change', () => jev.configure({ playerAutopilot: jevPlayer.checked }));
 
 const threeRenderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 const scene = new THREE.Scene();
@@ -153,7 +164,11 @@ let frameEvents: SimEvent[] = [];
 // empty in local play). `session.afterTick()` runs after — it only observes
 // `state` (hash exchange for net play), never mutates it.
 function runTick(commands: Record<string, Command>, drops: number[]): void {
-  step(state, commands, drops);
+  const external = jev.commands(state, session.kind === 'local');
+  if (external?.player && state.players[0]) commands = { ...commands, [state.players[0].id]: external.player };
+  step(state, commands, drops, external?.enemies);
+  jev.enforceRoster(state, session.kind === 'local');
+  jev.recordTick(state);
   frameEvents.push(...state.events);
   for (const event of state.events) {
     // Duel results are match wins, not a high-score run — skip the
@@ -184,9 +199,16 @@ function asNetSession(): NetSession | null {
 }
 
 installDebugApi({
+  jev: {
+    configure: (opts) => { jev.configure({ ...opts, playerAutopilot: opts.autopilot ?? opts.playerAutopilot }); jev.enforceRoster(state, session.kind === 'local'); },
+    getStats: () => jev.getStats(),
+    getMetrics: () => jev.getStats(),
+    getObservation: (id) => jev.getObservation(id),
+  },
   getState: () => JSON.parse(JSON.stringify(state)) as unknown,
   pause: () => {
     flow.paused = true;
+    jev.update(state, performance.now(), false, session.kind === 'local', true);
   },
   resume: () => {
     flow.paused = false;
@@ -205,6 +227,7 @@ installDebugApi({
     assertLocal('setLevel');
     state.gameOver = false; // jumping levels for testing should always resume active play
     rebuildLevel(state, n);
+    jev.enforceRoster(state);
     flow.forcePlaying();
   },
   collectAllFlags: () => {
@@ -229,6 +252,7 @@ installDebugApi({
   spawnEnemyAt: (x: number, z: number, kind: EnemyKind = 'drone') => {
     assertLocal('spawnEnemyAt');
     spawnEnemyAt(state, x, z, kind);
+    jev.enforceRoster(state);
   },
   killAllEnemies: () => {
     assertLocal('killAllEnemies');
@@ -262,6 +286,7 @@ installDebugApi({
     assertLocal('startGame');
     resumeAudio();
     resetGameWithLoadout(state, loadout, 1, opts);
+    jev.enforceRoster(state);
     flow.beginRun();
   },
   setFilled: (on: boolean) => {
@@ -415,6 +440,13 @@ function frame(now: number): void {
 
   frameEvents = [];
   const simActive = flow.isGameplayActive && !flow.paused;
+  jev.update(state, now, simActive, session.kind === 'local', document.visibilityState === 'visible');
+  const jevStats = jev.getStats();
+  jevEnabled.checked = jevStats.enabled;
+  jevPlayer.checked = jevStats.playerAutopilot;
+  jevPlayer.disabled = !jevStats.enabled;
+  jevStatus.textContent = jevStats.status;
+  jevPanel.dataset.live = jevStats.status.startsWith('Jev live') ? 'true' : 'false';
   let stalled = false;
   if (simActive) {
     accumulator += frameDt / 1000;

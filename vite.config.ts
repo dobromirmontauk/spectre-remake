@@ -18,6 +18,7 @@ export default defineConfig({
     __BUILD_HASH__: JSON.stringify(gitShortHash()),
   },
   server: {
+    proxy: { '/api/jev': 'http://127.0.0.1:8787' },
     watch: {
       // dist/index.html counts as an HTML entry to Vite's watcher, so a
       // `npm run build` while a dev tab is open force-reloads the game
