@@ -25,3 +25,17 @@ node --test backend/*.test.mjs
 ```
 
 Evidence: budget tests were first run before implementation and failed with missing module, then passed. Tests cover restarts, exclusive lock, budget reservations, timeout charging, maximum tank count, individual perception isolation, two-call concurrency, response validation, and CORS. No paid calls are part of this suite.
+
+## Complete durable audit
+
+Every upstream request is fsynced to JSONL before any model call, including its exact provider payload (model, individual perception, instructions and criteria), UTC timestamp, request sequence/tick/tank, globally unique `callId` and `recordId`. Every success includes the chosen option, probabilities, confidence, usage, cost and elapsed time; failures/timeouts retain reservation cost. Each successful decision in `/api/jev/decide` also carries `callId`. Partial batch failures do not suppress another tank's success evidence. Neither provider credentials/headers nor environment values are written. Fixed server error descriptions avoid printing upstream bodies.
+
+The audit file defaults to `JEV_LEDGER_FILE + '.calls.jsonl'`; set **absolute** `JEV_AUDIT_FILE` only to select a persistent alternate file. Reuse the same file across restarts. Existing spend ledgers work unchanged; history starts when this audit-capable server begins running, and cannot reconstruct earlier calls. A separate exclusive audit lock prevents concurrent writers. An incomplete/corrupt existing file or an append/fsync failure disables paid calls. A request without completion becomes an `interrupted` record on restart, with its unknown cost conservatively shown as reserved. If startup fails after a crash, verify stopped PID before removing only stale locks; preserve both ledger and history.
+
+Loopback endpoints share the same localhost Origin/Host restrictions:
+
+- `GET /api/jev/history?offset=0&limit=50`: `{records,nextOffset,total}`, oldest first, maximum 200 records/page.
+- `GET /api/jev/history/export`: complete JSONL download.
+- `POST /api/jev/audit/browser`: `{browserSessionId,sequence,tick,event:'attempt'|'response'|'outcome'|'applied',at:<ISO UTC>,details:{...}}`, at most 64 KiB. Persists a `type:'browser'` record with its own server UTC timestamp. This records browser stale/canceled/applied outcomes separately from provider outcomes, without inference or spending. Never include secrets in browser metadata.
+
+The model payload remains bounded at 32 KiB, 6,000 observation JSON characters per tank, and 16 options; clients should compact level-map knowledge before crossing this boundary. Audit tests include restart interrupted calls, request/result pairing, partial batch failures, fail-closed logging, paginated export and mock-only browser metadata.

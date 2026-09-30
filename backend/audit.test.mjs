@@ -1,0 +1,8 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {mkdtempSync,rmSync,readFileSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {Audit} from './audit.mjs';
+test('durable exact payload history, IDs and restart interrupted pending call',()=>{const dir=mkdtempSync(join(tmpdir(),'jev-audit-'));try{const file=join(dir,'audit.jsonl');let a=new Audit(file);a.append({type:'request',callId:'one',payload:{model:'jev',state:{own:1},questions:{}}});a.append({type:'result',callId:'one',choice:'hold'});a.append({type:'request',callId:'two',payload:{model:'jev'}});a.close();a=new Audit(file);const page=a.page(0,2);assert.equal(page.total,4);assert.equal(page.nextOffset,2);assert.equal(a.page(2,2).records[1].type,'interrupted');assert.equal(new Set(a.page(0,200).records.map(r=>r.recordId)).size,4);assert.ok(a.page(0,200).records.every(r=>/^\d{4}-.*Z$/.test(r.timestamp)));assert.equal(readFileSync(file,'utf8').trim().split('\n').length,4);a.close();}finally{rmSync(dir,{recursive:true,force:true});}});
+test('history index retains offsets only and restart scans multi-chunk payloads',()=>{const dir=mkdtempSync(join(tmpdir(),'jev-audit-'));try{const file=join(dir,'audit.jsonl');let a=new Audit(file);for(let i=0;i<20;i++)a.append({type:'browser',details:{marker:'visible-state-'+i,payload:'x'.repeat(10000)}});assert.ok(a.index.every(i=>Object.keys(i).sort().join(',')==='length,offset'));assert.ok(JSON.stringify(a.index).length<2000);a.close();a=new Audit(file);assert.equal(a.page(17,2).records[0].details.marker,'visible-state-17');assert.equal(a.page(17,2).total,20);a.close();}finally{rmSync(dir,{recursive:true,force:true});}});
