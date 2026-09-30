@@ -48,8 +48,9 @@ export function createJevServer({apiKey='',ledgerFile,fetchImpl=globalThis.fetch
    const route=new URL(req.url,'http://localhost');
    if(req.method==='GET'&&route.pathname==='/api/jev/history/export'){res.writeHead(200,{'Content-Type':'application/x-ndjson','Content-Disposition':'attachment; filename="jev-call-history.jsonl"','Cache-Control':'no-store'});const stream=createReadStream(audit.file);stream.on('error',()=>res.destroy());stream.pipe(res);return;}
    if(req.method==='GET'&&route.pathname==='/api/jev/history'){
-    const offset=Number(route.searchParams.get('offset')??0),limit=Number(route.searchParams.get('limit')??50);
-    if(!Number.isSafeInteger(offset)||offset<0||!Number.isSafeInteger(limit)||limit<1||limit>200)throw fail(400,'invalid history pagination');send(200,audit.page(offset,limit));return;
+    const offset=Number(route.searchParams.get('offset')??0),limit=Number(route.searchParams.get('limit')??50),callId=route.searchParams.get('callId');
+    if(callId!==null&&!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(callId))throw fail(400,'invalid call ID');
+    if(!Number.isSafeInteger(offset)||offset<0||!Number.isSafeInteger(limit)||limit<1||limit>200)throw fail(400,'invalid history pagination');send(200,audit.page(offset,limit,callId));return;
    }
    if(req.method==='POST'&&route.pathname==='/api/jev/audit/browser'){
     if(!(req.headers['content-type']??'').startsWith('application/json'))throw fail(415,'JSON required');
