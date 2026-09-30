@@ -6,12 +6,15 @@ Evaluate model-controlled enemies using the user’s proposed Jev / fast Luna op
 
 ## Next Steps
 
-- [ ] Identify model/provider names and finish the API, latency, and cost comparison. **[BLOCKED: Identify Jev and fast Luna]**
+- [x] Identify Jev and Luna Decisions APIs; documented verified capabilities, pricing, limits, and unknown Luna preview contract in `research-agent-model-apis/notes/api-evaluation.md`.
+- [ ] Obtain provider access and benchmark Jev at 2/5/10 Hz; add Luna Decisions when its official contract and account access are available.
 - [ ] Benchmark squad-level model tactics against the existing FSM and an improved deterministic squad baseline before deciding on implementation.
 
 - [ ] **Publish a blog post / LinkedIn post about Spectre.** Include the live game link, a gameplay screenshot, the inspiration from the 1991 Mac game, and local/network multiplayer. Draft for user review before posting.
 
 ## Last Progress
+
+- 2026-09-29 — Researched official Jev API and newly announced Luna Decisions API; revised experiment to bounded action selection at measured 2–10 Hz, via a Cloudflare Worker backend. Jev text-only, vendor latency 70–500 ms; Luna Decisions image support confirmed but public schema/pricing/latency not found. Raw sources and synthesis in `research-agent-model-apis/`. Supersedes the earlier generic two-second LLM-plan proposal.
 
 - 2026-09-29 — AI architecture evaluation: `src/sim/ai.ts` pursues nearest players, leads shots for hunters, and reverses when stuck; `simulation.ts` invokes it internally for every enemy rather than using the external player command map. Sim runs at 30 Hz with 2–12 enemies. Recommended experiment: one squad plan every 2 seconds, deterministic steering/aiming each tick, single-player first, model calls outside the sim via a Cloudflare Worker. Multiplayer needs host-authoritative plans scheduled and acknowledged at identical ticks (including fallback); never independent calls per peer. Benchmark complete-response p50/p95 latency, stale/invalid outputs, win rate, stuck time, and cost per player-hour. At one squad call / 2s: 1,800 calls/player-hour; illustrative 1,500 input + 200 output tokens/call = 2.7M input + 0.36M output tokens/hour. Exact providers unconfirmed. Cloudflare sources: https://developers.cloudflare.com/workers/configuration/secrets/ ; https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/ ; https://developers.cloudflare.com/durable-objects/best-practices/websockets/ . API keys should be Worker secrets; rate limiting is per-location/eventually consistent, so a strict shared spend cap needs centralized accounting. No AI implementation or paid model calls made.
 

@@ -2,6 +2,10 @@
 
 ## Open
 
+None.
+
+## Resolved
+
 ### 2026-09-29 — Identify Jev and fast Luna
 
 **Context:** User requested research on replacing Spectre’s enemy AI using “Jev” and “fast Luna.” These identifiers are not defined in the project and a public search did not establish their identities.
@@ -10,8 +14,8 @@
 
 **Blocking:** Provider-specific API, pricing, latency, and deployment evaluation. Architecture analysis can proceed independently.
 
+**Answered 2026-09-29:** User directed us to look up Jev’s ~100 ms decision model and newly launched image-capable Luna equivalent. Official research identifies TypeSafe AI Jev and OpenAI’s Luna-powered Decisions API. API findings: `research-agent-model-apis/notes/api-evaluation.md`.
 
-## Resolved
 
 ### 2026-09-29 — Cloudflare authentication
 
