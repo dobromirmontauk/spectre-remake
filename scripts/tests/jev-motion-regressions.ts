@@ -13,15 +13,24 @@ const normal=read('scripts/tests/jev-low-tier-initial.json'),session=new JevSess
 session.configure({enabled:true});session.enforceRoster(low);
 for(let i=0;i<low.enemies.length;i++)for(let j=i+1;j<low.enemies.length;j++)assert(Math.hypot(low.enemies[i]!.position.x-low.enemies[j]!.position.x,low.enemies[i]!.position.z-low.enemies[j]!.position.z)>=6.5,'Jev fresh hulls startclear');
 const after=JSON.stringify(low);session.enforceRoster(low);assert.equal(JSON.stringify(low),after,'placement runs once perlife notcontinuousworldteleport');
+const selectedPlanHistogram:Record<string,Record<string,number>>={};
+const rejectedCombatHistogram:Record<string,Record<string,number>>={};
 const memories:Record<string,TankMemory>={},plans:Record<string,TacticalPlan>={},flips:Record<string,number>={},last:Record<string,number>={},travel:Record<string,number>={},stationary:Record<string,number>={},maxStationary:Record<string,number>={},oscillationWindows:Record<string,number>={},history:Record<string,{position:{x:number;z:number};heading:number;turn:number}[]>={};
 for(let tick=0;tick<360;tick++){
- if(tick%15===0)for(const e of low.enemies){const choices=buildCandidates(observeTank(low,e.id,memories[e.id]??={seen:{}}),e.position);plans[e.id]=choices[0]!;assert(plans[e.id].id!=='scan','exactL2 usefulmovement tick'+tick+' '+e.id+' pos'+JSON.stringify(e.position)+' geometry'+JSON.stringify(observeTank(low,e.id,memories[e.id]!).geometry));}
+ if(tick%15===0)for(const e of low.enemies){const choices=buildCandidates(observeTank(low,e.id,memories[e.id]??={seen:{}}),e.position);
+ // Quiet motion replay intentionally suppresses weapons: select only navigation,
+ // rather than stripping a combat hold's fire and then calling its stillness a stall.
+ for(const p of choices.filter(p=>p.targetId)){const h=rejectedCombatHistogram[e.id]??={};h[p.id]=(h[p.id]??0)+1;}
+ plans[e.id]=choices.find(p=>(p.strategy==='patrol'||p.strategy==='explore')&&!p.targetId)!;
+ assert(plans[e.id],'quiet navigation option '+e.id+' offered '+choices.map(p=>p.id).join(','));
+ const h=selectedPlanHistogram[e.id]??={};h[plans[e.id].id]=(h[plans[e.id].id]??0)+1;assert(plans[e.id].id!=='scan','exactL2 usefulmovement tick'+tick+' '+e.id+' pos'+JSON.stringify(e.position)+' geometry'+JSON.stringify(observeTank(low,e.id,memories[e.id]!).geometry));}
  const positions=low.enemies.map(e=>({...e.position})),external:Parameters<typeof step>[3]={};
  for(const e of low.enemies){const command=commandForPlan(low,e.id,{...plans[e.id]!,fire:false,targetId:undefined,expiresTick:low.tick+30});if(last[e.id]&&command.turn&&last[e.id]!==command.turn){flips[e.id]=(flips[e.id]??0)+1;}last[e.id]=command.turn;const window=history[e.id]??=[];window.push({position:{...e.position},heading:e.heading,turn:command.turn});if(window.length>60)window.shift();if(window.length===60){let changes=0,previous=0;for(const sample of window)if(sample.turn){if(previous&&previous!==sample.turn)changes++;previous=sample.turn;}const first=window[0]!,final=window[59]!;if(changes>=4&&Math.abs(final.heading-first.heading)<.15&&Math.hypot(final.position.x-first.position.x,final.position.z-first.position.z)<1)oscillationWindows[e.id]=(oscillationWindows[e.id]??0)+1;}external[e.id]={command,fireHeading:e.heading};}
  step(low,{},[],external);
  assert(!low.events.some(e=>e.type==='ObstacleContact'||e.type==='TankContact'),'exactvalidL2 scene replay stayscontactfree');
  for(let i=0;i<low.enemies.length;i++){const e=low.enemies[i]!;travel[e.id]=(travel[e.id]??0)+Math.hypot(e.position.x-positions[i]!.x,e.position.z-positions[i]!.z);stationary[e.id]=Math.abs(e.speed)<.5?(stationary[e.id]??0)+1:0;maxStationary[e.id]=Math.max(maxStationary[e.id]??0,stationary[e.id]!);}
 }
+console.log('Quiet motion selected plan histogram',selectedPlanHistogram,'combat options excluded',rejectedCombatHistogram);
 for(const e of low.enemies){assert((travel[e.id]??0)>4,'exactlowtierhull makesprogress');assert((maxStationary[e.id]??0)<90,'no persistent lowtier stationaryrun '+e.id);assert.equal(oscillationWindows[e.id]??0,0,'no lowdisplacement rapidreversingoscillation '+e.id);}
 console.log('ExactL2 validspawn12sec travel',travel,'adjacentturnflips',flips,'max stationaryticks',maxStationary,'stationaryoscillation windows',oscillationWindows);
 const stalled=read('scripts/tests/jev-scan-stall.json');const se=stalled.enemies.find(e=>e.id==='enemy-L5-2')!;const start={...se.position};const memory:TankMemory={seen:{}};let plan:TacticalPlan|undefined;
