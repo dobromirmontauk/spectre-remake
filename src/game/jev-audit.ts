@@ -1,6 +1,6 @@
 export interface DecisionAudit {
   id: string; browserSessionId: string; sequence: number; tick: number; level: number; at: string;
-  request: unknown; response?: unknown; latencyMs?: number;
+  request: unknown; response?: unknown; responseText?: string; latencyMs?: number;
   outcome: 'pending' | 'accepted' | 'stale' | 'failed' | 'canceled' | 'budget';
   error?: string;
   decisions: { tankId: string; role: string; choice: string; description: string; strategy?: string; confidence?: number; callId?: string; accepted: boolean; notAppliedReason?: 'superseded' | 'expired' | 'session reset' | 'life ended' | 'budget exhausted'; applied: boolean; appliedTick?: number }[];
