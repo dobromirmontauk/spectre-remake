@@ -7,7 +7,7 @@ import type { TankMemory, TankObservation, TacticalPlan } from '../jev/types.ts'
 const REQUEST_TIMEOUT_MS = 1500;
 const PLAN_MAX_AGE_TICKS = 30;
 export class JevSession {
-  private settings = { enabled: false, playerAutopilot: false, hz: 5 };
+  private settings = { enabled: false, playerAutopilot: false, hz: 2 };
   private memories: Record<string, TankMemory> = {};
   private observations: Record<string, TankObservation> = {};
   private plans: Record<string, TacticalPlan> = {};

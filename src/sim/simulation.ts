@@ -14,7 +14,7 @@ import {
   pickEdgeSpawnPoint,
   updateStuckDetection,
 } from './ai.ts';
-import { fireGrenade, fireProjectile, nextId, updateGrenades, updateProjectiles } from './weapons.ts';
+import { fireGrenade, fireProjectile, safeExternalEnemyShot, nextId, updateGrenades, updateProjectiles } from './weapons.ts';
 import { levelConfig, type LevelConfig } from '../config/levels.ts';
 import {
   AMMO_PER_SHOT,
@@ -28,6 +28,7 @@ import {
   DUEL_RESPAWN_TICKS,
   DUEL_SPAWN_POINTS,
   ENEMY_FRIENDLY_FIRE_DEFAULT,
+  ENEMY_FIRE_COOLDOWN_JITTER_TICKS,
   ENEMY_RESPAWN_TICKS,
   ENEMY_SEED_SALT,
   ENEMY_TANK_RADIUS,
@@ -649,14 +650,28 @@ export function step(state: GameState, commands: Record<string, Command>, drops:
 
   for (const enemy of state.enemies) {
     if (!enemy.alive) continue;
-    const decision = externalEnemies?.[enemy.id] ?? enemyCommand(enemy, state, levelCfg);
+    const external = externalEnemies?.[enemy.id];
+    const decision = external ? { ...external, command: { ...external.command } } : enemyCommand(enemy, state, levelCfg);
+    if (external) {
+      if (enemy.fireCooldown > 0) enemy.fireCooldown--;
+      if (enemy.unstickTicksRemaining > 0) {
+        enemy.unstickTicksRemaining--;
+        if (enemy.unstickTicksRemaining <= 0) enemy.stuckTicks = 0;
+        decision.command = { turn: enemy.unstickTurnDir, thrust: -1, fire: false, grenade: false };
+        enemy.aiState = 'UNSTICK';
+      } else enemy.aiState = 'PURSUE';
+    }
     const moveParams = movementParamsForEnemy(enemy.kind, levelCfg);
     applyMovement(enemy, decision.command, moveParams);
     resolveObstacleCollisionsFor(enemy, state, ENEMY_TANK_RADIUS, events, false);
     resolveArenaBoundsFor(enemy, ENEMY_TANK_RADIUS, events, false);
     updateStuckDetection(enemy, decision.command.thrust, state);
-    if (decision.command.fire) {
-      fireProjectile(state, enemy, decision.fireHeading, events);
+    if (decision.command.fire && (!external || (enemy.fireCooldown <= 0 && safeExternalEnemyShot(state, enemy)))) {
+      if (external) {
+        enemy.fireCooldown = levelCfg.enemyFireCooldownTicks + Math.floor(state.rng.next() * ENEMY_FIRE_COOLDOWN_JITTER_TICKS);
+        enemy.aiState = 'FIRE';
+      }
+      fireProjectile(state, enemy, external ? enemy.heading : decision.fireHeading, events);
     }
   }
 

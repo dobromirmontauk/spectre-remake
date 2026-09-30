@@ -12,7 +12,7 @@ const mock = (async (_url: unknown, init: RequestInit) => {
 }) as typeof fetch;
 const state = makeState(), jev = new JevSession(mock);
 jev.update(state,0,true,true,true); await flush(); assert.equal(requests.length,0,'disabled sends no requests');
-jev.configure({enabled:true,playerAutopilot:true});
+jev.configure({enabled:true,playerAutopilot:true,hz:5});
 jev.update(state,0,true,true,true); await flush();
 assert.equal(requests.length,1); assert.ok(jev.getStats().modelDecisions>0);
 jev.update(state,100,true,true,true); await flush(); assert.equal(requests.length,1,'5 Hz cadence');
