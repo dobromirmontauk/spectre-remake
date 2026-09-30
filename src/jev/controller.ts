@@ -75,10 +75,41 @@ export function commandForPlan(state:GameState,tankId:string,plan:TacticalPlan|n
  }
  return segmentVsCircle(relativeBefore,relativeAfter,t.position,clearance).hit;
 }))return false;}return true;};
- if(!safe({turn,thrust,fire:false,grenade:false})){if(diagnostics){const end={x:tank.position.x+dsin(tank.heading)*Math.max(4,Math.abs(tank.speed)*LOOKAHEAD_SECONDS),z:tank.position.z+dcos(tank.heading)*Math.max(4,Math.abs(tank.speed)*LOOKAHEAD_SECONDS)};if(all.some(t=>t.id!==tankId&&t.alive&&segmentVsCircle(tank.position,end,t.position,TANK_RADIUS*2+SAFETY_MARGIN).hit))diagnostics.tankAvoided++;else diagnostics.wallAvoided++;}thrust=tank.speed<0?1:-1;if(!safe({turn,thrust,fire:false,grenade:false})){// If already too close to stop, maximize braking rather than unsafe coasting.
- turn=missingPlan&&Math.abs(tank.speed)>=.1?turn:turn||1;
- if(Math.abs(tank.speed)<.1)thrust=0;
- }}
+ // Every accepted next tick must retain a straight-heading emergency stopping corridor.
+ // Future model replans can change turning, so a curved coast rollout alone is insufficient.
+ const stoppingRoom=(cmd:Command)=>{
+  const ghost={...tank,position:{...tank.position},prevPosition:{...tank.prevPosition}};
+  const staticSafe=(a:Vec2,b:Vec2)=>Math.abs(b.x)<=ARENA_HALF_SIZE-TANK_RADIUS-SAFETY_MARGIN&&Math.abs(b.z)<=ARENA_HALF_SIZE-TANK_RADIUS-SAFETY_MARGIN&&!blocked(a,b,state.obstacles,TANK_RADIUS+SAFETY_MARGIN);
+  let before={...ghost.position};applyMovement(ghost,cmd,params);if(!staticSafe(before,ghost.position))return false;
+  for(let i=0;i<300&&Math.abs(ghost.speed)>.001;i++){
+   before={...ghost.position};const previousSpeed=ghost.speed;
+   applyMovement(ghost,{turn:0,thrust:previousSpeed<0?1:-1,fire:false,grenade:false},params);
+   if(!staticSafe(before,ghost.position))return false;
+   if(previousSpeed*ghost.speed<=0)break;
+  }
+  return true;
+ };
+ if(!safe({turn,thrust,fire:false,grenade:false})||!stoppingRoom({turn,thrust,fire:false,grenade:false})){if(diagnostics){const end={x:tank.position.x+dsin(tank.heading)*Math.max(4,Math.abs(tank.speed)*LOOKAHEAD_SECONDS),z:tank.position.z+dcos(tank.heading)*Math.max(4,Math.abs(tank.speed)*LOOKAHEAD_SECONDS)};if(all.some(t=>t.id!==tankId&&t.alive&&segmentVsCircle(tank.position,end,t.position,TANK_RADIUS*2+SAFETY_MARGIN).hit))diagnostics.tankAvoided++;else diagnostics.wallAvoided++;}thrust=tank.speed<0?1:-1;
+ const turns:Command['turn'][]=[turn,0,turn===1?-1:1];
+ let feasible=false;
+ for(const emergencyTurn of turns){const braking:Command={turn:emergencyTurn,thrust,fire:false,grenade:false};if(stoppingRoom(braking)&&safe(braking)){turn=emergencyTurn;feasible=true;break;}}
+ if(!feasible){
+  // Recover a collapsed margin with a physically feasible curved emergency stop.
+  const canEmergencyStop=(emergencyTurn:Command['turn'])=>{
+   const ghost={...tank,position:{...tank.position},prevPosition:{...tank.prevPosition}};
+   for(let i=0;i<300&&Math.abs(ghost.speed)>.001;i++){
+    const before={...ghost.position},v=ghost.speed;
+    applyMovement(ghost,{turn:emergencyTurn,thrust:v<0?1:-1,fire:false,grenade:false},params);
+    if(Math.abs(ghost.position.x)>ARENA_HALF_SIZE-TANK_RADIUS||Math.abs(ghost.position.z)>ARENA_HALF_SIZE-TANK_RADIUS||blocked(before,ghost.position,state.obstacles,TANK_RADIUS+.05))return false;
+    if(v*ghost.speed<=0)break;
+   }
+   return true;
+  };
+  turn=0;for(const recoveryTurn of [0,-1,1] as const)if(canEmergencyStop(recoveryTurn)){turn=recoveryTurn;break;}
+  if(Math.abs(tank.speed)<.1){thrust=0;turn=1;}
+ }
+ }
+
  let fire=false;if(plan.fire&&visibleTarget&&Math.abs(angleDelta(datan2(visibleTarget.position.x-tank.position.x,visibleTarget.position.z-tank.position.z),tank.heading))<.08){const end={x:tank.position.x+dsin(tank.heading)*PROJECTILE_RANGE,z:tank.position.z+dcos(tank.heading)*PROJECTILE_RANGE};
  const targetHit=segmentVsCircle(tank.position,end,visibleTarget.position,TANK_RADIUS+PROJECTILE_RADIUS);
  let impact=targetHit.hit?targetHit.t:1;

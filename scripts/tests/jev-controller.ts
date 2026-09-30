@@ -82,3 +82,14 @@ for(const absent of [null,{...plan,expiresTick:-1}]){
  s.obstacles=[];s.enemies=[e];player.position={x:-14,z:0};e.position={x:0,z:-14};player.heading=Math.PI/2;e.heading=0;player.speed=18;e.speed=18;
  for(let i=0;i<180;i++){const pc=commandForPlan(s,'player',absent),ec=commandForPlan(s,e.id,absent);applyMovement(player,pc,player.movement);applyMovement(e,ec,movementParamsForEnemy(e.kind,levelConfig(s.level)));assert(Math.hypot(player.position.x-e.position.x,player.position.z-e.position.z)>=3.2,'missing plans crossing remainssafe');}
 }
+// A2Hz waypoint switch must not invalidate the braking corridor near a pylon.
+s.players[0]!.position={x:-80,z:-80};s.enemies=[e];s.obstacles=[{id:'replanMill',kind:'windmill',position:{x:16.3087968043983,z:73.36144505813718},pylonRadius:1.2,bladeAngle:0,prevBladeAngle:0,bladeLength:8}];
+e.position={x:12.870410415155508,z:69.32559225610696};e.heading=19.038051480754067;e.speed=13.6;
+for(let tick=0;tick<180;tick++){
+ s.tick=tick;const waypoint=Math.floor(tick/15)%2?{x:15.69,z:89.49}:{x:34.878,z:59.277};
+ const ec=commandForPlan(s,e.id,{...plan,targetId:undefined,fire:false,waypoint,expiresTick:tick+30});applyMovement(e,ec,movementParamsForEnemy(e.kind,levelConfig(s.level)));
+ assert(Math.hypot(e.position.x-16.3087968043983,e.position.z-73.36144505813718)>=2.8,'2Hz alternating plans never hit windmill');
+}
+s.obstacles=[{id:'replanWall',kind:'wall',min:{x:15,z:71},max:{x:18,z:76}}];e.position={x:12.87,z:69.32};e.heading=19.038;e.speed=13.6;
+for(let tick=0;tick<180;tick++){s.tick=tick;const waypoint=Math.floor(tick/15)%2?{x:15.69,z:89.49}:{x:34.878,z:59.277};const cmd=commandForPlan(s,e.id,{...plan,targetId:undefined,fire:false,waypoint,expiresTick:tick+30});applyMovement(e,cmd,movementParamsForEnemy(e.kind,levelConfig(s.level)));const closest={x:Math.max(15,Math.min(18,e.position.x)),z:Math.max(71,Math.min(76,e.position.z))};assert(Math.hypot(e.position.x-closest.x,e.position.z-closest.z)>=1.6,'2Hz alternatingplans never hit wall');}
+console.log('Alternating2Hz exact windmill and wall stop-envelope regressions passed');
