@@ -59,3 +59,9 @@ console.log('Exact clearance deadlock: final gap '+escapedGap.toFixed(2)+' after
 const benchmarkStart=performance.now();
 for(let i=0;i<1200;i++)commandForPlan(s,'player',{...plan,expiresTick:s.tick+30});
 console.log('Controller1200 calls: '+(performance.now()-benchmarkStart).toFixed(1)+'ms');
+// Two independent commanders must predict moving bodies before their hulls meet.
+for(const fixture of [{name:'head-on',a:{x:0,z:-14},b:{x:0,z:14},ah:0,bh:Math.PI},{name:'crossing',a:{x:-14,z:0},b:{x:0,z:-14},ah:Math.PI/2,bh:0}]){
+ s.obstacles=[];s.enemies=[e];player.position={...fixture.a};e.position={...fixture.b};player.heading=fixture.ah;e.heading=fixture.bh;player.speed=18;e.speed=18;
+ const ap={x:player.position.x+Math.sin(fixture.ah)*50,z:player.position.z+Math.cos(fixture.ah)*50};const bp={x:e.position.x+Math.sin(fixture.bh)*50,z:e.position.z+Math.cos(fixture.bh)*50};
+ for(let tick=0;tick<180;tick++){s.tick=tick;const pc=commandForPlan(s,'player',{...plan,waypoint:ap,expiresTick:tick+30});const ec=commandForPlan(s,e.id,{...plan,targetId:'player',waypoint:bp,expiresTick:tick+30});applyMovement(player,pc,player.movement);applyMovement(e,ec,movementParamsForEnemy(e.kind,levelConfig(s.level)));assert(Math.hypot(player.position.x-e.position.x,player.position.z-e.position.z)>=3.2,fixture.name+' moving hulls must never physically contact');}
+}
