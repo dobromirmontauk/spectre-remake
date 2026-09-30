@@ -9,7 +9,7 @@ import { movementParamsForEnemy } from '../sim/ai.ts';
 import { levelConfig } from '../config/levels.ts';
 import { findTank,distance,angleDelta,blocked } from './observation.ts';
 import { clearNavigationSegment } from './navigation.ts';
-import { PLAN_TICKS, SAFETY_MARGIN, LOOKAHEAD_SECONDS, SHORT_PATH_PREDICTION_TICKS, BODY_SPACING, TURN_DEADZONE_EPSILON, EXPIRED_AIM_GRACE_TICKS, HOLD_ALLY_FRESH_TICKS } from './config.ts';
+import { PLAN_TICKS, SAFETY_MARGIN, LOOKAHEAD_SECONDS, SHORT_PATH_PREDICTION_TICKS, BODY_SPACING, TURN_DEADZONE_EPSILON, EXPIRED_AIM_GRACE_TICKS, HOLD_ALLY_FRESH_TICKS, SPACING_RELEASE_DISTANCE, SPACING_RECOVERY_MAX_TICKS } from './config.ts';
 import type { TankObservation,TacticalPlan,Strategy } from './types.ts';
 export function buildCandidates(o:TankObservation,motorOrigin?:Vec2):TacticalPlan[] {
  const plans:TacticalPlan[]=[]; const origin=motorOrigin??o.own.position;
@@ -93,8 +93,12 @@ export function buildCandidates(o:TankObservation,motorOrigin?:Vec2):TacticalPla
  return (allowed.length?allowed:plans).slice(0,16);
 }
 export interface SafetyDiagnostics { wallAvoided:number; tankAvoided:number; allyShotAvoided:number }
+interface SpacingRecovery { tick:number; startTick:number; level:number; backing:boolean; away:number; subjects:string[]; position:Vec2 }
+// Motor history belongs to this live in-place simulation identity, not model context
+// or serialized sim state. Replacement/reset/lifecycle gaps cannot inherit it.
+const spacingRecoveries=new WeakMap<GameState,Record<string,SpacingRecovery>>();
 export function commandForPlan(state:GameState,tankId:string,plan:TacticalPlan|null,diagnostics?:SafetyDiagnostics):Command {
- const tank=findTank(state,tankId);const neutral:Command={turn:0,thrust:0,fire:false,grenade:false};if(!tank||!tank.alive)return neutral;
+ const tank=findTank(state,tankId);const neutral:Command={turn:0,thrust:0,fire:false,grenade:false};if(!tank||!tank.alive){const history=spacingRecoveries.get(state);if(history)delete history[tankId];return neutral;}
  const missingPlan=!plan||plan.expiresTick<state.tick;
  // A short response gap should preserve aim at rest, not scan away then reacquire.
  // No stale target coordinates or firing permission survive expiry.
@@ -128,11 +132,23 @@ export function commandForPlan(state:GameState,tankId:string,plan:TacticalPlan|n
  const otherStop=t.speed*t.speed/(2*(t.speed<0?otherParams.thrustAccel:otherParams.reverseAccel));
  return distance(tank.position,t.position)<BODY_SPACING||(closing<0&&closest<BODY_SPACING&&distance(tank.position,t.position)<BODY_SPACING+ownStop+otherStop);
  });
- if(nearby.length){
+ let histories=spacingRecoveries.get(state);if(!histories){histories={};spacingRecoveries.set(state,histories);}
+ let recovery=histories[tankId];
+ if(recovery&&(recovery.level!==state.level||state.tick<recovery.tick||state.tick-recovery.tick>1||state.tick-recovery.startTick>=SPACING_RECOVERY_MAX_TICKS||distance(recovery.position,tank.position)>BODY_SPACING)){delete histories[tankId];recovery=undefined;}
+ if(recovery){
+  const subjects=all.filter(t=>t.alive&&recovery!.subjects.includes(t.id));
+  if(!subjects.length||(nearby.length===0&&subjects.every(t=>distance(tank.position,t.position)>=SPACING_RELEASE_DISTANCE))){delete histories[tankId];recovery=undefined;}
+ }
+ if(!recovery&&nearby.length){
   let awayX=0,awayZ=0;for(const other of nearby){const gap=Math.max(.1,distance(tank.position,other.position));awayX+=(tank.position.x-other.position.x)/(gap*gap);awayZ+=(tank.position.z-other.position.z)/(gap*gap);}
   const away=datan2(awayX,awayZ);const forwardDelta=angleDelta(away,tank.heading);const reverseDelta=angleDelta(away+Math.PI,tank.heading);
-  const reversing=Math.abs(reverseDelta)<Math.abs(forwardDelta);const steering=reversing?reverseDelta:forwardDelta;
-  turn=Math.abs(steering)<turnTolerance?0:steering>0?1:-1;thrust=Math.abs(steering)<.7?(reversing?-1:1):0;
+  recovery={tick:state.tick,startTick:state.tick,level:state.level,backing:Math.abs(reverseDelta)<Math.abs(forwardDelta),away,subjects:nearby.map(t=>t.id),position:{...tank.position}};
+  histories[tankId]=recovery;
+ }
+ if(recovery){
+  const steering=angleDelta(recovery.away+(recovery.backing?Math.PI:0),tank.heading);
+  turn=Math.abs(steering)<turnTolerance?0:steering>0?1:-1;thrust=Math.abs(steering)<.7?(recovery.backing?-1:1):0;
+  recovery.tick=state.tick;recovery.position={...tank.position};
  }
  // Arena geometry is public local safety knowledge; step inward before the edge can trap a hull.
  const edgeX=Math.abs(tank.position.x)>96||(Math.abs(tank.position.x)>90&&Math.abs(plan.waypoint.x)>96);

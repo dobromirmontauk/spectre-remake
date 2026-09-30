@@ -59,3 +59,11 @@ A stationary hold is excluded when a fresh friendly commander contact occupies t
 For an expired accepted plan, the executor preserves current heading without firing for at most6ticks (0.2seconds), while continuing physical braking/spacing checks. It then resumes the usual survey fallback. No hidden target coordinates are followed during grace, and a missing initial plan has no grace.
 
 The minimal code fixture reproduces the final b73d865 run's60tick target poses and acceptance expiry timing at390–449. Baseline generates four scan/reacquire reversals and offers a blocked hold. The fixed fixture generates zero reversals and zero shots through the ally. Tests cover fresh own/shared ally reports, stale reports, memory-only positions, unknown affiliation, shared opposing sightings, hidden target changes, and bounded expiry.
+
+### Tactile spacing hysteresis
+
+A local spacing recovery keeps its chosen escape bearing and forward/reverse mode until the tracked close hulls have9units of clearance and no current closing risk remains. This prevents alternating patrol acceleration and reverse avoidance around the6.5-unit entry boundary. Every recovery command still passes the same body/static prediction, stopping-room and firing guards. Recovery direction expires after120ticks and clears on level change, rollback, missing execution ticks, hull discontinuity or death.
+
+Executor history is a WeakMap keyed by the live GameState identity, with per-tank records. `app.ts` owns one const state and `step()` mutates it in place; the actual `JevSession.commands()`→`step()` regression exercises that identity and integration path. This history is never written into serialized simulation state or commander/provider observations and does not touch normal scripted AI.
+
+The minimal live tick1860 pair fixture reproduces57/56 stationary jitter windows and5.49/5.38units of travel before the correction. In180ticks after correction, it has zero jitter windows, zero physical contacts/friendly-fire events, and28.94/51.14units of travel. Release, cloned-state isolation, death, level, rollback, execution gaps and bounded recovery lifetime are also tested. No paid requests or raw provider traces are involved.
