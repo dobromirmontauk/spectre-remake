@@ -2,13 +2,18 @@
 
 ## Current Objective
 
-Publish a blog post / LinkedIn post announcing Spectre at https://spectre-remake.pages.dev.
+Evaluate model-controlled enemies using the user’s proposed Jev / fast Luna options; retain the blog / LinkedIn announcement as the next publishing task.
 
 ## Next Steps
+
+- [ ] Identify model/provider names and finish the API, latency, and cost comparison. **[BLOCKED: Identify Jev and fast Luna]**
+- [ ] Benchmark squad-level model tactics against the existing FSM and an improved deterministic squad baseline before deciding on implementation.
 
 - [ ] **Publish a blog post / LinkedIn post about Spectre.** Include the live game link, a gameplay screenshot, the inspiration from the 1991 Mac game, and local/network multiplayer. Draft for user review before posting.
 
 ## Last Progress
+
+- 2026-09-29 — AI architecture evaluation: `src/sim/ai.ts` pursues nearest players, leads shots for hunters, and reverses when stuck; `simulation.ts` invokes it internally for every enemy rather than using the external player command map. Sim runs at 30 Hz with 2–12 enemies. Recommended experiment: one squad plan every 2 seconds, deterministic steering/aiming each tick, single-player first, model calls outside the sim via a Cloudflare Worker. Multiplayer needs host-authoritative plans scheduled and acknowledged at identical ticks (including fallback); never independent calls per peer. Benchmark complete-response p50/p95 latency, stale/invalid outputs, win rate, stuck time, and cost per player-hour. At one squad call / 2s: 1,800 calls/player-hour; illustrative 1,500 input + 200 output tokens/call = 2.7M input + 0.36M output tokens/hour. Exact providers unconfirmed. Cloudflare sources: https://developers.cloudflare.com/workers/configuration/secrets/ ; https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/ ; https://developers.cloudflare.com/durable-objects/best-practices/websockets/ . API keys should be Worker secrets; rate limiting is per-location/eventually consistent, so a strict shared spend cap needs centralized accounting. No AI implementation or paid model calls made.
 
 - 2026-09-29 — Published https://spectre-remake.pages.dev on Cloudflare Pages. Production build passes (sim purity, TypeScript, Vite); opened production in Chrome and started single-player gameplay. Screenshot: `reference/verification/deployment/cloudflare-2026-09-29.png`. Repeat deploy with `npm run deploy`. Network multiplayer and mobile were not re-tested.
 
