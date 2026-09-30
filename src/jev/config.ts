@@ -5,3 +5,5 @@ export const MEMORY_TICKS = 180;
 export const PLAN_TICKS = 30;
 export const SAFETY_MARGIN = 0.8;
 export const LOOKAHEAD_SECONDS = 0.65;
+// Short clear local paths need incremental steering rather than a full acceleration/coast overrun.
+export const SHORT_PATH_PREDICTION_TICKS = 8;

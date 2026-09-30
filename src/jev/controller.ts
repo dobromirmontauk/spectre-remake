@@ -7,13 +7,14 @@ import { applyMovement } from '../sim/movement.ts';
 import { movementParamsForEnemy } from '../sim/ai.ts';
 import { levelConfig } from '../config/levels.ts';
 import { findTank,distance,angleDelta,blocked } from './observation.ts';
-import { PLAN_TICKS, SAFETY_MARGIN, LOOKAHEAD_SECONDS } from './config.ts';
+import { clearNavigationSegment } from './navigation.ts';
+import { PLAN_TICKS, SAFETY_MARGIN, LOOKAHEAD_SECONDS, SHORT_PATH_PREDICTION_TICKS } from './config.ts';
 import type { TankObservation,TacticalPlan,Strategy } from './types.ts';
-export function buildCandidates(o:TankObservation):TacticalPlan[] {
- const plans:TacticalPlan[]=[]; const origin=o.own.position;
+export function buildCandidates(o:TankObservation,motorOrigin?:Vec2):TacticalPlan[] {
+ const plans:TacticalPlan[]=[]; const origin=motorOrigin??o.own.position;
  const survival=!!o.recentThreat||o.own.shieldFraction<.35;
  const strategyFor=(id:string):Strategy=>id.startsWith('retreat:')?'retreat':id.startsWith('regroup:')?'regroup':id.startsWith('patrol:')?'patrol':id.startsWith('guard:')||id.startsWith('hold:')?'protect':id.startsWith('engage:')||id.startsWith('flank:')||id.startsWith('intercept:')?'pursue':'explore';
- const add=(id:string,description:string,waypoint:Vec2,fire=false,targetId?:string)=>{if(Math.abs(waypoint.x)<o.bounds-4&&Math.abs(waypoint.z)<o.bounds-4&&!blocked(origin,waypoint,o.geometry,TANK_RADIUS+SAFETY_MARGIN))plans.push({id,strategy:strategyFor(id),description:'Strategy '+strategyFor(id)+': '+description+'; travel '+Math.round(distance(origin,waypoint))+' units at '+Math.round(angleDelta(datan2(waypoint.x-origin.x,waypoint.z-origin.z),o.own.heading)*180/Math.PI)+' degrees relative heading; known obstacle route clear'+(targetId?'; destination target range '+Math.round(distance(waypoint,o.contacts.find(c=>c.id===targetId)!.position))+' units':''),waypoint,fire,targetId,expiresTick:o.own.tick+PLAN_TICKS});};
+ const add=(id:string,description:string,waypoint:Vec2,fire=false,targetId?:string)=>{if(Math.abs(waypoint.x)<o.bounds-4&&Math.abs(waypoint.z)<o.bounds-4&&clearNavigationSegment(origin,waypoint,o.geometry,TANK_RADIUS+SAFETY_MARGIN))plans.push({id,strategy:strategyFor(id),description:'Strategy '+strategyFor(id)+': '+description+'; travel '+Math.round(distance(origin,waypoint))+' units at '+Math.round(angleDelta(datan2(waypoint.x-origin.x,waypoint.z-origin.z),o.own.heading)*180/Math.PI)+' degrees relative heading; known obstacle route clear'+(targetId?'; destination target range '+Math.round(distance(waypoint,o.contacts.find(c=>c.id===targetId)!.position))+' units':''),waypoint,fire,targetId,expiresTick:o.own.tick+PLAN_TICKS});};
  const supply=(c:TankObservation['contacts'][number],remembered=false)=>{
   if(o.own.team!=='player'||!c.pickupKind||!c.amount)return;
   const missing=c.pickupKind==='shield'?o.own.maxShield-o.own.shield:o.own.maxAmmo-o.own.ammo;
@@ -65,8 +66,9 @@ export function buildCandidates(o:TankObservation):TacticalPlan[] {
   add('regroup:'+ally.id,'Regroup8 units from known ally '+ally.id+'; coordinate with ally strategy '+(ally.strategy??'unknown')+' without colliding',{x:ally.position.x+(origin.x-ally.position.x)*8/gap,z:ally.position.z+(origin.z-ally.position.z)*8/gap},opponents.length>0,opponents[0]?.id);
  }
  // Sector sweep keeps tanks moving/searching without obtaining hidden coordinates.
- for(let i=0;i<8;i++){const a=o.own.heading+i*Math.PI/4;const p={x:origin.x+dsin(a)*24,z:origin.z+dcos(a)*24};if(!o.visited.some(v=>distance(v,p)<12))add('explore:'+i,'Search unvisited clear sector '+i+(o.own.team==='player'?' for flags, supplies or opponents':' for opposing player; reacquire visual contact'),p);}
- if(!plans.length)for(let i=0;i<8;i++){const a=o.own.heading+i*Math.PI/4;add('revisit:'+i,'Navigate clear sector to exit surveyed area',{x:origin.x+dsin(a)*15,z:origin.z+dcos(a)*15});}
+ for(let i=0;i<8;i++){const a=i*Math.PI/4;const p={x:origin.x+dsin(a)*24,z:origin.z+dcos(a)*24};if(!o.visited.some(v=>distance(v,p)<12))add('explore:'+i,'Search unvisited clear sector '+i+(o.own.team==='player'?' for flags, supplies or opponents':' for opposing player; reacquire visual contact'),p);}
+ if(!plans.length)for(let i=0;i<8;i++){const a=i*Math.PI/4;add('revisit:'+i,'Navigate clear sector to exit surveyed area',{x:origin.x+dsin(a)*15,z:origin.z+dcos(a)*15});}
+ if(!plans.length)for(let i=0;i<8;i++){const a=i*Math.PI/4;add('escape:'+i,'Clear the local safety margin with a short feasible move, then resume patrol/search',{x:origin.x+dsin(a)*6,z:origin.z+dcos(a)*6});}
  if(!plans.length)plans.push({id:'scan',description:'Rotate to survey blocked surroundings',waypoint:origin,fire:false,expiresTick:o.own.tick+PLAN_TICKS});const priority=(p:TacticalPlan)=>survival?(p.strategy==='retreat'?0:p.strategy==='regroup'?1:p.description.includes('shield supply')?2:p.strategy==='explore'?3:4):p.id.startsWith('intercept:')?0:p.strategy==='patrol'?0:o.own.team==='player'&&p.id.startsWith('flag:')?0:p.strategy==='pursue'||p.strategy==='protect'?1:2;
  plans.sort((a,b)=>priority(a)-priority(b));
  // While frightened, withhold offensive pursuit/hold choices; deterministic reflex still handles collisions.
@@ -91,7 +93,7 @@ export function commandForPlan(state:GameState,tankId:string,plan:TacticalPlan|n
  else if(d<3&&plan.lookAt)delta=angleDelta(datan2(plan.lookAt.x-tank.position.x,plan.lookAt.z-tank.position.z),tank.heading);
  let turn:Command['turn']=Math.abs(delta)<.045?0:delta>0?1:-1;
  let thrust:Command['thrust']=d>3&&Math.abs(delta)<.7?1:0;
- if(missingPlan){turn=Math.abs(tank.speed)<.1?1:0;thrust=0;}
+ if(missingPlan||plan.id==='scan'){turn=Math.abs(tank.speed)<.1?1:0;thrust=0;}
  const all=[...state.players,...state.enemies];
  // Tactile spacing reflex: move away from close hulls instead of accepting mutual idle.
  const nearby=all.filter(t=>{
@@ -123,7 +125,7 @@ export function commandForPlan(state:GameState,tankId:string,plan:TacticalPlan|n
   if(Math.abs(b.x)>physical+1e-8||Math.abs(b.z)>physical+1e-8)return false;
   return (Math.abs(a.x)>clearance?Math.abs(b.x)<=Math.abs(a.x)+1e-8:Math.abs(b.x)<=clearance)&&(Math.abs(a.z)>clearance?Math.abs(b.z)<=Math.abs(a.z)+1e-8:Math.abs(b.z)<=clearance);
  };
- const safe=(cmd:Command)=>{const ghost={...tank,position:{...tank.position},prevPosition:{...tank.prevPosition}};const horizon=Math.ceil(LOOKAHEAD_SECONDS*30);for(let i=0;i<horizon+300;i++){if(i>=horizon&&Math.abs(ghost.speed)<.001)break;const before={...ghost.position};applyMovement(ghost,i<horizon?cmd:{...cmd,thrust:0},params);if(!withinBounds(before,ghost.position)||blocked(before,ghost.position,state.obstacles,TANK_RADIUS+SAFETY_MARGIN)||all.some(t=>{
+ const safe=(cmd:Command,brakeOnly=false)=>{const ghost={...tank,position:{...tank.position},prevPosition:{...tank.prevPosition}};const shortPath=d<=24&&clearNavigationSegment(tank.position,plan.waypoint,state.obstacles,TANK_RADIUS+SAFETY_MARGIN);const horizon=shortPath?Math.abs(tank.speed)<2?1:SHORT_PATH_PREDICTION_TICKS:Math.ceil(LOOKAHEAD_SECONDS*30);for(let i=0;i<horizon+300;i++){if(i>=horizon&&Math.abs(ghost.speed)<.001)break;const before={...ghost.position};const stoppingThrust:Command['thrust']=Math.abs(ghost.speed)<=(ghost.speed<0?params.thrustAccel:params.reverseAccel)/30?0:ghost.speed<0?1:-1;applyMovement(ghost,i<horizon?brakeOnly?{...cmd,thrust:stoppingThrust}:cmd:{...cmd,turn:0,thrust:0},params);if(!withinBounds(before,ghost.position)||!clearNavigationSegment(before,ghost.position,state.obstacles,TANK_RADIUS+SAFETY_MARGIN)||all.some(t=>{
  if(t.id===tankId||!t.alive)return false;
  const physical=TANK_RADIUS*2;const clearance=physical+SAFETY_MARGIN;
  // Relative swept segment predicts observed heading/speed rather than a stationary hull.
@@ -145,7 +147,7 @@ export function commandForPlan(state:GameState,tankId:string,plan:TacticalPlan|n
  // Future model replans can change turning, so a curved coast rollout alone is insufficient.
  const stoppingRoom=(cmd:Command)=>{
   const ghost={...tank,position:{...tank.position},prevPosition:{...tank.prevPosition}};
-  const staticSafe=(a:Vec2,b:Vec2)=>withinBounds(a,b)&&!blocked(a,b,state.obstacles,TANK_RADIUS+SAFETY_MARGIN);
+  const staticSafe=(a:Vec2,b:Vec2)=>withinBounds(a,b)&&clearNavigationSegment(a,b,state.obstacles,TANK_RADIUS+SAFETY_MARGIN);
   let before={...ghost.position};applyMovement(ghost,cmd,params);if(!staticSafe(before,ghost.position))return false;
   for(let i=0;i<300&&Math.abs(ghost.speed)>.001;i++){
    before={...ghost.position};const previousSpeed=ghost.speed;
@@ -155,10 +157,10 @@ export function commandForPlan(state:GameState,tankId:string,plan:TacticalPlan|n
   }
   return true;
  };
- if(!safe({turn,thrust,fire:false,grenade:false})||!stoppingRoom({turn,thrust,fire:false,grenade:false})){if(diagnostics){const end={x:tank.position.x+dsin(tank.heading)*Math.max(4,Math.abs(tank.speed)*LOOKAHEAD_SECONDS),z:tank.position.z+dcos(tank.heading)*Math.max(4,Math.abs(tank.speed)*LOOKAHEAD_SECONDS)};if(all.some(t=>t.id!==tankId&&t.alive&&segmentVsCircle(tank.position,end,t.position,TANK_RADIUS*2+SAFETY_MARGIN).hit))diagnostics.tankAvoided++;else diagnostics.wallAvoided++;}thrust=tank.speed<0?1:-1;
- const turns:Command['turn'][]=[turn,0,turn===1?-1:1];
+ if(!safe({turn,thrust,fire:false,grenade:false})||!stoppingRoom({turn,thrust,fire:false,grenade:false})){if(diagnostics){const end={x:tank.position.x+dsin(tank.heading)*Math.max(4,Math.abs(tank.speed)*LOOKAHEAD_SECONDS),z:tank.position.z+dcos(tank.heading)*Math.max(4,Math.abs(tank.speed)*LOOKAHEAD_SECONDS)};if(all.some(t=>t.id!==tankId&&t.alive&&segmentVsCircle(tank.position,end,t.position,TANK_RADIUS*2+SAFETY_MARGIN).hit))diagnostics.tankAvoided++;else diagnostics.wallAvoided++;}thrust=Math.abs(tank.speed)<=(tank.speed<0?params.thrustAccel:params.reverseAccel)/30?0:tank.speed<0?1:-1;
+ const turns:Command['turn'][]=[Math.abs(tank.speed)<params.coastFriction/30?turn:0,turn,turn===1?-1:1];
  let feasible=false;
- for(const emergencyTurn of turns){const braking:Command={turn:emergencyTurn,thrust,fire:false,grenade:false};if(stoppingRoom(braking)&&safe(braking)){turn=emergencyTurn;feasible=true;break;}}
+ for(const emergencyTurn of turns){const braking:Command={turn:emergencyTurn,thrust,fire:false,grenade:false};if(stoppingRoom(braking)&&safe(braking,true)){turn=emergencyTurn;feasible=true;break;}}
  if(!feasible){
   // Recover a collapsed margin with a physically feasible curved emergency stop.
   const canEmergencyStop=(emergencyTurn:Command['turn'])=>{
