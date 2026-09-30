@@ -12,7 +12,7 @@ import type { TankObservation,TacticalPlan,Strategy } from './types.ts';
 export function buildCandidates(o:TankObservation):TacticalPlan[] {
  const plans:TacticalPlan[]=[]; const origin=o.own.position;
  const survival=!!o.recentThreat||o.own.shieldFraction<.35;
- const strategyFor=(id:string):Strategy=>id.startsWith('retreat:')?'retreat':id.startsWith('regroup:')?'regroup':id.startsWith('patrol:')?'patrol':id.startsWith('guard:')||id.startsWith('hold:')?'protect':id.startsWith('engage:')||id.startsWith('flank:')?'pursue':'explore';
+ const strategyFor=(id:string):Strategy=>id.startsWith('retreat:')?'retreat':id.startsWith('regroup:')?'regroup':id.startsWith('patrol:')?'patrol':id.startsWith('guard:')||id.startsWith('hold:')?'protect':id.startsWith('engage:')||id.startsWith('flank:')||id.startsWith('intercept:')?'pursue':'explore';
  const add=(id:string,description:string,waypoint:Vec2,fire=false,targetId?:string)=>{if(Math.abs(waypoint.x)<o.bounds-4&&Math.abs(waypoint.z)<o.bounds-4&&!blocked(origin,waypoint,o.geometry,TANK_RADIUS+SAFETY_MARGIN))plans.push({id,strategy:strategyFor(id),description:'Strategy '+strategyFor(id)+': '+description+'; travel '+Math.round(distance(origin,waypoint))+' units at '+Math.round(angleDelta(datan2(waypoint.x-origin.x,waypoint.z-origin.z),o.own.heading)*180/Math.PI)+' degrees relative heading; known obstacle route clear'+(targetId?'; destination target range '+Math.round(distance(waypoint,o.contacts.find(c=>c.id===targetId)!.position))+' units':''),waypoint,fire,targetId,expiresTick:o.own.tick+PLAN_TICKS});};
  const supply=(c:TankObservation['contacts'][number],remembered=false)=>{
   if(o.own.team!=='player'||!c.pickupKind||!c.amount)return;
@@ -22,20 +22,33 @@ export function buildCandidates(o:TankObservation):TacticalPlan[] {
  };
  for(const c of o.contacts){if(c.kind==='tank'&&c.team!==o.own.team){const d=distance(origin,c.position);const dx=(origin.x-c.position.x)/Math.max(d,1),dz=(origin.z-c.position.z)/Math.max(d,1);add('hold:'+c.id,'Hold current vantage, aim and fire at visible target '+c.id,origin,true,c.id);add('engage:'+c.id,'Engage visible target '+c.id+' while maintaining separation',{x:c.position.x+dx*12,z:c.position.z+dz*12},true,c.id);for(const s of [-1,1])add('flank:'+c.id+':'+s,'Flank '+(s===1?'left':'right')+' of visible target '+c.id,{x:c.position.x+dx*18-dz*s*14,z:c.position.z+dz*18+dx*s*14},true,c.id);add('retreat:'+c.id,'Create distance from visible target '+c.id,{x:origin.x+dx*15,z:origin.z+dz*15},true,c.id);}else if(c.kind==='flag'&&o.own.team==='player')add('flag:'+c.id,'Collect visible flag '+c.id,c.position);else if(c.kind==='pickup')supply(c);}
  for(const c of o.memory)if(o.own.team==='player'){if(c.kind==='flag')add('remember:'+c.id,'Collect previously seen flag '+c.id,c.position);else if(c.kind==='pickup')supply(c,true);}
- if(o.own.team==='enemy'&&!o.contacts.some(c=>c.kind==='tank'&&c.team!==o.own.team))for(const c of [...o.contacts,...o.memory])if(c.kind==='flag'){
-  const gap=Math.max(1,distance(origin,c.position));
-  add('guard:'+c.id,'Guard '+(c.seenTick===o.own.tick?'visible':'previously seen')+' flag '+c.id+' from a12-unit stand-off vantage; watch for approaching opposing player, do not collect',{x:c.position.x+(origin.x-c.position.x)*12/gap,z:c.position.z+(origin.z-c.position.z)*12/gap});
-  const guard=plans.find(p=>p.id==='guard:'+c.id);if(guard)guard.lookAt={...c.position};
- }
-
  const opponents=o.contacts.filter(c=>c.kind==='tank'&&c.team!==o.own.team);
  const knownFlags=[...o.contacts,...o.memory].filter(c=>c.kind==='flag').sort((a,b)=>distance(origin,a.position)-distance(origin,b.position));
- if(!opponents.length&&o.own.team==='enemy')for(const flag of knownFlags.slice(0,2)){
-  const bearing=datan2(origin.x-flag.position.x,origin.z-flag.position.z);
-  for(const direction of [1,-1]){
+ if(o.own.team==='enemy'&&!survival&&o.remainingFlags<=2)for(const opponent of opponents){
+  const threatenedFlag=knownFlags.slice().sort((a,b)=>distance(opponent.position,a.position)-distance(opponent.position,b.position))[0];
+  if(threatenedFlag){
+   const gap=Math.max(1,distance(opponent.position,threatenedFlag.position));
+   const ux=(threatenedFlag.position.x-opponent.position.x)/gap,uz=(threatenedFlag.position.z-opponent.position.z)/gap;
+   const waypoint=gap>24?{x:opponent.position.x+ux*Math.min(16,gap-12),z:opponent.position.z+uz*Math.min(16,gap-12)}:{x:threatenedFlag.position.x+ux*12,z:threatenedFlag.position.z+uz*12};
+   add('intercept:'+opponent.id+':'+threatenedFlag.id,'URGENT '+o.remainingFlags+' flags remain: intercept observed opponent '+opponent.id+' on known flag '+threatenedFlag.id+' approach; keep at least12-unit target separation, aim to stop capture',waypoint,true,opponent.id);
+  }
+ }
+ if(!opponents.length&&o.own.team==='enemy'&&!survival)for(const flag of knownFlags){
+  if(plans.filter(p=>p.strategy==='patrol').length>=2)break;
+  const gap=distance(origin,flag.position),bearing=datan2(origin.x-flag.position.x,origin.z-flag.position.z);
+  if(gap>28){
+   // Move toward a feasible orbit entry, in a local24-unit step rather than waiting at a guard spot.
+   for(const [sector,offset] of [0,Math.PI/4,-Math.PI/4,Math.PI/2,-Math.PI/2].entries()){
+    const a=bearing+offset,entry={x:flag.position.x+dsin(a)*18,z:flag.position.z+dcos(a)*18};
+    const travel=distance(origin,entry),scale=Math.min(1,24/Math.max(1,travel));
+    const waypoint={x:origin.x+(entry.x-origin.x)*scale,z:origin.z+(entry.z-origin.z)*scale};
+    add('patrol:'+flag.id+':approach:'+sector,(o.remainingFlags<=2?'URGENT defend last '+o.remainingFlags+' flags: ':'')+'Advance toward an18-unit orbit around known flag '+flag.id+'; keep moving then circle and survey',waypoint);
+    if(plans.some(p=>p.id==='patrol:'+flag.id+':approach:'+sector))break;
+   }
+  }else for(const direction of [1,-1]){
    const a=bearing+direction*Math.PI/4;
-   add('patrol:'+flag.id+':'+direction,'Circle '+(direction===1?'clockwise':'counterclockwise')+' around known flag '+flag.id+' at18-unit radius; continuously survey for opponents',{x:flag.position.x+dsin(a)*18,z:flag.position.z+dcos(a)*18});
-   if(plans.some(p=>p.id==='patrol:'+flag.id+':'+direction))break; // Stable clockwise patrol; counterclockwise only if its next segment is blocked.
+   add('patrol:'+flag.id+':'+direction,(o.remainingFlags<=2?'URGENT defend last '+o.remainingFlags+' flags: ':'')+'Circle '+(direction===1?'clockwise':'counterclockwise')+' around known flag '+flag.id+' at18-unit radius; continuously survey for opponents',{x:flag.position.x+dsin(a)*18,z:flag.position.z+dcos(a)*18});
+   if(plans.some(p=>p.id==='patrol:'+flag.id+':'+direction))break;
   }
  }
  // Survival uses only visible/reportable threats and own recent damage, never hidden attackers.
@@ -47,14 +60,14 @@ export function buildCandidates(o:TankObservation):TacticalPlan[] {
   const away=datan2(ax,az);
   for(const [sector,offset] of [0,-Math.PI/4,Math.PI/4].entries())add('retreat:safe:'+sector,'Break contact after '+(o.recentThreat?.kind??'low shields')+'; move away and regain stopping room',{x:origin.x+dsin(away+offset)*18,z:origin.z+dcos(away+offset)*18},opponents.length>0,opponents[0]?.id);
  }
- for(const ally of o.contacts.filter(c=>c.kind==='tank'&&c.team===o.own.team)){
+ if(survival)for(const ally of o.contacts.filter(c=>c.kind==='tank'&&c.team===o.own.team)){
   const gap=Math.max(1,distance(origin,ally.position));
   add('regroup:'+ally.id,'Regroup8 units from known ally '+ally.id+'; coordinate with ally strategy '+(ally.strategy??'unknown')+' without colliding',{x:ally.position.x+(origin.x-ally.position.x)*8/gap,z:ally.position.z+(origin.z-ally.position.z)*8/gap},opponents.length>0,opponents[0]?.id);
  }
  // Sector sweep keeps tanks moving/searching without obtaining hidden coordinates.
  for(let i=0;i<8;i++){const a=o.own.heading+i*Math.PI/4;const p={x:origin.x+dsin(a)*24,z:origin.z+dcos(a)*24};if(!o.visited.some(v=>distance(v,p)<12))add('explore:'+i,'Search unvisited clear sector '+i+(o.own.team==='player'?' for flags, supplies or opponents':' for opposing player; reacquire visual contact'),p);}
  if(!plans.length)for(let i=0;i<8;i++){const a=o.own.heading+i*Math.PI/4;add('revisit:'+i,'Navigate clear sector to exit surveyed area',{x:origin.x+dsin(a)*15,z:origin.z+dcos(a)*15});}
- if(!plans.length)plans.push({id:'scan',description:'Rotate to survey blocked surroundings',waypoint:origin,fire:false,expiresTick:o.own.tick+PLAN_TICKS});const priority=(p:TacticalPlan)=>survival?(p.strategy==='retreat'?0:p.strategy==='regroup'?1:p.description.includes('shield supply')?2:p.strategy==='explore'?3:4):p.strategy==='patrol'?0:o.own.team==='player'&&p.id.startsWith('flag:')?0:p.strategy==='pursue'||p.strategy==='protect'?1:2;
+ if(!plans.length)plans.push({id:'scan',description:'Rotate to survey blocked surroundings',waypoint:origin,fire:false,expiresTick:o.own.tick+PLAN_TICKS});const priority=(p:TacticalPlan)=>survival?(p.strategy==='retreat'?0:p.strategy==='regroup'?1:p.description.includes('shield supply')?2:p.strategy==='explore'?3:4):p.id.startsWith('intercept:')?0:p.strategy==='patrol'?0:o.own.team==='player'&&p.id.startsWith('flag:')?0:p.strategy==='pursue'||p.strategy==='protect'?1:2;
  plans.sort((a,b)=>priority(a)-priority(b));
  // While frightened, withhold offensive pursuit/hold choices; deterministic reflex still handles collisions.
  const recovery=plans.filter(p=>p.strategy==='retreat'||p.strategy==='regroup'||p.description.includes('shield supply'));

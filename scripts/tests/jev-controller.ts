@@ -113,7 +113,7 @@ e.position={x:-77,z:94};e.heading=Math.PI;e.speed=-10;
 for(let tick=0;tick<180;tick++){s.tick=tick;const cmd=commandForPlan(s,e.id,{...plan,targetId:undefined,fire:false,waypoint:Math.floor(tick/15)%2?{x:-77,z:110}:{x:-50,z:90},expiresTick:tick+30});applyMovement(e,cmd,movementParamsForEnemy(e.kind,levelConfig(s.level)));assert(e.position.z<98.4,'2Hz guard replans never touch physical arena boundary');}
 s.obstacles=[];s.enemies=[e];e.position={x:0,z:0};e.heading=0;e.speed=0;player.position={x:0,z:30};s.flags=[{id:'guardGoal',position:{x:15,z:20},collected:false}];s.pickups=[];
 let guardChoices=buildCandidates(observeTank(s,e.id,{seen:{}}));assert(!guardChoices.some(c=>c.id.startsWith('guard:')),'visible opponent suppresses passiveguard');assert(guardChoices.some(c=>c.id.startsWith('hold:')&&c.fire),'visiblethreat gets holdaimfire');
-player.position={x:0,z:90};guardChoices=buildCandidates(observeTank(s,e.id,{seen:{}}));const peacefulGuard=guardChoices.find(c=>c.id==='guard:guardGoal');assert(peacefulGuard&&!peacefulGuard.fire,'peacefulflagguard remains');
+player.position={x:0,z:90};guardChoices=buildCandidates(observeTank(s,e.id,{seen:{}}));const peacefulGuard=guardChoices.find(c=>c.strategy==='patrol');assert(peacefulGuard&&!peacefulGuard.fire,'peacefulflagdefense keepsmoving aspatrol');
 e.position={...peacefulGuard.waypoint};e.heading=Math.PI;
 const guardCmd=commandForPlan(s,e.id,peacefulGuard);assert(guardCmd.turn!==0,'arrivedguard explicitly turns toward knownflag');assert.equal(guardCmd.fire,false,'peacefulguard never blindfires');
 // Full serialized live sample: scripted UNSTICK must never replace guarded external commands.
