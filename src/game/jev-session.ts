@@ -2,6 +2,7 @@ import type { GameState, TankState } from '../sim/types.ts';
 import type { SimEvent } from '../sim/events.ts';
 import type { Command } from '../sim/commands.ts';
 import { observeTank } from '../jev/observation.ts';
+import { separateJevSpawns } from '../jev/placement.ts';
 import { buildCandidates, commandForPlan } from '../jev/controller.ts';
 import { DecisionAuditStore, type DecisionAudit } from './jev-audit.ts';
 import type { TankMemory, TankObservation, TacticalPlan, Strategy } from '../jev/types.ts';
@@ -36,6 +37,9 @@ export class JevSession {
   private lastSafetyEvents: { tick: number; level: number; event: SimEvent; tanks: { id: string; position: { x: number; z: number }; prevPosition: { x: number; z: number }; heading: number; speed: number; alive: boolean; controlled: boolean; planId: string | null; modelAgeTicks: number | null; expired: boolean }[] }[] = [];
   private modelTicks: Record<string, number> = {};
   private settings = { enabled: false, playerAutopilot: false, hz: 2 };
+  private placementLevel = -1;
+  private placementTick = -1;
+  private placementAlive: Record<string,boolean> = {};
   private memories: Record<string, TankMemory> = {};
   private observations: Record<string, TankObservation> = {};
   private plans: Record<string, TacticalPlan> = {};
@@ -97,7 +101,14 @@ export class JevSession {
     this.modelTicks = {}; this.plans = {}; this.memories = {}; this.observations = {}; this.nextAt = 0;
   }
   enforceRoster(state: GameState, local = true): void {
-    if (this.settings.enabled && local && state.mode === 'solo' && state.players.length === 1) state.enemies.splice(3);
+    if (this.settings.enabled && local && state.mode === 'solo' && state.players.length === 1) {
+      state.enemies.splice(3);
+      if(this.placementLevel!==state.level||state.tick<this.placementTick){this.placementAlive={};this.placementLevel=state.level;}
+      const spawned=state.enemies.filter(e=>e.alive&&!this.placementAlive[e.id]).map(e=>e.id);
+      separateJevSpawns(state,spawned);
+      for(const e of state.enemies)this.placementAlive[e.id]=e.alive;
+      this.placementTick=state.tick;
+    }
   }
   update(state: GameState, now: number, playing: boolean, local: boolean, visible: boolean): void {
     const active = this.settings.enabled && playing && local && visible && state.mode === 'solo' && state.players.length === 1 && !state.gameOver;
@@ -131,7 +142,7 @@ export class JevSession {
       const memory = this.memories[tank.id] ??= { seen: {} };
       const observation = observeTank(state, tank.id, memory, { sharedSightings: state.enemies.some(e => e.id === tank.id) ? sharedSightings : [], strategies: this.acceptedStrategies });
       this.observations[tank.id] = observation;
-      const choices = buildCandidates(observation); candidates[tank.id] = choices;
+      const choices = buildCandidates(observation, tank.position); candidates[tank.id] = choices;
       return { tankId: tank.id, role: tank.id === player?.id ? 'player' : 'enemy', observation, candidates: choices.map(c => ({ id: c.id, description: c.description })) };
     });
     if (!payload.length) return;
