@@ -1,3 +1,4 @@
+import { sampledKPIs } from './sampled.mjs';
 export function summarizeRun({ config, samples, network, errors, stoppedReason, elapsedSeconds }) {
   const last = samples.at(-1) ?? {};
   const metrics = last.metrics ?? {};
@@ -17,8 +18,10 @@ export function summarizeRun({ config, samples, network, errors, stoppedReason, 
     observedTankCount: tanks.length,
     maxActualEnemies: Math.max(0,...samples.map(s => s.state?.enemies?.length ?? 0)),
     maxRequestedTanks: metrics.maxRequestedTanks ?? null,
-    effectiveAcceptedHzPerTank: metrics.effectiveHzPerTank ?? null,
-    modelDrivenTickFraction: metrics.modelTicks !== undefined && metrics.observedTicks > 0 ? metrics.modelTicks / metrics.observedTicks : null,
+    effectiveAcceptedHzPerTank: metrics.acceptedHzPerTank ?? null,
+    modelDrivenTickFraction: metrics.modelCommandTicks !== undefined && (metrics.modelCommandTicks + metrics.fallbackTicks) > 0 ? metrics.modelCommandTicks / (metrics.modelCommandTicks + metrics.fallbackTicks) : null,
+    appliedChoiceHistogram: metrics.appliedChoiceHistogram ?? null,
+    sampled: sampledKPIs(samples),
     contextSample: samples.find(s => s.observation)?.observation ?? null, samples,
   };
 }
