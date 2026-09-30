@@ -1,0 +1,680 @@
+{
+  "schemaVersion": 1,
+  "config": {
+    "url": "http://localhost:5173/",
+    "duration": 60,
+    "enabled": true,
+    "offline": false,
+    "autopilot": true,
+    "level": 6,
+    "seed": 1991,
+    "hz": 2,
+    "seedApplied": false,
+    "seedNote": "Requested seed recorded; game start uses built-in deterministic seed",
+    "maxEnemies": 3,
+    "god": false,
+    "video": true
+  },
+  "elapsedSeconds": 60.211,
+  "stoppedReason": "duration",
+  "inferenceEvidence": "model-decisions-observed",
+  "network": {
+    "requested": 120,
+    "responses": 119,
+    "httpFailures": 0,
+    "transportFailures": 1,
+    "statuses": {
+      "200": 119
+    }
+  },
+  "errors": [],
+  "metrics": {
+    "requests": 119,
+    "maxRequestedTanks": 4,
+    "modelDecisions": 463,
+    "modelCommandTicks": 7035,
+    "fallbackTicks": 85,
+    "staleResponses": 0,
+    "failures": 1,
+    "inputTokens": 865450,
+    "spentUsd": 0.39124054199999664,
+    "latencyMs": 258.2999999821186,
+    "wallHits": 0,
+    "obstacleContacts": 0,
+    "tankContacts": 0,
+    "friendlyFireHits": 0,
+    "friendlyFireDamage": 0,
+    "playerDamage": 24,
+    "enemyProjectileDamage": 5,
+    "playerDeaths": 0,
+    "enemyDeaths": 1,
+    "shots": 7,
+    "flags": 6,
+    "closeCallTicks": 0,
+    "tankContactTicks": 0,
+    "stationaryTicks": 0,
+    "observedTicks": 1810,
+    "interventions": {
+      "wallAvoided": 1776,
+      "tankAvoided": 119,
+      "allyShotAvoided": 3
+    },
+    "enabled": true,
+    "playerAutopilot": true,
+    "hz": 2,
+    "activeSeconds": 61.892300000000006,
+    "activeTankSeconds": {
+      "enemy": 181.7936999999988,
+      "player": 61.892300000000006
+    },
+    "acceptedHzPerTank": 1.899986047618666,
+    "acceptedHzByRole": {
+      "enemy": 1.8977555327825015,
+      "player": 1.9065376468478306
+    },
+    "latencySamplesMs": [
+      267.80000001192093,
+      346.39999997615814,
+      255.89999997615814,
+      417,
+      242.90000000596046,
+      242.09999999403954,
+      225.7000000178814,
+      244.09999999403954,
+      198.2999999821186,
+      291.90000000596046,
+      289.90000000596046,
+      243,
+      330,
+      262.89999997615814,
+      270.7000000178814,
+      284,
+      250.30000001192093,
+      274.59999999403954,
+      263.69999998807907,
+      252.59999999403954,
+      215.19999998807907,
+      194.09999999403954,
+      194.7000000178814,
+      189.30000001192093,
+      250.2000000178814,
+      253.19999998807907,
+      219.09999999403954,
+      235.40000000596046,
+      222.39999997615814,
+      261.40000000596046,
+      217.30000001192093,
+      258.80000001192093,
+      246.5,
+      291.2000000178814,
+      345.40000000596046,
+      266.5,
+      297.7000000178814,
+      245.7000000178814,
+      244.19999998807907,
+      241.5,
+      222.19999998807907,
+      275.2000000178814,
+      240.7999999821186,
+      293.5,
+      239.60000002384186,
+      276.09999999403954,
+      289.90000000596046,
+      234.2999999821186,
+      287.80000001192093,
+      293.09999999403954,
+      326,
+      271.59999999403954,
+      220.5,
+      263.5,
+      254.40000000596046,
+      304.40000000596046,
+      222.40000000596046,
+      302.69999998807907,
+      223,
+      269.60000002384186,
+      281.80000001192093,
+      234.5,
+      235.5,
+      235.2000000178814,
+      259.80000001192093,
+      261.2999999821186,
+      269.59999999403954,
+      280.2000000178814,
+      242.09999999403954,
+      334,
+      239.09999999403954,
+      282.09999999403954,
+      281.7999999821186,
+      238.5,
+      245.09999999403954,
+      287.90000000596046,
+      226.2999999821186,
+      248.7999999821186,
+      249.30000001192093,
+      306.19999998807907,
+      278,
+      232.5,
+      241.59999999403954,
+      257.30000001192093,
+      239.89999997615814,
+      273.90000000596046,
+      239.2000000178814,
+      378.7999999821186,
+      228,
+      272.5,
+      264.90000000596046,
+      245.40000000596046,
+      254.80000001192093,
+      273.90000000596046,
+      231.5,
+      240.40000000596046,
+      212.5,
+      235.40000000596046,
+      242.90000000596046,
+      356.30000001192093,
+      259.90000000596046,
+      256.60000002384186,
+      250.10000002384186,
+      333.5,
+      293.40000000596046,
+      316.7999999821186,
+      266.19999998807907,
+      250.59999999403954,
+      277.69999998807907,
+      299.59999999403954,
+      239.39999997615814,
+      284.09999999403954,
+      245,
+      387.69999998807907,
+      250.59999999403954,
+      223.69999998807907,
+      306.10000002384186,
+      258.2999999821186
+    ],
+    "latencyP50Ms": 255.89999997615814,
+    "latencyP95Ms": 345.40000000596046,
+    "appliedChoiceHistogram": {
+      "enemy:guard:flag-4": {
+        "role": "enemy",
+        "id": "guard:flag-4",
+        "category": "guard",
+        "count": 3
+      },
+      "enemy:explore:0": {
+        "role": "enemy",
+        "id": "explore:0",
+        "category": "explore",
+        "count": 3
+      },
+      "enemy:guard:flag-2": {
+        "role": "enemy",
+        "id": "guard:flag-2",
+        "category": "guard",
+        "count": 210
+      },
+      "player:flag:flag-9": {
+        "role": "player",
+        "id": "flag:flag-9",
+        "category": "flag",
+        "count": 8
+      },
+      "enemy:guard:flag-0": {
+        "role": "enemy",
+        "id": "guard:flag-0",
+        "category": "guard",
+        "count": 5
+      },
+      "enemy:guard:flag-5": {
+        "role": "enemy",
+        "id": "guard:flag-5",
+        "category": "guard",
+        "count": 115
+      },
+      "enemy:engage:player": {
+        "role": "enemy",
+        "id": "engage:player",
+        "category": "engage",
+        "count": 7
+      },
+      "player:remember:flag-9": {
+        "role": "player",
+        "id": "remember:flag-9",
+        "category": "remember",
+        "count": 1
+      },
+      "player:hold:enemy-L6-0": {
+        "role": "player",
+        "id": "hold:enemy-L6-0",
+        "category": "hold",
+        "count": 1
+      },
+      "player:remember:flag-0": {
+        "role": "player",
+        "id": "remember:flag-0",
+        "category": "remember",
+        "count": 1
+      },
+      "player:flag:flag-4": {
+        "role": "player",
+        "id": "flag:flag-4",
+        "category": "flag",
+        "count": 7
+      },
+      "player:engage:enemy-L6-0": {
+        "role": "player",
+        "id": "engage:enemy-L6-0",
+        "category": "engage",
+        "count": 4
+      },
+      "player:flag:flag-0": {
+        "role": "player",
+        "id": "flag:flag-0",
+        "category": "flag",
+        "count": 6
+      },
+      "enemy:guard:flag-3": {
+        "role": "enemy",
+        "id": "guard:flag-3",
+        "category": "guard",
+        "count": 2
+      },
+      "player:pickup:pickup-4": {
+        "role": "player",
+        "id": "pickup:pickup-4",
+        "category": "pickup",
+        "count": 7
+      },
+      "player:explore:1": {
+        "role": "player",
+        "id": "explore:1",
+        "category": "explore",
+        "count": 2
+      },
+      "player:explore:0": {
+        "role": "player",
+        "id": "explore:0",
+        "category": "explore",
+        "count": 7
+      },
+      "player:flag:flag-1": {
+        "role": "player",
+        "id": "flag:flag-1",
+        "category": "flag",
+        "count": 50
+      },
+      "player:pickup:pickup-3": {
+        "role": "player",
+        "id": "pickup:pickup-3",
+        "category": "pickup",
+        "count": 6
+      },
+      "player:flag:flag-7": {
+        "role": "player",
+        "id": "flag:flag-7",
+        "category": "flag",
+        "count": 4
+      },
+      "player:flag:flag-8": {
+        "role": "player",
+        "id": "flag:flag-8",
+        "category": "flag",
+        "count": 7
+      },
+      "player:remember:flag-8": {
+        "role": "player",
+        "id": "remember:flag-8",
+        "category": "remember",
+        "count": 4
+      },
+      "player:pickup:pickup-1": {
+        "role": "player",
+        "id": "pickup:pickup-1",
+        "category": "pickup",
+        "count": 3
+      }
+    },
+    "latestPlans": {
+      "enemy-L6-1": {
+        "id": "guard:flag-5",
+        "description": "Guard visible flag flag-5 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 3 units at -3 degrees relative heading; known obstacle route clear",
+        "waypoint": {
+          "x": 69.40645847938983,
+          "z": -46.85561892176824
+        },
+        "fire": false,
+        "expiresTick": 1828,
+        "lookAt": {
+          "x": 63.820766219869256,
+          "z": -36.23488250747323
+        }
+      },
+      "enemy-L6-2": {
+        "id": "guard:flag-2",
+        "description": "Guard visible flag flag-2 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 2 units at -7 degrees relative heading; known obstacle route clear",
+        "waypoint": {
+          "x": -13.947612933980814,
+          "z": -92.36609289025701
+        },
+        "fire": false,
+        "expiresTick": 1828,
+        "lookAt": {
+          "x": -24.780279144644737,
+          "z": -87.20340533740819
+        }
+      },
+      "player": {
+        "id": "pickup:pickup-1",
+        "description": "Collect visible ammo supply pickup-1; restore up to 5 ammo of 5 missing; enable more cannon shots; travel 13 units at 2 degrees relative heading; known obstacle route clear",
+        "waypoint": {
+          "x": 85.28250491060317,
+          "z": 2.3559739459306
+        },
+        "fire": false,
+        "expiresTick": 1828
+      },
+      "enemy-L6-0": {
+        "id": "guard:flag-2",
+        "description": "Guard visible flag flag-2 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 8 units at 19 degrees relative heading; known obstacle route clear",
+        "waypoint": {
+          "x": -13.232868755442363,
+          "z": -90.46795941160286
+        },
+        "fire": false,
+        "expiresTick": 1828,
+        "lookAt": {
+          "x": -24.780279144644737,
+          "z": -87.20340533740819
+        }
+      }
+    },
+    "lastSafetyEvents": [],
+    "budgetExhausted": false,
+    "pending": false,
+    "status": "Jev live · 2 Hz · 258 ms",
+    "active": true
+  },
+  "outcome": {
+    "level": 6,
+    "score": 800,
+    "flagsCollected": 6,
+    "gameOver": false,
+    "players": [
+      {
+        "id": "player",
+        "shield": 100,
+        "lives": 3,
+        "kills": 0,
+        "alive": true
+      }
+    ],
+    "enemyCount": 3
+  },
+  "effectiveDecisionsPerSecond": 7.689624819385163,
+  "unavailableKPIs": [
+    "human fun rating",
+    "lowShieldRecoveries",
+    "chaseLoops"
+  ],
+  "observedTankCount": 4,
+  "maxActualEnemies": 3,
+  "maxRequestedTanks": 4,
+  "effectiveAcceptedHzPerTank": 1.899986047618666,
+  "modelDrivenTickFraction": 0.988061797752809,
+  "appliedChoiceHistogram": {
+    "enemy:guard:flag-4": {
+      "role": "enemy",
+      "id": "guard:flag-4",
+      "category": "guard",
+      "count": 3
+    },
+    "enemy:explore:0": {
+      "role": "enemy",
+      "id": "explore:0",
+      "category": "explore",
+      "count": 3
+    },
+    "enemy:guard:flag-2": {
+      "role": "enemy",
+      "id": "guard:flag-2",
+      "category": "guard",
+      "count": 210
+    },
+    "player:flag:flag-9": {
+      "role": "player",
+      "id": "flag:flag-9",
+      "category": "flag",
+      "count": 8
+    },
+    "enemy:guard:flag-0": {
+      "role": "enemy",
+      "id": "guard:flag-0",
+      "category": "guard",
+      "count": 5
+    },
+    "enemy:guard:flag-5": {
+      "role": "enemy",
+      "id": "guard:flag-5",
+      "category": "guard",
+      "count": 115
+    },
+    "enemy:engage:player": {
+      "role": "enemy",
+      "id": "engage:player",
+      "category": "engage",
+      "count": 7
+    },
+    "player:remember:flag-9": {
+      "role": "player",
+      "id": "remember:flag-9",
+      "category": "remember",
+      "count": 1
+    },
+    "player:hold:enemy-L6-0": {
+      "role": "player",
+      "id": "hold:enemy-L6-0",
+      "category": "hold",
+      "count": 1
+    },
+    "player:remember:flag-0": {
+      "role": "player",
+      "id": "remember:flag-0",
+      "category": "remember",
+      "count": 1
+    },
+    "player:flag:flag-4": {
+      "role": "player",
+      "id": "flag:flag-4",
+      "category": "flag",
+      "count": 7
+    },
+    "player:engage:enemy-L6-0": {
+      "role": "player",
+      "id": "engage:enemy-L6-0",
+      "category": "engage",
+      "count": 4
+    },
+    "player:flag:flag-0": {
+      "role": "player",
+      "id": "flag:flag-0",
+      "category": "flag",
+      "count": 6
+    },
+    "enemy:guard:flag-3": {
+      "role": "enemy",
+      "id": "guard:flag-3",
+      "category": "guard",
+      "count": 2
+    },
+    "player:pickup:pickup-4": {
+      "role": "player",
+      "id": "pickup:pickup-4",
+      "category": "pickup",
+      "count": 7
+    },
+    "player:explore:1": {
+      "role": "player",
+      "id": "explore:1",
+      "category": "explore",
+      "count": 2
+    },
+    "player:explore:0": {
+      "role": "player",
+      "id": "explore:0",
+      "category": "explore",
+      "count": 7
+    },
+    "player:flag:flag-1": {
+      "role": "player",
+      "id": "flag:flag-1",
+      "category": "flag",
+      "count": 50
+    },
+    "player:pickup:pickup-3": {
+      "role": "player",
+      "id": "pickup:pickup-3",
+      "category": "pickup",
+      "count": 6
+    },
+    "player:flag:flag-7": {
+      "role": "player",
+      "id": "flag:flag-7",
+      "category": "flag",
+      "count": 4
+    },
+    "player:flag:flag-8": {
+      "role": "player",
+      "id": "flag:flag-8",
+      "category": "flag",
+      "count": 7
+    },
+    "player:remember:flag-8": {
+      "role": "player",
+      "id": "remember:flag-8",
+      "category": "remember",
+      "count": 4
+    },
+    "player:pickup:pickup-1": {
+      "role": "player",
+      "id": "pickup:pickup-1",
+      "category": "pickup",
+      "count": 3
+    }
+  },
+  "sampled": {
+    "provenance": "sample-derived; 200ms snapshots; motion/events between samples can be missed",
+    "tanks": {
+      "player": {
+        "distance": 414.9229267466127,
+        "stationarySeconds": 27.449,
+        "lowShieldEpisodes": 0,
+        "lowShieldRecoveries": 0
+      },
+      "enemy-L6-0": {
+        "distance": 45.96786538820045,
+        "stationarySeconds": 52.123,
+        "lowShieldEpisodes": 1,
+        "lowShieldRecoveries": 0
+      },
+      "enemy-L6-1": {
+        "distance": 87.46779150893042,
+        "stationarySeconds": 53.881,
+        "lowShieldEpisodes": 0,
+        "lowShieldRecoveries": 0
+      },
+      "enemy-L6-2": {
+        "distance": 2.168837081974262,
+        "stationarySeconds": 59.244,
+        "lowShieldEpisodes": 0,
+        "lowShieldRecoveries": 0
+      }
+    }
+  },
+  "contextSample": {
+    "visited": [
+      {
+        "x": 0,
+        "z": 0
+      }
+    ],
+    "own": {
+      "id": "player",
+      "team": "player",
+      "position": {
+        "x": 0,
+        "z": 0
+      },
+      "heading": 0.47123889803846897,
+      "speed": 0,
+      "shieldFraction": 1,
+      "ammo": 80,
+      "maxAmmo": 80,
+      "shield": 100,
+      "maxShield": 100,
+      "fireReady": true,
+      "tick": 5
+    },
+    "contacts": [
+      {
+        "id": "flag-9",
+        "kind": "flag",
+        "position": {
+          "x": -31.339258033782244,
+          "z": 40.225777704268694
+        },
+        "seenTick": 5
+      },
+      {
+        "id": "pickup-0",
+        "kind": "pickup",
+        "pickupKind": "ammo",
+        "amount": 20,
+        "position": {
+          "x": -44.77389687485993,
+          "z": 12.591823615133762
+        },
+        "seenTick": 5
+      },
+      {
+        "id": "pickup-6",
+        "kind": "pickup",
+        "pickupKind": "shield",
+        "amount": 25,
+        "position": {
+          "x": -7.286429863423109,
+          "z": 54.52474973909557
+        },
+        "seenTick": 5
+      },
+      {
+        "id": "pickup-7",
+        "kind": "pickup",
+        "pickupKind": "shield",
+        "amount": 25,
+        "position": {
+          "x": 43.85095617175102,
+          "z": -18.222311813384295
+        },
+        "seenTick": 5
+      }
+    ],
+    "memory": [],
+    "geometry": [
+      {
+        "id": "wall-5",
+        "kind": "wall",
+        "min": {
+          "x": 21.855787590146065,
+          "z": 51.173753935843706
+        },
+        "max": {
+          "x": 26.89491331577301,
+          "z": 60.983589954674244
+        }
+      }
+    ],
+    "bounds": 100
+  },
+  "sourceRevision": "c7c041626c31bab5871fec60472985fc424397e5",
+  "accountingNote": "spentUsd is cumulative backend ledger accounting including conservative unknown-usage reservations; not this run alone"
+}

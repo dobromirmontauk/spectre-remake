@@ -1,0 +1,215 @@
+{
+  "schemaVersion": 1,
+  "config": {
+    "url": "http://localhost:5173/",
+    "duration": 20,
+    "enabled": true,
+    "offline": true,
+    "autopilot": true,
+    "level": 1,
+    "seed": 1991,
+    "hz": 2,
+    "seedApplied": false,
+    "seedNote": "Requested seed recorded; game start uses built-in deterministic seed",
+    "maxEnemies": 3,
+    "god": false,
+    "video": false
+  },
+  "elapsedSeconds": 20.084,
+  "stoppedReason": "duration",
+  "inferenceEvidence": "no-model-decisions-observed",
+  "network": {
+    "requested": 41,
+    "responses": 0,
+    "httpFailures": 0,
+    "transportFailures": 41,
+    "statuses": {}
+  },
+  "errors": [],
+  "metrics": {
+    "requests": 41,
+    "maxRequestedTanks": 3,
+    "modelDecisions": 0,
+    "modelCommandTicks": 0,
+    "fallbackTicks": 1815,
+    "staleResponses": 0,
+    "failures": 41,
+    "inputTokens": 0,
+    "spentUsd": 0,
+    "latencyMs": 0,
+    "wallHits": 0,
+    "obstacleContacts": 0,
+    "tankContacts": 0,
+    "friendlyFireHits": 0,
+    "friendlyFireDamage": 0,
+    "playerDamage": 0,
+    "playerDeaths": 0,
+    "enemyDeaths": 0,
+    "shots": 0,
+    "flags": 0,
+    "closeCallTicks": 0,
+    "tankContactTicks": 0,
+    "stationaryTicks": 0,
+    "observedTicks": 605,
+    "interventions": {
+      "wallAvoided": 0,
+      "tankAvoided": 0,
+      "allyShotAvoided": 0
+    },
+    "enabled": true,
+    "playerAutopilot": true,
+    "hz": 2,
+    "acceptedHzPerTank": 0,
+    "pending": false,
+    "status": "Offline fallback · Failed to fetch",
+    "active": true
+  },
+  "outcome": {
+    "level": 1,
+    "score": 0,
+    "flagsCollected": 0,
+    "gameOver": false,
+    "players": [
+      {
+        "id": "player",
+        "shield": 100,
+        "lives": 3,
+        "kills": 0,
+        "alive": true
+      }
+    ],
+    "enemyCount": 2
+  },
+  "effectiveDecisionsPerSecond": 0,
+  "unavailableKPIs": [
+    "human fun rating",
+    "lowShieldRecoveries",
+    "chaseLoops"
+  ],
+  "observedTankCount": 3,
+  "maxActualEnemies": 2,
+  "maxRequestedTanks": 3,
+  "effectiveAcceptedHzPerTank": null,
+  "modelDrivenTickFraction": null,
+  "contextSample": {
+    "visited": [
+      {
+        "x": 0,
+        "z": 0
+      }
+    ],
+    "own": {
+      "id": "player",
+      "team": "player",
+      "position": {
+        "x": 0,
+        "z": 0
+      },
+      "heading": 0,
+      "speed": 0,
+      "shieldFraction": 1,
+      "ammo": 80,
+      "fireReady": true,
+      "tick": 0
+    },
+    "contacts": [
+      {
+        "id": "flag-3",
+        "kind": "flag",
+        "position": {
+          "x": -42.11120047606528,
+          "z": -13.517702771350741
+        },
+        "seenTick": 0
+      },
+      {
+        "id": "flag-5",
+        "kind": "flag",
+        "position": {
+          "x": -29.29670492000878,
+          "z": 52.31205037981272
+        },
+        "seenTick": 0
+      },
+      {
+        "id": "pickup-2",
+        "kind": "pickup",
+        "position": {
+          "x": -42.04406579770148,
+          "z": 26.142198223620653
+        },
+        "seenTick": 0
+      },
+      {
+        "id": "pickup-6",
+        "kind": "pickup",
+        "position": {
+          "x": 57.40091338194907,
+          "z": -1.4772933553904295
+        },
+        "seenTick": 0
+      },
+      {
+        "id": "pickup-7",
+        "kind": "pickup",
+        "position": {
+          "x": -9.642250053584576,
+          "z": 56.22497889213264
+        },
+        "seenTick": 0
+      }
+    ],
+    "memory": [],
+    "geometry": [
+      {
+        "id": "wall-0",
+        "kind": "wall",
+        "min": {
+          "x": -65.86220878479071,
+          "z": -3.6332196998409927
+        },
+        "max": {
+          "x": -56.206942113814875,
+          "z": 5.639089017640799
+        }
+      },
+      {
+        "id": "wall-3",
+        "kind": "wall",
+        "min": {
+          "x": -49.50704122078605,
+          "z": -52.53977097268216
+        },
+        "max": {
+          "x": -45.06566422688775,
+          "z": -45.91629651119001
+        }
+      },
+      {
+        "id": "wall-4",
+        "kind": "wall",
+        "min": {
+          "x": 11.472147894557565,
+          "z": 46.15446905372664
+        },
+        "max": {
+          "x": 15.96362096304074,
+          "z": 55.93599735992029
+        }
+      },
+      {
+        "id": "windmill-1",
+        "kind": "windmill",
+        "position": {
+          "x": -15.004783501848578,
+          "z": -44.05462353117764
+        },
+        "pylonRadius": 1.2,
+        "bladeLength": 6,
+        "bladeAngle": 0.13776729065206916,
+        "prevBladeAngle": 0.13776729065206916
+      }
+    ],
+    "bounds": 100
+  }
+}

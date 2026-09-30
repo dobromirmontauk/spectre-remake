@@ -2,17 +2,19 @@
 
 ## Current Objective
 
-Build and locally evaluate optional Jev AI enemies and main-player autopilot. Iterate until model decisions run at 5 Hz (2 Hz if latency requires it), use commander-visible observations, and demonstrate useful tactics with a safe 30 Hz executor. Paid testing is limited to $10 total and three enemies plus the main player. Durable implementation tasks: local Beads epic `asn-cq8`; Beads data is never remotely synced.
+Optional Jev AI and player autopilot are locally verified at 2 Hz, with bounded commander observations and safe 30 Hz execution. Next prepare the Spectre blog / LinkedIn post draft. Human fun and reliable win-rate estimates remain playtest questions. The Jev experiment's cumulative $10 budget and three-enemy-plus-player cap still apply; never reset its ledger. Implementation history: local Beads epic `asn-cq8`, never remotely synced.
 
 ## Next Steps
 
 - [x] Identify Jev and Luna Decisions APIs; documented verified capabilities, pricing, limits, and unknown Luna preview contract in `research-agent-model-apis/notes/api-evaluation.md`.
-- [ ] Obtain provider access and benchmark Jev at 2/5/10 Hz; add Luna Decisions when its official contract and account access are available.
-- [ ] Benchmark squad-level model tactics against the existing FSM and an improved deterministic squad baseline before deciding on implementation.
-
 - [ ] **Publish a blog post / LinkedIn post about Spectre.** Include the live game link, a gameplay screenshot, the inspiration from the 1991 Mac game, and local/network multiplayer. Draft for user review before posting.
+- [ ] Human playtest optional Jev mode: challenge, guarding/stall duration, recoverable close calls and navigation in dense levels. Targets and limitations: `JEV-DESIGN.md`; measured results: `reference/verification/jev/EVALUATION.md`.
+- [ ] Evaluate an authenticated, budget-controlled production AI backend if the local mode is selected for publication. Current public Pages build remains the original static game.
+- [ ] Revisit Luna Decisions when its official API contract and account access become available; benchmark against Jev and deterministic AI as a separate experiment.
 
 ## Last Progress
+
+- 2026-09-29 — Built optional Jev checkbox/player autopilot, isolated per-tank provider calls, persistent $9.50 hard stop and 2 Hz scheduling. Lead's final 120s level-3 and 60s level-6 trials recorded zero obstacle/tank contacts or friendly damage, 1.90–1.92 accepted Hz/tank and 339–345ms p95 batch latency. Level 3 cleared with 15 flags, nine enemy kills, no life lost; player ended at 18% shield. Total ledger accounting $0.391572. Build, controller/scheduler/backend tests, live Chromium regressions and cross-engine determinism pass. Design, gameplay videos, compact reports and raw samples: `JEV-DESIGN.md`, `reference/verification/jev/`. Jev is local only; human fun remains unmeasured. Earlier squad/shared-perspective batching plans are superseded by one upstream call per commander.
 
 - 2026-09-29 — User authorized local Jev implementation/testing with workspace `.env` credentials; maximum $10 total paid calls, three enemies plus main player. Optional checkbox and player autopilot required. Implementation tracked by local Beads `asn-cq8`; production publication is outside this build/test step.
 

@@ -72,8 +72,8 @@ const timingState=makeState(), timing=new JevSession(mock);timing.configure({ena
 timing.update(timingState,base,true,true,true);await flush();
 timingState.enemies[0]!.alive=false;timing.update(timingState,base+1000,true,true,true);await flush();
 timing.update(timingState,base+2000,false,true,true);
-assert.equal(timing.getStats().activeSeconds,2);
-assert.equal(timing.getStats().activeTankSeconds.enemy,3,'denominator integrates living commanders, not stale observation count');
+assert.ok(Math.abs(timing.getStats().activeSeconds-2)<1e-9);
+assert.ok(Math.abs(timing.getStats().activeTankSeconds.enemy-3)<1e-9,'denominator integrates living commanders, not stale observation count');
 assert.equal(timing.getStats().activeTankSeconds.player,0);
 let exhaustedRequests=0;
 const exhausted=new JevSession((async()=>{exhaustedRequests++;return new Response(JSON.stringify({spentUsd:9.9,error:'Budget exhausted'}),{status:402});}) as typeof fetch);
