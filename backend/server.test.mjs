@@ -36,3 +36,11 @@ test('enemy commander mission defends remaining flags with urgency, while surviv
  assert.deepEqual(payload.state.observations,{'enemy-1':enemy.observation});assert.match(prompt,/ONLY observations\["enemy-1"\]/);
  const playerPrompt=providerRequest(body([tank('player-1','player')])).questions.tank_0.instructions;assert.match(playerPrompt,/Collect flags and survive while fighting enemies\./);assert.doesNotMatch(playerPrompt,/STOP the opposing tank/);
 });
+test('bounded four-tank transport above32KiB is accepted, above64KiB and oversized individual provider payload are rejected',async()=>{
+ let upstreamCalls=0;
+ await fixture({fetchImpl:async(_url,opts)=>{upstreamCalls++;assert.ok(Buffer.byteLength(opts.body)<=32768);const p=JSON.parse(opts.body);assert.equal(Object.keys(p.state.observations).length,1);const ids=Object.keys(p.questions.tank_0.criteria);return new Response(JSON.stringify({answers:{tank_0:{type:'choice',choice:ids[0],confidence:1,probabilities:Object.fromEntries(ids.map((id,i)=>[id,i===0?1:0]))}},usage:{input_tokens:100}}));}},async url=>{
+  const tanks=[tank(1),tank(2),tank(3),tank(4,'player')].map(t=>({...t,observation:{own:t.tankId,visibleGeometry:'x'.repeat(5000)},candidates:Array.from({length:16},(_,i)=>({id:'explore:'+i,description:'Safe observed route '+ 'x'.repeat(450)}))}));const batch=body(tanks);const bytes=Buffer.byteLength(JSON.stringify(batch));assert.ok(bytes>32768&&bytes<65536);assert.equal((await post(url,batch)).status,200);assert.equal(upstreamCalls,4);
+  assert.equal((await post(url,{...batch,padding:'x'.repeat(65536)})).status,413);assert.equal(upstreamCalls,4);
+  const oversized=tank(9);oversized.observation={visibleGeometry:'界'.repeat(5900)};oversized.candidates=Array.from({length:16},(_,i)=>({id:'explore:'+i,description:'界'.repeat(500)}));assert.ok(JSON.stringify(oversized.observation).length<6000);assert.ok(Buffer.byteLength(JSON.stringify(body([oversized])))<65536);assert.equal((await post(url,body([oversized]))).status,413);assert.equal(upstreamCalls,4);
+ });
+});

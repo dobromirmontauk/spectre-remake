@@ -5,7 +5,8 @@ import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { Audit } from './audit.mjs';
 import { Budget, MAX_INPUT_TOKENS, RESERVATION_USD } from './budget.mjs';
-const BODY_LIMIT=32768;
+const BODY_LIMIT=65536;
+const PROVIDER_PAYLOAD_LIMIT=32768;
 const fail=(status,message)=>Object.assign(new Error(message),{status});
 const plain=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
 const id=x=>(typeof x==='string'&&/^[a-zA-Z0-9_-]{1,64}$/.test(x))||(Number.isSafeInteger(x)&&x>=0);
@@ -69,7 +70,7 @@ export function createJevServer({apiKey='',ledgerFile,fetchImpl=globalThis.fetch
     const results=await Promise.all(body.tanks.map(async(t)=>{
      // One tank per provider call: shared-state batching would reveal another tank's vision.
      const one={...body,tanks:[t]};const payload=providerRequest(one);
-     if(Buffer.byteLength(JSON.stringify(payload))>BODY_LIMIT)throw fail(413,'upstream payload too large');
+     if(Buffer.byteLength(JSON.stringify(payload))>PROVIDER_PAYLOAD_LIMIT)throw fail(413,'upstream payload too large');
      await acquire();
      const callId=randomUUID(),started=Date.now();const meta={callId,sequence:body.sequence,tick:body.tick,tankId:t.tankId};
      let reservation;try{if(!audit.healthy)throw fail(503,'audit unavailable');audit.append({...meta,type:'request',payload,reservedCostUsd:RESERVATION_USD});reservation=budget.reserve();}catch(e){release();if(audit.healthy)audit.append({...meta,type:'error',error:e.status?'audit unavailable':'budget exhausted or reservation failed',durationMs:Date.now()-started,costUsd:0});throw fail(!audit.healthy?503:(e.status??402),!audit.healthy?'audit unavailable':'Jev test budget exhausted');}
