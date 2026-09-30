@@ -75,3 +75,16 @@ timing.update(timingState,base+2000,false,true,true);
 assert.equal(timing.getStats().activeSeconds,2);
 assert.equal(timing.getStats().activeTankSeconds.enemy,3,'denominator integrates living commanders, not stale observation count');
 assert.equal(timing.getStats().activeTankSeconds.player,0);
+let exhaustedRequests=0;
+const exhausted=new JevSession((async()=>{exhaustedRequests++;return new Response(JSON.stringify({spentUsd:9.9,error:'Budget exhausted'}),{status:402});}) as typeof fetch);
+exhausted.configure({enabled:true});const budgetState=makeState();exhausted.update(budgetState,0,true,true,true);await flush();exhausted.update(budgetState,1000,true,true,true);await flush();
+assert.equal(exhaustedRequests,1,'402 stops further paid requests');
+assert.equal(exhausted.getStats().spentUsd,9.9);assert.equal(exhausted.getStats().budgetExhausted,true);assert.match(exhausted.getStats().status,/Budget exhausted/);assert.ok(exhausted.commands(budgetState,true),'offline guards remain enabled');
+exhausted.configure({enabled:false});exhausted.configure({enabled:true});exhausted.update(budgetState,2000,true,true,true);await flush();assert.equal(exhaustedRequests,1,'checkbox toggle cannot restart paid requests after exhaustion');
+const malformed=new JevSession((async()=>new Response('bad-json',{status:402})) as typeof fetch);malformed.configure({enabled:true});malformed.update(makeState(),0,true,true,true);await flush();assert.equal(malformed.getStats().budgetExhausted,true,'malformed budget JSON still stops');
+const diagnosticsState=makeState(), diagnostics=new JevSession(mock);diagnostics.configure({enabled:true,playerAutopilot:true});diagnostics.update(diagnosticsState,performance.now(),true,true,true);await flush();
+const diagnosticTank=diagnosticsState.enemies[0]!;
+for(let i=0;i<40;i++){diagnosticsState.tick=i+1;diagnosticsState.events=[{type:'ObstacleContact',tankId:diagnosticTank.id,obstacleId:'test-wall',penetration:.1}];diagnostics.recordTick(diagnosticsState);}
+const safety=diagnostics.getStats().lastSafetyEvents;assert.equal(safety.length,32);assert.equal(safety[0]!.tick,8);assert.equal(safety[31]!.tick,39);assert.equal(safety[31]!.tanks[0]!.id,diagnosticTank.id);assert.ok(safety[31]!.tanks[0]!.planId);assert.equal(safety[31]!.tanks[0]!.modelAgeTicks,39);
+const savedX=safety[31]!.tanks[0]!.position.x;diagnosticTank.position.x+=10;assert.equal(diagnostics.getStats().lastSafetyEvents[31]!.tanks[0]!.position.x,savedX,'diagnostic pose frozen at physical event');
+console.log('Budget402 hard browser stop and bounded safety snapshot tests pass.');

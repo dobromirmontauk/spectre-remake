@@ -1,4 +1,5 @@
 import type { GameState, TankState } from '../sim/types.ts';
+import type { SimEvent } from '../sim/events.ts';
 import type { Command } from '../sim/commands.ts';
 import { observeTank } from '../jev/observation.ts';
 import { buildCandidates, commandForPlan } from '../jev/controller.ts';
@@ -7,6 +8,9 @@ import type { TankMemory, TankObservation, TacticalPlan } from '../jev/types.ts'
 const REQUEST_TIMEOUT_MS = 1500;
 const PLAN_MAX_AGE_TICKS = 30;
 export class JevSession {
+  private budgetExhausted = false;
+  private lastSafetyEvents: { tick: number; level: number; event: SimEvent; tanks: { id: string; position: { x: number; z: number }; prevPosition: { x: number; z: number }; heading: number; speed: number; alive: boolean; controlled: boolean; planId: string | null; modelAgeTicks: number | null; expired: boolean }[] }[] = [];
+  private modelTicks: Record<string, number> = {};
   private settings = { enabled: false, playerAutopilot: false, hz: 2 };
   private memories: Record<string, TankMemory> = {};
   private observations: Record<string, TankObservation> = {};
@@ -37,7 +41,7 @@ export class JevSession {
     if (opts.hz !== undefined && opts.hz !== 2 && opts.hz !== 5) throw new Error('Jev cadence must be 2 or 5 Hz');
     this.settings = { ...this.settings, ...Object.fromEntries(Object.entries(opts).filter(([, value]) => value !== undefined)) };
     this.invalidate();
-    this.status = this.settings.enabled ? 'Ready · offline fallback until Jev responds' : 'Disabled · scripted AI';
+    this.status = this.settings.enabled ? (this.budgetExhausted ? 'Budget exhausted · offline guards · no paid requests' : 'Ready · offline fallback until Jev responds') : 'Disabled · scripted AI';
   }
   getStats() {
     const extra = this.active ? Math.max(0, performance.now() - this.clockAt) : 0;
@@ -56,13 +60,14 @@ export class JevSession {
       acceptedHzByRole: { enemy: tankSeconds.enemy ? this.acceptedByRole.enemy / tankSeconds.enemy : 0, player: tankSeconds.player ? this.acceptedByRole.player / tankSeconds.player : 0 },
       latencySamplesMs: [...this.latencySamplesMs], latencyP50Ms: percentile(.5), latencyP95Ms: percentile(.95),
       appliedChoiceHistogram: structuredClone(this.appliedChoiceHistogram), latestPlans: structuredClone(this.plans),
+      lastSafetyEvents: structuredClone(this.lastSafetyEvents), budgetExhausted: this.budgetExhausted,
       pending: !!this.pending, status: this.status, active: this.active,
     };
   }
   getObservation(id: string) { return this.observations[id] ? structuredClone(this.observations[id]) : null; }
   private invalidate(): void {
     this.generation++; this.pending?.abort(); this.pending = null;
-    this.plans = {}; this.memories = {}; this.observations = {}; this.nextAt = 0;
+    this.modelTicks = {}; this.plans = {}; this.memories = {}; this.observations = {}; this.nextAt = 0;
   }
   enforceRoster(state: GameState, local = true): void {
     if (this.settings.enabled && local && state.mode === 'solo' && state.players.length === 1) state.enemies.splice(3);
@@ -84,6 +89,7 @@ export class JevSession {
     this.lastTick = state.tick;
     if (!active) { if (this.settings.enabled) this.status = 'Suspended · single-player, visible, unpaused gameplay only'; return; }
     this.enforceRoster(state, local);
+    if (this.budgetExhausted) { this.status = 'Budget exhausted · offline guards · no paid requests'; return; }
     if (this.pending || now < this.nextAt) return;
     this.nextAt = now + 1000 / this.settings.hz;
     const tanks = [...state.enemies.filter(t => t.alive), ...(this.settings.playerAutopilot && player?.alive ? [player] : [])];
@@ -103,7 +109,16 @@ export class JevSession {
     const timeout = setTimeout(() => abort.abort(), REQUEST_TIMEOUT_MS);
     const started = performance.now(); this.counters.requests++;
     void this.fetcher('/api/jev/decide', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: abort.signal, body: JSON.stringify({ version: 1, sequence, tick, tanks: payload }) })
-      .then(async response => { if (!response.ok) throw new Error(`Backend ${response.status}`); return await response.json() as { sequence: number; tick: number; decisions: { tankId: string; choice: string }[]; usage?: { inputTokens?: number }; spentUsd?: number }; })
+      .then(async response => {
+        if (response.status === 402) {
+          this.budgetExhausted = true;
+          this.plans = {};
+          const details: unknown = await response.json().catch(() => null);
+          if (details && typeof details === 'object' && 'spentUsd' in details && typeof details.spentUsd === 'number' && Number.isFinite(details.spentUsd) && details.spentUsd >= 0) this.counters.spentUsd = details.spentUsd;
+          this.status = 'Budget exhausted · offline guards · no paid requests';
+          throw new Error('Budget exhausted');
+        }
+        if (!response.ok) throw new Error(`Backend ${response.status}`); return await response.json() as { sequence: number; tick: number; decisions: { tankId: string; choice: string }[]; usage?: { inputTokens?: number }; spentUsd?: number }; })
       .then(response => {
         this.counters.inputTokens += response.usage?.inputTokens ?? 0;
         this.counters.spentUsd = response.spentUsd ?? this.counters.spentUsd;
@@ -115,13 +130,13 @@ export class JevSession {
         for (const decision of response.decisions) {
           const plan = candidates[decision.tankId]?.find(c => c.id === decision.choice);
           const tank = [...state.enemies, ...state.players].find(t => t.id === decision.tankId);
-          if (plan && tank?.alive && plan.expiresTick >= state.tick && (lives[tank.id] ?? 0) === (this.lifeSerial[tank.id] ?? 0)) { this.plans[decision.tankId] = plan; this.selectionSerial[decision.tankId] = sequence;
+          if (plan && tank?.alive && plan.expiresTick >= state.tick && (lives[tank.id] ?? 0) === (this.lifeSerial[tank.id] ?? 0)) { this.plans[decision.tankId] = plan; this.selectionSerial[decision.tankId] = sequence; this.modelTicks[decision.tankId] = tick;
             this.acceptedByRole[state.players.some(p => p.id === tank.id) ? 'player' : 'enemy']++; accepted++; }
         }
         this.counters.modelDecisions += accepted;
         if (this.counters.latencyMs > 200 && this.settings.hz === 5) this.settings.hz = 2;
         this.status = accepted ? `Jev live · ${this.settings.hz} Hz · ${Math.round(this.counters.latencyMs)} ms` : 'Offline fallback · no valid Jev decisions';
-      }).catch(error => { if (generation === this.generation) { this.counters.failures++; this.status = `Offline fallback · ${error instanceof Error ? error.message : 'backend unavailable'}`; } })
+      }).catch(error => { if (generation === this.generation) { this.counters.failures++; this.status = this.budgetExhausted ? 'Budget exhausted · offline guards · no paid requests' : `Offline fallback · ${error instanceof Error ? error.message : 'backend unavailable'}`; } })
       .finally(() => { clearTimeout(timeout); if (this.pending === abort) this.pending = null; });
   }
   command(state: GameState, tank: TankState): Command {
@@ -149,6 +164,18 @@ export class JevSession {
     if (!this.settings.enabled || state.mode !== 'solo') return;
     this.counters.observedTicks++;
     for (const event of state.events) {
+      if (event.type === 'ObstacleContact' || event.type === 'TankContact' || event.type === 'FriendlyFireHit') {
+        const ids = event.type === 'TankContact' ? [event.tankId, event.otherTankId] : event.type === 'FriendlyFireHit' ? [event.shooterId, event.tankId] : [event.tankId];
+        const tick = Math.max(0, state.tick - 1);
+        const tanks = ids.flatMap(id => {
+          const tank = [...state.players, ...state.enemies].find(t => t.id === id);
+          if (!tank) return [];
+          const plan = this.plans[id], issued = this.modelTicks[id];
+          return [{ id, position: { ...tank.position }, prevPosition: { ...tank.prevPosition }, heading: tank.heading, speed: tank.speed, alive: tank.alive, controlled: state.enemies.some(t => t.id === id) || this.settings.playerAutopilot, planId: plan?.id ?? null, modelAgeTicks: issued === undefined ? null : tick - issued, expired: !plan || plan.expiresTick < tick }];
+        });
+        this.lastSafetyEvents.push({ tick, level: state.level, event: structuredClone(event), tanks });
+        if (this.lastSafetyEvents.length > 32) this.lastSafetyEvents.shift();
+      }
       if (event.type === 'EnemyRespawned' || event.type === 'EnemyDestroyed' || event.type === 'PlayerRespawned' || event.type === 'PlayerDestroyed') {
         const id = event.type === 'EnemyRespawned' || event.type === 'EnemyDestroyed' ? event.enemyId : event.tankId;
         this.lifeSerial[id] = (this.lifeSerial[id] ?? 0) + 1;
