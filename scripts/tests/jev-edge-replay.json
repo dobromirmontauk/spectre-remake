@@ -1,0 +1,476 @@
+{
+  "state": {
+    "tick": 60,
+    "level": 3,
+    "rng": {
+      "state": -873243881
+    },
+    "mode": "solo",
+    "players": [
+      {
+        "id": "player",
+        "slot": 0,
+        "position": {
+          "x": 23.1038426345668,
+          "z": 13.668433731100716
+        },
+        "prevPosition": {
+          "x": 22.587397418364432,
+          "z": 13.363008881650494
+        },
+        "heading": 1.0367255756846319,
+        "prevHeading": 1.0367255756846319,
+        "speed": 18,
+        "shield": 100,
+        "maxShield": 100,
+        "ammo": 80,
+        "maxAmmo": 80,
+        "alive": true,
+        "fireCooldown": 0,
+        "grenadeCooldown": 0,
+        "invulnerableTicks": 0,
+        "lastHitBy": null,
+        "respawnTicksRemaining": 0,
+        "lives": 3,
+        "kills": 0,
+        "loadout": {
+          "id": "balanced",
+          "name": "Balanced",
+          "speed": 9,
+          "shields": 100,
+          "ammo": 80
+        },
+        "movement": {
+          "turnRate": 2.827433388230814,
+          "thrustAccel": 40,
+          "reverseAccel": 26,
+          "coastFriction": 18,
+          "maxSpeed": 18,
+          "maxReverseSpeed": 14
+        },
+        "name": "Player 1",
+        "removed": false
+      }
+    ],
+    "obstacles": [
+      {
+        "id": "wall-0",
+        "kind": "wall",
+        "min": {
+          "x": 65.12392214499414,
+          "z": -39.862812059232965
+        },
+        "max": {
+          "x": 74.40867277793586,
+          "z": -32.325138894608244
+        }
+      },
+      {
+        "id": "wall-1",
+        "kind": "wall",
+        "min": {
+          "x": -38.64151150616817,
+          "z": 67.25103114242665
+        },
+        "max": {
+          "x": -31.83535134163685,
+          "z": 72.51917329360731
+        }
+      },
+      {
+        "id": "wall-2",
+        "kind": "wall",
+        "min": {
+          "x": -73.62951348605566,
+          "z": -41.2937657146249
+        },
+        "max": {
+          "x": -65.65366798755713,
+          "z": -35.44043316482566
+        }
+      },
+      {
+        "id": "wall-3",
+        "kind": "wall",
+        "min": {
+          "x": -46.47106830403209,
+          "z": -20.482078961562365
+        },
+        "max": {
+          "x": -41.189574003219604,
+          "z": -11.26232522400096
+        }
+      },
+      {
+        "id": "wall-4",
+        "kind": "wall",
+        "min": {
+          "x": -83.40469490876421,
+          "z": 14.890331295318902
+        },
+        "max": {
+          "x": -79.28043113509193,
+          "z": 21.35092832800001
+        }
+      },
+      {
+        "id": "wall-5",
+        "kind": "wall",
+        "min": {
+          "x": -71.44906164100394,
+          "z": -84.9377746868413
+        },
+        "max": {
+          "x": -62.02714357385412,
+          "z": -77.9641606148798
+        }
+      },
+      {
+        "id": "wall-6",
+        "kind": "wall",
+        "min": {
+          "x": -89.021541998256,
+          "z": -17.741877879947424
+        },
+        "max": {
+          "x": -83.39207236422226,
+          "z": -11.224278826266527
+        }
+      },
+      {
+        "id": "wall-7",
+        "kind": "wall",
+        "min": {
+          "x": -19.066464823205024,
+          "z": -68.15873465430923
+        },
+        "max": {
+          "x": -10.783648151438683,
+          "z": -63.99802980083041
+        }
+      },
+      {
+        "id": "windmill-0",
+        "kind": "windmill",
+        "position": {
+          "x": -51.585966028273106,
+          "z": 23.058774331584573
+        },
+        "pylonRadius": 1.2,
+        "bladeLength": 6,
+        "bladeAngle": 4.386389280045779,
+        "prevBladeAngle": 4.334029402485949
+      },
+      {
+        "id": "windmill-1",
+        "kind": "windmill",
+        "position": {
+          "x": -82.77158216387033,
+          "z": 78.91119318455458
+        },
+        "pylonRadius": 1.2,
+        "bladeLength": 6,
+        "bladeAngle": 6.372756910927854,
+        "prevBladeAngle": 6.320397033368024
+      },
+      {
+        "id": "windmill-2",
+        "kind": "windmill",
+        "position": {
+          "x": 17.445405460894108,
+          "z": -72.77346029132605
+        },
+        "pylonRadius": 1.2,
+        "bladeLength": 6,
+        "bladeAngle": 3.5832090006832527,
+        "prevBladeAngle": 3.530849123123423
+      },
+      {
+        "id": "windmill-3",
+        "kind": "windmill",
+        "position": {
+          "x": 16.3087968043983,
+          "z": 73.36144505813718
+        },
+        "pylonRadius": 1.2,
+        "bladeLength": 6,
+        "bladeAngle": 8.797740483421595,
+        "prevBladeAngle": 8.745380605861765
+      }
+    ],
+    "flags": [
+      {
+        "id": "flag-0",
+        "position": {
+          "x": 77.742222558707,
+          "z": 89.65980296395719
+        },
+        "collected": false
+      },
+      {
+        "id": "flag-1",
+        "position": {
+          "x": 53.336082780733705,
+          "z": 52.92227613925934
+        },
+        "collected": false
+      },
+      {
+        "id": "flag-2",
+        "position": {
+          "x": 39.60821772180498,
+          "z": 24.31704222969711
+        },
+        "collected": false
+      },
+      {
+        "id": "flag-3",
+        "position": {
+          "x": -11.609525902196765,
+          "z": 70.08837599866092
+        },
+        "collected": false
+      },
+      {
+        "id": "flag-4",
+        "position": {
+          "x": 59.58907453715801,
+          "z": -71.06535390764475
+        },
+        "collected": false
+      },
+      {
+        "id": "flag-5",
+        "position": {
+          "x": -69.95959266833961,
+          "z": 54.81463869847357
+        },
+        "collected": false
+      },
+      {
+        "id": "flag-6",
+        "position": {
+          "x": -27.608189651742578,
+          "z": 33.49044111929834
+        },
+        "collected": false
+      },
+      {
+        "id": "flag-7",
+        "position": {
+          "x": 68.8750458266586,
+          "z": 11.836426576599479
+        },
+        "collected": false
+      },
+      {
+        "id": "flag-8",
+        "position": {
+          "x": -58.710400158539414,
+          "z": 71.18011444620788
+        },
+        "collected": false
+      },
+      {
+        "id": "flag-9",
+        "position": {
+          "x": 42.18513999320567,
+          "z": -25.281080449
+        },
+        "collected": false
+      }
+    ],
+    "pickups": [
+      {
+        "id": "pickup-0",
+        "kind": "ammo",
+        "amount": 20,
+        "position": {
+          "x": 12.928410030901432,
+          "z": -40.816576171666384
+        },
+        "collected": false
+      },
+      {
+        "id": "pickup-1",
+        "kind": "ammo",
+        "amount": 20,
+        "position": {
+          "x": -37.42651786468923,
+          "z": -77.0806328188628
+        },
+        "collected": false
+      },
+      {
+        "id": "pickup-2",
+        "kind": "ammo",
+        "amount": 20,
+        "position": {
+          "x": -48.65533908456564,
+          "z": 49.877829398959875
+        },
+        "collected": false
+      },
+      {
+        "id": "pickup-3",
+        "kind": "ammo",
+        "amount": 20,
+        "position": {
+          "x": 82.85194275155663,
+          "z": -88.35925150103867
+        },
+        "collected": false
+      },
+      {
+        "id": "pickup-4",
+        "kind": "shield",
+        "amount": 25,
+        "position": {
+          "x": 79.66125079803169,
+          "z": 33.553418565541506
+        },
+        "collected": false
+      },
+      {
+        "id": "pickup-5",
+        "kind": "shield",
+        "amount": 25,
+        "position": {
+          "x": 17.239724239334464,
+          "z": 46.73210511729121
+        },
+        "collected": false
+      },
+      {
+        "id": "pickup-6",
+        "kind": "shield",
+        "amount": 25,
+        "position": {
+          "x": 42.67814178019762,
+          "z": -61.12852630764246
+        },
+        "collected": false
+      },
+      {
+        "id": "pickup-7",
+        "kind": "shield",
+        "amount": 25,
+        "position": {
+          "x": 66.32963496260345,
+          "z": 71.7447817157954
+        },
+        "collected": false
+      }
+    ],
+    "flagsCollected": 0,
+    "enemies": [
+      {
+        "id": "enemy-L3-0",
+        "position": {
+          "x": -15.89920503706479,
+          "z": 79.64629172740703
+        },
+        "prevPosition": {
+          "x": -16.041510916942457,
+          "z": 80.20053653627508
+        },
+        "heading": 2.890265241302612,
+        "prevHeading": 2.827433388230816,
+        "speed": 17.166666666666654,
+        "shield": 3,
+        "maxShield": 3,
+        "ammo": 999999,
+        "maxAmmo": 999999,
+        "alive": true,
+        "fireCooldown": 0,
+        "grenadeCooldown": 0,
+        "invulnerableTicks": 0,
+        "lastHitBy": null,
+        "respawnTicksRemaining": 0,
+        "kind": "drone",
+        "aiState": "PURSUE",
+        "stuckTicks": 0,
+        "unstickTicksRemaining": 0,
+        "unstickTurnDir": 1
+      },
+      {
+        "id": "enemy-L3-1",
+        "position": {
+          "x": -75.5011109024515,
+          "z": 94.07405757126887
+        },
+        "prevPosition": {
+          "x": -75.5053378203017,
+          "z": 94.07543098013275
+        },
+        "heading": 1.884955592153877,
+        "prevHeading": 1.822123739082081,
+        "speed": 0.13333333333333386,
+        "shield": 3,
+        "maxShield": 3,
+        "ammo": 999999,
+        "maxAmmo": 999999,
+        "alive": true,
+        "fireCooldown": 0,
+        "grenadeCooldown": 0,
+        "invulnerableTicks": 0,
+        "lastHitBy": null,
+        "respawnTicksRemaining": 0,
+        "kind": "drone",
+        "aiState": "UNSTICK",
+        "stuckTicks": 0,
+        "unstickTicksRemaining": 20,
+        "unstickTurnDir": 1
+      },
+      {
+        "id": "enemy-L3-2",
+        "position": {
+          "x": 83.78584328374626,
+          "z": 87.126654532925
+        },
+        "prevPosition": {
+          "x": 83.76470380883806,
+          "z": 86.79065220102082
+        },
+        "heading": 0.06283185307179587,
+        "prevHeading": 0,
+        "speed": 10.099999999999987,
+        "shield": 3,
+        "maxShield": 3,
+        "ammo": 999999,
+        "maxAmmo": 999999,
+        "alive": true,
+        "fireCooldown": 0,
+        "grenadeCooldown": 0,
+        "invulnerableTicks": 0,
+        "lastHitBy": null,
+        "respawnTicksRemaining": 0,
+        "kind": "drone",
+        "aiState": "PURSUE",
+        "stuckTicks": 0,
+        "unstickTicksRemaining": 0,
+        "unstickTurnDir": 1
+      }
+    ],
+    "projectiles": [],
+    "grenades": [],
+    "score": 0,
+    "bonusRemaining": 492,
+    "winner": null,
+    "gameOver": false,
+    "god": false,
+    "enemyFriendlyFire": true,
+    "nextEntityId": 0,
+    "events": []
+  },
+  "plan": {
+    "id": "guard:flag-8",
+    "description": "Guard visible flag flag-8 from a12-unit stand-off vantage; watch for approaching opposing player, do not collect; travel 16 units at 39 degrees relative heading; known obstacle route clear",
+    "waypoint": {
+      "x": -65.82633490704205,
+      "z": 80.84259200918585
+    },
+    "fire": false,
+    "expiresTick": 68
+  }
+}

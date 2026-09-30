@@ -654,18 +654,17 @@ export function step(state: GameState, commands: Record<string, Command>, drops:
     const decision = external ? { ...external, command: { ...external.command } } : enemyCommand(enemy, state, levelCfg);
     if (external) {
       if (enemy.fireCooldown > 0) enemy.fireCooldown--;
-      if (enemy.unstickTicksRemaining > 0) {
-        enemy.unstickTicksRemaining--;
-        if (enemy.unstickTicksRemaining <= 0) enemy.stuckTicks = 0;
-        decision.command = { turn: enemy.unstickTurnDir, thrust: -1, fire: false, grenade: false };
-        enemy.aiState = 'UNSTICK';
-      } else enemy.aiState = 'PURSUE';
+      // External controllers own movement recovery and already guard every command.
+      // Scripted UNSTICK must never replace their brake/turn intent.
+      enemy.unstickTicksRemaining = 0;
+      enemy.stuckTicks = 0;
+      enemy.aiState = 'PURSUE';
     }
     const moveParams = movementParamsForEnemy(enemy.kind, levelCfg);
     applyMovement(enemy, decision.command, moveParams);
     resolveObstacleCollisionsFor(enemy, state, ENEMY_TANK_RADIUS, events, false);
     resolveArenaBoundsFor(enemy, ENEMY_TANK_RADIUS, events, false);
-    updateStuckDetection(enemy, decision.command.thrust, state);
+    if (!external) updateStuckDetection(enemy, decision.command.thrust, state);
     if (decision.command.fire && (!external || (enemy.fireCooldown <= 0 && safeExternalEnemyShot(state, enemy)))) {
       if (external) {
         enemy.fireCooldown = levelCfg.enemyFireCooldownTicks + Math.floor(state.rng.next() * ENEMY_FIRE_COOLDOWN_JITTER_TICKS);

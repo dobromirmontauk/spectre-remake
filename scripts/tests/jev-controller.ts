@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import {createInitialState} from '../../src/sim/simulation.ts';
+import {readFileSync} from 'node:fs';
+import {createInitialState,step} from '../../src/sim/simulation.ts';
 import {observeTank} from '../../src/jev/observation.ts';
 import {buildCandidates,commandForPlan} from '../../src/jev/controller.ts';
 import {movementParamsForEnemy} from '../../src/sim/ai.ts';
@@ -115,3 +116,13 @@ let guardChoices=buildCandidates(observeTank(s,e.id,{seen:{}}));assert(!guardCho
 player.position={x:0,z:90};guardChoices=buildCandidates(observeTank(s,e.id,{seen:{}}));const peacefulGuard=guardChoices.find(c=>c.id==='guard:guardGoal');assert(peacefulGuard&&!peacefulGuard.fire,'peacefulflagguard remains');
 e.position={...peacefulGuard.waypoint};e.heading=Math.PI;
 const guardCmd=commandForPlan(s,e.id,peacefulGuard);assert(guardCmd.turn!==0,'arrivedguard explicitly turns toward knownflag');assert.equal(guardCmd.fire,false,'peacefulguard never blindfires');
+// Full serialized live sample: scripted UNSTICK must never replace guarded external commands.
+const replay=JSON.parse(readFileSync('scripts/tests/jev-edge-replay.json','utf8')) as {state:typeof s;plan:typeof plan};
+const rs=replay.state;rs.enemies=rs.enemies.filter(t=>t.id==='enemy-L3-1');const re=rs.enemies[0]!;rs.players[0]!.position={x:0,z:0};
+const originalHeading=re.heading;step(rs,{},[],{[re.id]:{command:{turn:0,thrust:0,fire:false,grenade:false},fireHeading:re.heading}});
+assert.equal(re.heading,originalHeading,'external neutral command cannot be overridden by pendingUNSTICK');
+assert.equal(re.unstickTicksRemaining,0,'external control clears scripted unsticking');
+for(let i=0;i<180;i++){const tick=rs.tick;const cmd=commandForPlan(rs,re.id,{...replay.plan,expiresTick:tick+30});step(rs,{},[],{[re.id]:{command:cmd,fireHeading:re.heading}});assert(!rs.events.some(e=>e.type==='ObstacleContact'||e.type==='TankContact'),'fullsimreplay externalcontrol remains collisionfree');assert(re.position.z<98.4,'realguard replay never contacts physical arena');}
+const forwardState=createInitialState(3,[{loadout:{speed:10,shields:100,ammo:100}}]);forwardState.obstacles=[];forwardState.enemies=[forwardState.enemies[0]!];const fe=forwardState.enemies[0]!;fe.position={x:0,z:0};fe.heading=0;fe.speed=0;fe.unstickTicksRemaining=25;fe.stuckTicks=100;forwardState.players[0]!.position={x:50,z:50};
+step(forwardState,{},[],{[fe.id]:{command:{turn:0,thrust:1,fire:false,grenade:false},fireHeading:0}});assert(fe.speed>0&&fe.heading===0,'external forward overrides stale scriptedrecovery');
+console.log('Serialized live UNSTICK edge replay180ticks no contacts; externalneutral+forward exactintent respected');
