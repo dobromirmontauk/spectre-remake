@@ -24,3 +24,5 @@ const shared=squad.getObservation(squadState.enemies[1]!.id)!;assert.ok(shared.c
 assert.ok(!squad.getObservation('player')!.contacts.some(c=>c.id==='player'),'enemy player reports never enter player commander contacts');
 squad.update(squadState,1000,true,true,true);await flush();assert.equal(squad.getObservation(squadState.enemies[0]!.id)!.own.lastStrategy,squad.getStats().latestStrategies[squadState.enemies[0]!.id]);
 console.log('Level5 actual ally reports and accepted prior strategy context pass.');
+const playerIntel=squad.getObservation('player')!;const enemyIntel=playerIntel.contacts.filter(c=>c.kind==='tank'&&c.team==='enemy');
+assert.ok(enemyIntel.length>0);assert.ok(enemyIntel.every(c=>c.strategy===squad.getStats().latestStrategies[c.id]),'tier5 player testing commander receives each AI enemy last accepted strategy');

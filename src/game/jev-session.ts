@@ -129,7 +129,7 @@ export class JevSession {
     });
     const payload = tanks.map(tank => {
       const memory = this.memories[tank.id] ??= { seen: {} };
-      const observation = observeTank(state, tank.id, memory, { sharedSightings: state.enemies.some(e => e.id === tank.id) ? sharedSightings : [], strategies: state.enemies.some(e => e.id === tank.id) ? this.acceptedStrategies : this.acceptedStrategies[tank.id] ? { [tank.id]: this.acceptedStrategies[tank.id]! } : {} });
+      const observation = observeTank(state, tank.id, memory, { sharedSightings: state.enemies.some(e => e.id === tank.id) ? sharedSightings : [], strategies: this.acceptedStrategies });
       this.observations[tank.id] = observation;
       const choices = buildCandidates(observation); candidates[tank.id] = choices;
       return { tankId: tank.id, role: tank.id === player?.id ? 'player' : 'enemy', observation, candidates: choices.map(c => ({ id: c.id, description: c.description })) };
