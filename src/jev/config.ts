@@ -11,3 +11,6 @@ export const SHORT_PATH_PREDICTION_TICKS = 8;
 export const BODY_SPACING = 6.5;
 // Deadzone must exceed half one motor turn step to avoid overshoot alternation.
 export const TURN_DEADZONE_EPSILON = 0.005;
+
+export const EXPIRED_AIM_GRACE_TICKS = 6;
+export const HOLD_ALLY_FRESH_TICKS = 15;

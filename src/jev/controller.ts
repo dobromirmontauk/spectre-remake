@@ -9,7 +9,7 @@ import { movementParamsForEnemy } from '../sim/ai.ts';
 import { levelConfig } from '../config/levels.ts';
 import { findTank,distance,angleDelta,blocked } from './observation.ts';
 import { clearNavigationSegment } from './navigation.ts';
-import { PLAN_TICKS, SAFETY_MARGIN, LOOKAHEAD_SECONDS, SHORT_PATH_PREDICTION_TICKS, BODY_SPACING, TURN_DEADZONE_EPSILON } from './config.ts';
+import { PLAN_TICKS, SAFETY_MARGIN, LOOKAHEAD_SECONDS, SHORT_PATH_PREDICTION_TICKS, BODY_SPACING, TURN_DEADZONE_EPSILON, EXPIRED_AIM_GRACE_TICKS, HOLD_ALLY_FRESH_TICKS } from './config.ts';
 import type { TankObservation,TacticalPlan,Strategy } from './types.ts';
 export function buildCandidates(o:TankObservation,motorOrigin?:Vec2):TacticalPlan[] {
  const plans:TacticalPlan[]=[]; const origin=motorOrigin??o.own.position;
@@ -27,7 +27,8 @@ export function buildCandidates(o:TankObservation,motorOrigin?:Vec2):TacticalPla
    const d=distance(origin,c.position),dx=(origin.x-c.position.x)/Math.max(d,1),dz=(origin.z-c.position.z)/Math.max(d,1);
    const ownSight=c.source===undefined||c.source==='own';
    const targetDescription=ownSight?'visible target '+c.id:'spotter-reported target '+c.id+' at last reported position (age '+(c.ageSeconds??Math.max(0,(o.own.tick-c.seenTick)/30))+' seconds)';
-   if(ownSight&&!blocked(origin,c.position,o.geometry)){
+   const friendlyLaneBlocked=o.contacts.some(ally=>ally.kind==='tank'&&ally.id!==o.own.id&&ally.team===o.own.team&&o.own.tick-ally.seenTick<=HOLD_ALLY_FRESH_TICKS&&ally.seenTick<=o.own.tick&&(ally.ageSeconds===undefined||ally.ageSeconds<=HOLD_ALLY_FRESH_TICKS/30)&&segmentVsCircle(origin,c.position,ally.position,TANK_RADIUS+PROJECTILE_RADIUS+SAFETY_MARGIN).hit);
+   if(ownSight&&!friendlyLaneBlocked&&!blocked(origin,c.position,o.geometry)){
     add('hold:'+c.id,'Hold current vantage, aim and fire at '+targetDescription,origin,true,c.id);
     const hold=plans.find(p=>p.id==='hold:'+c.id);
     if(hold)hold.lookAt={...c.position};
@@ -95,6 +96,9 @@ export interface SafetyDiagnostics { wallAvoided:number; tankAvoided:number; all
 export function commandForPlan(state:GameState,tankId:string,plan:TacticalPlan|null,diagnostics?:SafetyDiagnostics):Command {
  const tank=findTank(state,tankId);const neutral:Command={turn:0,thrust:0,fire:false,grenade:false};if(!tank||!tank.alive)return neutral;
  const missingPlan=!plan||plan.expiresTick<state.tick;
+ // A short response gap should preserve aim at rest, not scan away then reacquire.
+ // No stale target coordinates or firing permission survive expiry.
+ const briefExpiry=!!plan&&missingPlan&&state.tick-plan.expiresTick<=EXPIRED_AIM_GRACE_TICKS;
  if(missingPlan)plan={id:'timeout-scan',description:'Locally brake/coast then survey',waypoint:{...tank.position},fire:false,expiresTick:state.tick};
  // Always run prediction even while the provider is unavailable.
  if(!plan)return neutral;
@@ -109,7 +113,7 @@ export function commandForPlan(state:GameState,tankId:string,plan:TacticalPlan|n
  const turnTolerance=Math.max(.045,params.turnRate/60+TURN_DEADZONE_EPSILON);
  let turn:Command['turn']=Math.abs(delta)<turnTolerance?0:delta>0?1:-1;
  let thrust:Command['thrust']=d>3&&Math.abs(delta)<.7?1:0;
- if(missingPlan||plan.id==='scan'){turn=Math.abs(tank.speed)<.1?1:0;thrust=0;}
+ if(missingPlan||plan.id==='scan'){turn=briefExpiry?0:Math.abs(tank.speed)<.1?1:0;thrust=0;}
  const all=[...state.players,...state.enemies];
  // Tactile spacing reflex: move away from close hulls instead of accepting mutual idle.
  const nearby=all.filter(t=>{

@@ -51,3 +51,11 @@ Body prediction retains the full 0.65-second command horizon even when a short w
 The steering deadzone exceeds half the tank's actual per-tick turn increment. This prevents a fixed aim point from alternating motor turns every frame, without masking turns in telemetry.
 
 Recorded fixtures come from `reference/verification/jev-v2/level5` of the lead's source-9b42 run. The contact fixture starts at sampled tick1922, with all hull poses overwritten from the exact action records; subsequent sampled accepted-plan updates are replayed. Baseline reproduces the first contact exactly at tick1964. The fixed 180-tick replay has zero tank contacts. The independent stationary fixture starts at action tick389; baseline produces103 oscillation windows, while the fixed180-tick replay produces zero. Quiet fixtures suppress weapons intentionally and do not claim live paid-model acceptance. Existing expanded-margin recovery, low-tier valid-spawn motion, patrol, and stopping invariants remain green.
+
+### Brief expiry and obstructed holds
+
+A stationary hold is excluded when a fresh friendly commander contact occupies the corridor from the motor origin to the currently observed target. It uses contacts no older than15ticks, not memory or hidden simulation bodies; shared opposing sightings still cannot enable a hold. Moving flank/engage alternatives and the independent physical firing guard remain available.
+
+For an expired accepted plan, the executor preserves current heading without firing for at most6ticks (0.2seconds), while continuing physical braking/spacing checks. It then resumes the usual survey fallback. No hidden target coordinates are followed during grace, and a missing initial plan has no grace.
+
+The minimal code fixture reproduces the final b73d865 run's60tick target poses and acceptance expiry timing at390–449. Baseline generates four scan/reacquire reversals and offers a blocked hold. The fixed fixture generates zero reversals and zero shots through the ally. Tests cover fresh own/shared ally reports, stale reports, memory-only positions, unknown affiliation, shared opposing sightings, hidden target changes, and bounded expiry.
