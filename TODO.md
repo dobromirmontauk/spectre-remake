@@ -2,17 +2,19 @@
 
 ## Current Objective
 
-Draft the Spectre blog / LinkedIn post for user review. Optional Jev intelligence and audit code is landed and locally verified; approved recordings, action traces and full call examples are archived under `test/validation/jev-ai/2026-09-30/`. Public Cloudflare remains the original static game. Preserve the cumulative $10 ledger and 2 Hz / three-enemy-plus-player limits for future local experiments.
+Review `PROJECT-SUMMARY.md` and adapt it into a Spectre blog / LinkedIn post for user approval. Optional Jev intelligence and audit code is landed and locally verified; approved recordings, action traces and full call examples are archived under `test/validation/jev-ai/2026-09-30/`. Public Cloudflare remains the original static game. Preserve the cumulative $10 ledger and 2 Hz / three-enemy-plus-player limits for future local experiments.
 
 ## Next Steps
 
 - [x] Identify Jev and Luna Decisions APIs; documented verified capabilities, pricing, limits, and unknown Luna preview contract in `research-agent-model-apis/notes/api-evaluation.md`.
-- [ ] **Publish a blog post / LinkedIn post about Spectre.** Include the live game link, a gameplay screenshot, the inspiration from the 1991 Mac game, and local/network multiplayer. Draft for user review before posting.
+- [ ] **Publish a blog post / LinkedIn post about Spectre.** Include the live game link, a gameplay screenshot, the inspiration from the 1991 Mac game, and local/network multiplayer. Publishable project summary and performance/cost record: `PROJECT-SUMMARY.md`. Adapt for the chosen channel and obtain user review before posting.
 - [ ] Human playtest optional Jev mode: challenge, guarding/stall duration, recoverable close calls and navigation in dense levels. Targets and limitations: `JEV-DESIGN.md`; latest measured results: `test/validation/jev-ai/2026-09-30/EVALUATION.md`.
 - [ ] Evaluate an authenticated, budget-controlled production AI backend if the local mode is selected for publication. Current public Pages build remains the original static game.
 - [ ] Revisit Luna Decisions when its official API contract and account access become available; benchmark against Jev and deterministic AI as a separate experiment.
 
 ## Last Progress
+
+- 2026-09-30 — Wrote `PROJECT-SUMMARY.md`: publishable game/AI overview, measured final cadence and batch latency, safety/behavior results, token-derived operating costs, failure-driven design lessons and remaining playtest limits. All figures checked against archived run traces; no new paid calls or public post.
 
 - 2026-09-30 — Added tiered intelligence, dated tracks, defensive patrol and fear, personalities, persistent full provider/browser audits, and collapsed live log. Lead found and fixed actual spawn/margin, shared-hold, moving-body collision, projectile friendly-fire, expired-hold, and malformed-response failures. Build/controller/session/backend tests and live UI tier/log checks pass; final 120s Level 5 has zero contacts, friendly fire and stationary oscillation windows, 1.90 accepted Hz/tank, five flags, two enemy kills and no player death. Full-session spacing and expiry regressions pass. Cumulative ledger $1.612480 of $10; never reset it. User-approved validation evidence committed under `test/validation/jev-ai/2026-09-30/`; index: `test/validation/README.md`.
 
