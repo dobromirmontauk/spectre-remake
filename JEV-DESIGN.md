@@ -27,7 +27,7 @@ Jev chooses a finite maneuver, not arbitrary controls or executable code. Player
 
 ## Information boundary
 
-The commander always has its own operating status and local vision: contacts within 65 units, a 234-degree forward arc and unobstructed line of sight, plus visible obstacle geometry or four-unit tactile geometry. Intelligence deliberately expands with campaign level:
+The commander always has its own operating status, public total/remaining flag counts, and local vision: contacts within 65 units, a 234-degree forward arc and unobstructed line of sight, plus visible obstacle geometry or four-unit tactile geometry. Intelligence deliberately expands with campaign level:
 
 | Level | Authorized map and squad knowledge |
 | --- | --- |
@@ -37,7 +37,7 @@ The commander always has its own operating status and local vision: contacts wit
 
 Tank tracks record their last observed position and heading, observation tick/time, age relative to the current game time, and whether the sighting came from the commander or a shared spotter. Hidden moving targets retain their last observation; they do not acquire fresh coordinates or headings merely because game time advances. No tier reveals opponent health/ammo, RNG or the complete simulation.
 
-Enemies without a visible opponent should patrol a defensive circuit around a known flag and look outward for the player. Protecting a flag remains a distinct deliberate choice. Recent incoming fire and low shield prioritize retreat or regrouping over pursuit. Tactical strategy and maneuver are recorded separately, so several local maneuvers can implement the same survival or patrol strategy.
+Enemy mission instructions explicitly say to stop the player taking their flags. Two or fewer remaining flags increase interception urgency without bypassing survival or safety rules. Healthy enemies without a visible opponent receive progressing patrol/exploration choices; automatic idle guarding and peaceful regrouping are excluded after recorded tests showed long stationary stretches. Enemies without a visible opponent should patrol a defensive circuit around a known flag and look outward for the player. Protecting a flag remains a distinct deliberate choice. Recent incoming fire and low shield prioritize retreat or regrouping over pursuit. Tactical strategy and maneuver are recorded separately, so several local maneuvers can implement the same survival or patrol strategy.
 
 Each upstream request contains **one tank's perspective only**. Multiple Jev questions share state, so combining all perspectives into one provider call would violate the boundary. Browser batching saves local transport overhead only. At four tanks and 2 Hz, the nominal load is eight provider calls/second. Two upstream calls may run concurrently.
 

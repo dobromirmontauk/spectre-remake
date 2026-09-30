@@ -1,0 +1,464 @@
+{
+  "tick": 0,
+  "level": 2,
+  "rng": {
+    "state": 1590157602
+  },
+  "mode": "solo",
+  "players": [
+    {
+      "id": "player",
+      "slot": 0,
+      "position": {
+        "x": 0,
+        "z": 0
+      },
+      "prevPosition": {
+        "x": 0,
+        "z": 0
+      },
+      "heading": 0,
+      "prevHeading": 0,
+      "speed": 0,
+      "shield": 100,
+      "maxShield": 100,
+      "ammo": 80,
+      "maxAmmo": 80,
+      "alive": true,
+      "fireCooldown": 0,
+      "grenadeCooldown": 0,
+      "invulnerableTicks": 0,
+      "lastHitBy": null,
+      "respawnTicksRemaining": 0,
+      "lives": 3,
+      "kills": 0,
+      "loadout": {
+        "id": "balanced",
+        "name": "Balanced",
+        "speed": 9,
+        "shields": 100,
+        "ammo": 80
+      },
+      "movement": {
+        "turnRate": 2.827433388230814,
+        "thrustAccel": 40,
+        "reverseAccel": 26,
+        "coastFriction": 18,
+        "maxSpeed": 18,
+        "maxReverseSpeed": 14
+      },
+      "name": "Player 1",
+      "removed": false
+    }
+  ],
+  "obstacles": [
+    {
+      "id": "wall-0",
+      "kind": "wall",
+      "min": {
+        "x": -62.74952761642635,
+        "z": -39.71249286388047
+      },
+      "max": {
+        "x": -56.51015956886113,
+        "z": -34.46539232949726
+      }
+    },
+    {
+      "id": "wall-1",
+      "kind": "wall",
+      "min": {
+        "x": 30.66611822345294,
+        "z": -85.95716075692326
+      },
+      "max": {
+        "x": 36.45203574351035,
+        "z": -80.5575628420338
+      }
+    },
+    {
+      "id": "wall-2",
+      "kind": "wall",
+      "min": {
+        "x": 17.52998363506049,
+        "z": 56.791275813477114
+      },
+      "max": {
+        "x": 25.818978157825768,
+        "z": 65.84275827254169
+      }
+    },
+    {
+      "id": "wall-3",
+      "kind": "wall",
+      "min": {
+        "x": -9.689488736214116,
+        "z": -93.46994148404337
+      },
+      "max": {
+        "x": -3.7202602203469723,
+        "z": -89.16524005471729
+      }
+    },
+    {
+      "id": "wall-4",
+      "kind": "wall",
+      "min": {
+        "x": -44.04489664034918,
+        "z": 81.89613274345174
+      },
+      "max": {
+        "x": -34.05452803103253,
+        "z": 88.27195842331275
+      }
+    },
+    {
+      "id": "wall-5",
+      "kind": "wall",
+      "min": {
+        "x": -76.75950038712472,
+        "z": -73.89484484004788
+      },
+      "max": {
+        "x": -67.81573814246804,
+        "z": -64.62678075325675
+      }
+    },
+    {
+      "id": "wall-6",
+      "kind": "wall",
+      "min": {
+        "x": -14.677273588255048,
+        "z": 62.481046616332605
+      },
+      "max": {
+        "x": -8.315377751365304,
+        "z": 67.0115280940663
+      }
+    },
+    {
+      "id": "wall-7",
+      "kind": "wall",
+      "min": {
+        "x": -28.880113458260894,
+        "z": -43.84263721527532
+      },
+      "max": {
+        "x": -22.267553264275193,
+        "z": -33.98754769517109
+      }
+    },
+    {
+      "id": "windmill-0",
+      "kind": "windmill",
+      "position": {
+        "x": 57.33628724887967,
+        "z": 30.127064300701022
+      },
+      "pylonRadius": 1.2,
+      "bladeLength": 6,
+      "bladeAngle": 3.427987077055662,
+      "prevBladeAngle": 3.427987077055662
+    },
+    {
+      "id": "windmill-1",
+      "kind": "windmill",
+      "position": {
+        "x": 91.42459548823535,
+        "z": 45.420604607090354
+      },
+      "pylonRadius": 1.2,
+      "bladeLength": 6,
+      "bladeAngle": 2.3371243977435916,
+      "prevBladeAngle": 2.3371243977435916
+    },
+    {
+      "id": "windmill-2",
+      "kind": "windmill",
+      "position": {
+        "x": -25.65481899678707,
+        "z": 39.353815542533994
+      },
+      "pylonRadius": 1.2,
+      "bladeLength": 6,
+      "bladeAngle": 3.709880651648824,
+      "prevBladeAngle": 3.709880651648824
+    },
+    {
+      "id": "windmill-3",
+      "kind": "windmill",
+      "position": {
+        "x": 79.53405022248626,
+        "z": 85.52027777582407
+      },
+      "pylonRadius": 1.2,
+      "bladeLength": 6,
+      "bladeAngle": 1.745889632842473,
+      "prevBladeAngle": 1.745889632842473
+    }
+  ],
+  "flags": [
+    {
+      "id": "flag-0",
+      "position": {
+        "x": -67.68947107717395,
+        "z": -5.908587958663702
+      },
+      "collected": false
+    },
+    {
+      "id": "flag-1",
+      "position": {
+        "x": 53.68462907336652,
+        "z": -64.89095499739051
+      },
+      "collected": false
+    },
+    {
+      "id": "flag-2",
+      "position": {
+        "x": 75.82458124868572,
+        "z": 6.780649039894342
+      },
+      "collected": false
+    },
+    {
+      "id": "flag-3",
+      "position": {
+        "x": 71.4071187954396,
+        "z": -19.774576721712947
+      },
+      "collected": false
+    },
+    {
+      "id": "flag-4",
+      "position": {
+        "x": -49.9467303622514,
+        "z": 51.78829988092184
+      },
+      "collected": false
+    },
+    {
+      "id": "flag-5",
+      "position": {
+        "x": -74.8918682076037,
+        "z": 72.86521380022168
+      },
+      "collected": false
+    },
+    {
+      "id": "flag-6",
+      "position": {
+        "x": -81.73513847216964,
+        "z": 35.66882745176554
+      },
+      "collected": false
+    },
+    {
+      "id": "flag-7",
+      "position": {
+        "x": 35.52153332345188,
+        "z": -54.98343498632312
+      },
+      "collected": false
+    },
+    {
+      "id": "flag-8",
+      "position": {
+        "x": 65.5797106269747,
+        "z": -43.317752841860056
+      },
+      "collected": false
+    },
+    {
+      "id": "flag-9",
+      "position": {
+        "x": 66.94592612795532,
+        "z": -82.75605214573443
+      },
+      "collected": false
+    }
+  ],
+  "pickups": [
+    {
+      "id": "pickup-0",
+      "kind": "ammo",
+      "amount": 20,
+      "position": {
+        "x": 49.10065966099501,
+        "z": 70.47950398549438
+      },
+      "collected": false
+    },
+    {
+      "id": "pickup-1",
+      "kind": "ammo",
+      "amount": 20,
+      "position": {
+        "x": 1.3083459250628948,
+        "z": 83.30673972144723
+      },
+      "collected": false
+    },
+    {
+      "id": "pickup-2",
+      "kind": "ammo",
+      "amount": 20,
+      "position": {
+        "x": 90.82619795575738,
+        "z": -79.13022643886507
+      },
+      "collected": false
+    },
+    {
+      "id": "pickup-3",
+      "kind": "ammo",
+      "amount": 20,
+      "position": {
+        "x": -88.40116496384144,
+        "z": 15.424968587234616
+      },
+      "collected": false
+    },
+    {
+      "id": "pickup-4",
+      "kind": "shield",
+      "amount": 25,
+      "position": {
+        "x": -48.47638450562954,
+        "z": -63.43297797627747
+      },
+      "collected": false
+    },
+    {
+      "id": "pickup-5",
+      "kind": "shield",
+      "amount": 25,
+      "position": {
+        "x": 49.40183598175645,
+        "z": -27.324915574863553
+      },
+      "collected": false
+    },
+    {
+      "id": "pickup-6",
+      "kind": "shield",
+      "amount": 25,
+      "position": {
+        "x": -3.9671178460121155,
+        "z": -67.06902816332877
+      },
+      "collected": false
+    },
+    {
+      "id": "pickup-7",
+      "kind": "shield",
+      "amount": 25,
+      "position": {
+        "x": 33.99724793806672,
+        "z": 81.45678453706205
+      },
+      "collected": false
+    }
+  ],
+  "flagsCollected": 0,
+  "enemies": [
+    {
+      "id": "enemy-L2-0",
+      "position": {
+        "x": -39.21084974613041,
+        "z": 94
+      },
+      "prevPosition": {
+        "x": -39.21084974613041,
+        "z": 94
+      },
+      "heading": 0,
+      "prevHeading": 0,
+      "speed": 0,
+      "shield": 3,
+      "maxShield": 3,
+      "ammo": 999999,
+      "maxAmmo": 999999,
+      "alive": true,
+      "fireCooldown": 0,
+      "grenadeCooldown": 0,
+      "invulnerableTicks": 0,
+      "lastHitBy": null,
+      "respawnTicksRemaining": 0,
+      "kind": "drone",
+      "aiState": "PURSUE",
+      "stuckTicks": 0,
+      "unstickTicksRemaining": 0,
+      "unstickTurnDir": 1
+    },
+    {
+      "id": "enemy-L2-1",
+      "position": {
+        "x": 56.86417611222714,
+        "z": 94
+      },
+      "prevPosition": {
+        "x": 56.86417611222714,
+        "z": 94
+      },
+      "heading": 0,
+      "prevHeading": 0,
+      "speed": 0,
+      "shield": 3,
+      "maxShield": 3,
+      "ammo": 999999,
+      "maxAmmo": 999999,
+      "alive": true,
+      "fireCooldown": 0,
+      "grenadeCooldown": 0,
+      "invulnerableTicks": 0,
+      "lastHitBy": null,
+      "respawnTicksRemaining": 0,
+      "kind": "drone",
+      "aiState": "PURSUE",
+      "stuckTicks": 0,
+      "unstickTicksRemaining": 0,
+      "unstickTurnDir": 1
+    },
+    {
+      "id": "enemy-L2-2",
+      "position": {
+        "x": -37.12279755529016,
+        "z": 94
+      },
+      "prevPosition": {
+        "x": -37.12279755529016,
+        "z": 94
+      },
+      "heading": 0,
+      "prevHeading": 0,
+      "speed": 0,
+      "shield": 3,
+      "maxShield": 3,
+      "ammo": 999999,
+      "maxAmmo": 999999,
+      "alive": true,
+      "fireCooldown": 0,
+      "grenadeCooldown": 0,
+      "invulnerableTicks": 0,
+      "lastHitBy": null,
+      "respawnTicksRemaining": 0,
+      "kind": "drone",
+      "aiState": "PURSUE",
+      "stuckTicks": 0,
+      "unstickTicksRemaining": 0,
+      "unstickTurnDir": 1
+    }
+  ],
+  "projectiles": [],
+  "grenades": [],
+  "score": 0,
+  "bonusRemaining": 500,
+  "winner": null,
+  "gameOver": false,
+  "god": false,
+  "enemyFriendlyFire": true,
+  "nextEntityId": 0,
+  "events": []
+}

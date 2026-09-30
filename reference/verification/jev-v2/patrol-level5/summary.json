@@ -1,0 +1,572 @@
+{
+  "mocked": false,
+  "level": 5,
+  "duration": 90,
+  "actions": 9824,
+  "metrics": {
+    "requests": 171,
+    "maxRequestedTanks": 4,
+    "modelDecisions": 615,
+    "modelCommandTicks": 9384,
+    "fallbackTicks": 440,
+    "staleResponses": 0,
+    "failures": 1,
+    "inputTokens": 2336900,
+    "spentUsd": 0.8925922739999788,
+    "latencyMs": 689.6999999880791,
+    "wallHits": 0,
+    "obstacleContacts": 0,
+    "tankContacts": 0,
+    "friendlyFireHits": 0,
+    "friendlyFireDamage": 0,
+    "playerDamage": 132,
+    "enemyProjectileDamage": 21,
+    "playerDeaths": 1,
+    "enemyDeaths": 7,
+    "shots": 46,
+    "flags": 8,
+    "closeCallTicks": 94,
+    "tankContactTicks": 0,
+    "stationaryTicks": 0,
+    "observedTicks": 2666,
+    "interventions": {
+      "wallAvoided": 2159,
+      "tankAvoided": 0,
+      "allyShotAvoided": 147
+    },
+    "enabled": false,
+    "playerAutopilot": false,
+    "hz": 2,
+    "activeSeconds": 90.2511999999821,
+    "activeTankSeconds": {
+      "enemy": 243.3047999999469,
+      "player": 90.2511999999821
+    },
+    "acceptedHzPerTank": 1.8437683627340864,
+    "acceptedHzByRole": {
+      "enemy": 1.8330916611595716,
+      "player": 1.8725512790969372
+    },
+    "latencySamplesMs": [
+      643.8000000119209,
+      425.09999999403954,
+      321.39999997615814,
+      478.2999999821186,
+      326.80000001192093,
+      361.09999999403954,
+      394.39999997615814,
+      364,
+      460.39999997615814,
+      484.39999997615814,
+      344,
+      306.2999999821186,
+      324.40000000596046,
+      330,
+      333.5,
+      320.5,
+      367.80000001192093,
+      329.19999998807907,
+      424,
+      386.59999999403954,
+      331.80000001192093,
+      387.2000000178814,
+      324.19999998807907,
+      327.69999998807907,
+      359.59999999403954,
+      361.59999999403954,
+      343.7000000178814,
+      510,
+      459.69999998807907,
+      425.2000000178814,
+      466.80000001192093,
+      405.5,
+      506.59999999403954,
+      315,
+      515.1999999880791,
+      343,
+      369.09999999403954,
+      335.69999998807907,
+      408,
+      420.09999999403954,
+      343,
+      418.89999997615814,
+      300.30000001192093,
+      299.40000000596046,
+      330.59999999403954,
+      292.2000000178814,
+      341.59999999403954,
+      429,
+      322.90000000596046,
+      321.19999998807907,
+      346.60000002384186,
+      355.80000001192093,
+      337.2000000178814,
+      318.80000001192093,
+      347.39999997615814,
+      480.2000000178814,
+      372.40000000596046,
+      334.19999998807907,
+      305.39999997615814,
+      352.80000001192093,
+      333.5,
+      295.5,
+      315.2000000178814,
+      351.09999999403954,
+      362.5,
+      337.7999999821186,
+      331.5,
+      329.80000001192093,
+      314.5,
+      374.39999997615814,
+      435,
+      327.80000001192093,
+      334.80000001192093,
+      448.59999999403954,
+      337.80000001192093,
+      383.2999999821186,
+      444.5,
+      331.5,
+      361.09999999403954,
+      356.5,
+      335.2000000178814,
+      345.59999999403954,
+      334.40000000596046,
+      377.5,
+      340.5,
+      578.4000000059605,
+      358.7999999821186,
+      341,
+      425.39999997615814,
+      212.59999999403954,
+      186.40000000596046,
+      193.19999998807907,
+      194.7999999821186,
+      273.5,
+      348.7000000178814,
+      311.7000000178814,
+      455.10000002384186,
+      345.5,
+      353.7999999821186,
+      342.90000000596046,
+      351,
+      633.5999999940395,
+      365.5,
+      336.90000000596046,
+      352.10000002384186,
+      357.09999999403954,
+      331.19999998807907,
+      338.09999999403954,
+      421.69999998807907,
+      304.40000000596046,
+      464.40000000596046,
+      362.09999999403954,
+      334.69999998807907,
+      345.7999999821186,
+      316.90000000596046,
+      662.3999999761581,
+      308.30000001192093,
+      421,
+      402.69999998807907,
+      169.40000000596046,
+      209.2000000178814,
+      167.69999998807907,
+      159.09999999403954,
+      161.7000000178814,
+      286.2999999821186,
+      280.59999999403954,
+      302.39999997615814,
+      399.2000000178814,
+      311.09999999403954,
+      327.2000000178814,
+      334.19999998807907,
+      324.39999997615814,
+      401.30000001192093,
+      338.40000000596046,
+      396.80000001192093,
+      375.10000002384186,
+      536,
+      305.80000001192093,
+      330.09999999403954,
+      308.90000000596046,
+      303.7000000178814,
+      361.80000001192093,
+      327.09999999403954,
+      407.60000002384186,
+      346.90000000596046,
+      331.19999998807907,
+      437.19999998807907,
+      498.30000001192093,
+      557.0999999940395,
+      398,
+      352.80000001192093,
+      483.5,
+      379.2999999821186,
+      581.0999999940395,
+      545.2999999821186,
+      494.69999998807907,
+      412.89999997615814,
+      429.59999999403954,
+      342,
+      338.7999999821186,
+      336.40000000596046,
+      419.19999998807907,
+      330.09999999403954,
+      455.5,
+      435.59999999403954,
+      517.2999999821186,
+      662.8999999761581,
+      473.59999999403954,
+      689.6999999880791
+    ],
+    "latencyP50Ms": 346.90000000596046,
+    "latencyP95Ms": 545.2999999821186,
+    "appliedChoiceHistogram": {
+      "enemy:patrol:flag-8:approach:0": {
+        "role": "enemy",
+        "id": "patrol:flag-8:approach:0",
+        "category": "patrol",
+        "count": 22
+      },
+      "enemy:patrol:flag-1:-1": {
+        "role": "enemy",
+        "id": "patrol:flag-1:-1",
+        "category": "patrol",
+        "count": 13
+      },
+      "enemy:patrol:flag-1:approach:0": {
+        "role": "enemy",
+        "id": "patrol:flag-1:approach:0",
+        "category": "patrol",
+        "count": 4
+      },
+      "player:flag:flag-2": {
+        "role": "player",
+        "id": "flag:flag-2",
+        "category": "flag",
+        "count": 7
+      },
+      "enemy:patrol:flag-1:1": {
+        "role": "enemy",
+        "id": "patrol:flag-1:1",
+        "category": "patrol",
+        "count": 13
+      },
+      "enemy:patrol:flag-8:1": {
+        "role": "enemy",
+        "id": "patrol:flag-8:1",
+        "category": "patrol",
+        "count": 83
+      },
+      "player:flag:flag-9": {
+        "role": "player",
+        "id": "flag:flag-9",
+        "category": "flag",
+        "count": 7
+      },
+      "player:flag:flag-4": {
+        "role": "player",
+        "id": "flag:flag-4",
+        "category": "flag",
+        "count": 14
+      },
+      "enemy:hold:player": {
+        "role": "enemy",
+        "id": "hold:player",
+        "category": "hold",
+        "count": 94
+      },
+      "enemy:engage:player": {
+        "role": "enemy",
+        "id": "engage:player",
+        "category": "engage",
+        "count": 77
+      },
+      "player:flag:flag-1": {
+        "role": "player",
+        "id": "flag:flag-1",
+        "category": "flag",
+        "count": 11
+      },
+      "player:pickup:pickup-6": {
+        "role": "player",
+        "id": "pickup:pickup-6",
+        "category": "pickup",
+        "count": 6
+      },
+      "player:hold:enemy-L5-2": {
+        "role": "player",
+        "id": "hold:enemy-L5-2",
+        "category": "hold",
+        "count": 7
+      },
+      "player:engage:enemy-L5-0": {
+        "role": "player",
+        "id": "engage:enemy-L5-0",
+        "category": "engage",
+        "count": 1
+      },
+      "player:retreat:safe:0": {
+        "role": "player",
+        "id": "retreat:safe:0",
+        "category": "retreat",
+        "count": 7
+      },
+      "enemy:retreat:safe:0": {
+        "role": "enemy",
+        "id": "retreat:safe:0",
+        "category": "retreat",
+        "count": 8
+      },
+      "player:retreat:safe:1": {
+        "role": "player",
+        "id": "retreat:safe:1",
+        "category": "retreat",
+        "count": 5
+      },
+      "player:hold:enemy-L5-1": {
+        "role": "player",
+        "id": "hold:enemy-L5-1",
+        "category": "hold",
+        "count": 14
+      },
+      "enemy:retreat:safe:1": {
+        "role": "enemy",
+        "id": "retreat:safe:1",
+        "category": "retreat",
+        "count": 4
+      },
+      "player:engage:enemy-L5-1": {
+        "role": "player",
+        "id": "engage:enemy-L5-1",
+        "category": "engage",
+        "count": 3
+      },
+      "enemy:patrol:flag-7:1": {
+        "role": "enemy",
+        "id": "patrol:flag-7:1",
+        "category": "patrol",
+        "count": 7
+      },
+      "player:engage:enemy-L5-2": {
+        "role": "player",
+        "id": "engage:enemy-L5-2",
+        "category": "engage",
+        "count": 1
+      },
+      "player:pickup:pickup-2": {
+        "role": "player",
+        "id": "pickup:pickup-2",
+        "category": "pickup",
+        "count": 5
+      },
+      "enemy:patrol:flag-0:1": {
+        "role": "enemy",
+        "id": "patrol:flag-0:1",
+        "category": "patrol",
+        "count": 15
+      },
+      "enemy:patrol:flag-5:-1": {
+        "role": "enemy",
+        "id": "patrol:flag-5:-1",
+        "category": "patrol",
+        "count": 9
+      },
+      "enemy:patrol:flag-4:approach:0": {
+        "role": "enemy",
+        "id": "patrol:flag-4:approach:0",
+        "category": "patrol",
+        "count": 1
+      },
+      "enemy:patrol:flag-5:1": {
+        "role": "enemy",
+        "id": "patrol:flag-5:1",
+        "category": "patrol",
+        "count": 8
+      },
+      "enemy:patrol:flag-0:-1": {
+        "role": "enemy",
+        "id": "patrol:flag-0:-1",
+        "category": "patrol",
+        "count": 1
+      },
+      "player:retreat:safe:2": {
+        "role": "player",
+        "id": "retreat:safe:2",
+        "category": "retreat",
+        "count": 3
+      },
+      "player:retreat:enemy-L5-1": {
+        "role": "player",
+        "id": "retreat:enemy-L5-1",
+        "category": "retreat",
+        "count": 16
+      },
+      "player:pickup:pickup-4": {
+        "role": "player",
+        "id": "pickup:pickup-4",
+        "category": "pickup",
+        "count": 8
+      },
+      "player:pickup:pickup-5": {
+        "role": "player",
+        "id": "pickup:pickup-5",
+        "category": "pickup",
+        "count": 2
+      },
+      "enemy:patrol:flag-5:approach:0": {
+        "role": "enemy",
+        "id": "patrol:flag-5:approach:0",
+        "category": "patrol",
+        "count": 4
+      },
+      "enemy:patrol:flag-0:approach:0": {
+        "role": "enemy",
+        "id": "patrol:flag-0:approach:0",
+        "category": "patrol",
+        "count": 3
+      },
+      "enemy:patrol:flag-8:approach:2": {
+        "role": "enemy",
+        "id": "patrol:flag-8:approach:2",
+        "category": "patrol",
+        "count": 4
+      },
+      "player:flag:flag-6": {
+        "role": "player",
+        "id": "flag:flag-6",
+        "category": "flag",
+        "count": 9
+      },
+      "player:hold:enemy-L5-0": {
+        "role": "player",
+        "id": "hold:enemy-L5-0",
+        "category": "hold",
+        "count": 8
+      },
+      "enemy:scan": {
+        "role": "enemy",
+        "id": "scan",
+        "category": "scan",
+        "count": 65
+      },
+      "player:retreat:enemy-L5-0": {
+        "role": "player",
+        "id": "retreat:enemy-L5-0",
+        "category": "retreat",
+        "count": 1
+      },
+      "enemy:regroup:enemy-L5-0": {
+        "role": "enemy",
+        "id": "regroup:enemy-L5-0",
+        "category": "regroup",
+        "count": 1
+      },
+      "player:pickup:pickup-1": {
+        "role": "player",
+        "id": "pickup:pickup-1",
+        "category": "pickup",
+        "count": 7
+      },
+      "player:flag:flag-7": {
+        "role": "player",
+        "id": "flag:flag-7",
+        "category": "flag",
+        "count": 4
+      },
+      "player:flag:flag-0": {
+        "role": "player",
+        "id": "flag:flag-0",
+        "category": "flag",
+        "count": 4
+      },
+      "enemy:patrol:flag-8:approach:4": {
+        "role": "enemy",
+        "id": "patrol:flag-8:approach:4",
+        "category": "patrol",
+        "count": 10
+      },
+      "player:flag:flag-5": {
+        "role": "player",
+        "id": "flag:flag-5",
+        "category": "flag",
+        "count": 6
+      },
+      "player:flag:flag-3": {
+        "role": "player",
+        "id": "flag:flag-3",
+        "category": "flag",
+        "count": 9
+      },
+      "player:explore:1": {
+        "role": "player",
+        "id": "explore:1",
+        "category": "explore",
+        "count": 2
+      },
+      "player:explore:4": {
+        "role": "player",
+        "id": "explore:4",
+        "category": "explore",
+        "count": 1
+      },
+      "player:explore:0": {
+        "role": "player",
+        "id": "explore:0",
+        "category": "explore",
+        "count": 1
+      }
+    },
+    "latestPlans": {},
+    "latestStrategies": {},
+    "lastSafetyEvents": [],
+    "budgetExhausted": false,
+    "pending": false,
+    "status": "Disabled \u00b7 scripted AI",
+    "active": false
+  },
+  "realism": {
+    "enemy-L5-0": {
+      "seconds": 84.86666666666666,
+      "maxStationarySeconds": 13.033333333333333,
+      "turnReversals": 290,
+      "quickTurnFlips": 264,
+      "underFireTicks": 8,
+      "survivalStrategyTicks": 0,
+      "visibleOpponentTicks": 1114,
+      "fireCommandTicks": 136,
+      "pursuitTicks": 289,
+      "damageEvents": 2
+    },
+    "enemy-L5-1": {
+      "seconds": 72.86666666666666,
+      "maxStationarySeconds": 6.9,
+      "turnReversals": 113,
+      "quickTurnFlips": 79,
+      "underFireTicks": 202,
+      "survivalStrategyTicks": 135,
+      "visibleOpponentTicks": 1091,
+      "fireCommandTicks": 407,
+      "pursuitTicks": 576,
+      "damageEvents": 8
+    },
+    "enemy-L5-2": {
+      "seconds": 80.86666666666666,
+      "maxStationarySeconds": 34.3,
+      "turnReversals": 96,
+      "quickTurnFlips": 72,
+      "underFireTicks": 123,
+      "survivalStrategyTicks": 40,
+      "visibleOpponentTicks": 1051,
+      "fireCommandTicks": 209,
+      "pursuitTicks": 351,
+      "damageEvents": 4
+    }
+  },
+  "errors": [],
+  "notes": [
+    "Model choices and exact per-tick executor commands recorded separately.",
+    "Stationary uses abs(speed)<0.5; turn reversals are diagnostics requiring visual review, not automatically defects.",
+    "Opponents are last request observations; exact own visibility at execution may differ; safe fire requires current cannon alignment."
+  ],
+  "sourceRevision": "d3cf8ee145fe706d8475042039ef21a2a3eb2c8c"
+}
