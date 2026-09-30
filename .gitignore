@@ -2,3 +2,8 @@ node_modules/
 dist/
 dist-dmath-check/
 .playwright-mcp/
+
+# Local Jev credentials and persistent test accounting
+.env
+.env.*
+.jev-local/

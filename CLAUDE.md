@@ -80,3 +80,7 @@ bezel-less radar dot-cluster upper-right · "Filled" wireframe toggle · menu = 
 - Bonus formula (500 start, −1 per 8 ticks, added on level clear) is a guess; original undocumented.
 - Loadout presets are hand-tuned and don't sum to the Custom point budget (intentional).
 - Score: flags +100, kills +200 (tunable guesses).
+
+## Jev local experiment constraints
+
+User authorization (2026-09-29): optional Jev AI checkbox and main-player autopilot; local testing only. At most three enemies plus one player, and at most $10 total Jev test credits across iterations. Only lead runs paid tests after independently verifying persistent backend budget reservations and capped rosters. Never expose or print `TYPESAFE_API_KEY`; workspace `.env` is server-only. Use an absolute `JEV_LEDGER_FILE` so rebuilding worktrees/restarting cannot reset accounting. Do not delete/reset a spend ledger to continue testing. Failed/timed-out paid calls must be conservatively accounted. Beads epic `asn-cq8` is local-only. Existing normal/network modes retain their deterministic contract; Jev v1 is solo only. Evidence must distinguish actual Jev decisions, local executor behavior, fallback, and estimated fun proxies; no claim that telemetry alone proves human fun.

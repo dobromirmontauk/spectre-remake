@@ -2,7 +2,7 @@
 
 ## Current Objective
 
-Evaluate model-controlled enemies using the user’s proposed Jev / fast Luna options; retain the blog / LinkedIn announcement as the next publishing task.
+Build and locally evaluate optional Jev AI enemies and main-player autopilot. Iterate until model decisions run at 5 Hz (2 Hz if latency requires it), use commander-visible observations, and demonstrate useful tactics with a safe 30 Hz executor. Paid testing is limited to $10 total and three enemies plus the main player. Durable implementation tasks: local Beads epic `asn-cq8`; Beads data is never remotely synced.
 
 ## Next Steps
 
@@ -13,6 +13,8 @@ Evaluate model-controlled enemies using the user’s proposed Jev / fast Luna op
 - [ ] **Publish a blog post / LinkedIn post about Spectre.** Include the live game link, a gameplay screenshot, the inspiration from the 1991 Mac game, and local/network multiplayer. Draft for user review before posting.
 
 ## Last Progress
+
+- 2026-09-29 — User authorized local Jev implementation/testing with workspace `.env` credentials; maximum $10 total paid calls, three enemies plus main player. Optional checkbox and player autopilot required. Implementation tracked by local Beads `asn-cq8`; production publication is outside this build/test step.
 
 - 2026-09-29 — Added per-tank observation/action design and Jev unit-cost formula to API evaluation. Proposed 2–5 Hz bounded target/maneuver selection, 30 Hz local execution, and per-tank question batching. At 1,000 billed input tokens and 5 Hz: $0.0126/min/tank, excluding backend/retries. Token budget is an estimate pending actual API usage.
 
