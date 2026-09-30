@@ -75,3 +75,10 @@ assert(!enemyChoices.some(c=>c.description.includes('for flags')),'enemy explora
 assert(enemyChoices.some(c=>c.id.startsWith('guard:')),'enemy may guard flag with explicit vantage purpose');
 player.position={x:0,z:0};player.heading=0;e.position={x:0,z:60};
 const playerChoices=buildCandidates(observeTank(s,'player',{seen:{}}));assert(playerChoices.some(c=>c.id==='flag:knownFlag'),'player collection remains available');assert(playerChoices.some(c=>c.id==='pickup:knownSupply'),'player supplies remain available');
+for(const absent of [null,{...plan,expiresTick:-1}]){
+ s.tick=10;s.enemies=[];s.obstacles=[{id:'timeoutWall',kind:'wall',min:{x:-5,z:6.5},max:{x:5,z:8.5}}];player.position={x:0,z:0};player.heading=0;player.speed=15;
+ assert.equal(commandForPlan(s,'player',absent).thrust,-1,'missing/expired moving plan brakes before wall');
+ for(let i=0;i<60;i++){const cmd=commandForPlan(s,'player',absent);assert.equal(cmd.fire,false,'timeoutnever fires');applyMovement(player,cmd,player.movement);assert(player.position.z<4.9,'timeout path stays outside wall hull');}
+ s.obstacles=[];s.enemies=[e];player.position={x:-14,z:0};e.position={x:0,z:-14};player.heading=Math.PI/2;e.heading=0;player.speed=18;e.speed=18;
+ for(let i=0;i<180;i++){const pc=commandForPlan(s,'player',absent),ec=commandForPlan(s,e.id,absent);applyMovement(player,pc,player.movement);applyMovement(e,ec,movementParamsForEnemy(e.kind,levelConfig(s.level)));assert(Math.hypot(player.position.x-e.position.x,player.position.z-e.position.z)>=3.2,'missing plans crossing remainssafe');}
+}

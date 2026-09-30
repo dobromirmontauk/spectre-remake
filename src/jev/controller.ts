@@ -27,7 +27,10 @@ export function buildCandidates(o:TankObservation):TacticalPlan[] {
 export interface SafetyDiagnostics { wallAvoided:number; tankAvoided:number; allyShotAvoided:number }
 export function commandForPlan(state:GameState,tankId:string,plan:TacticalPlan|null,diagnostics?:SafetyDiagnostics):Command {
  const tank=findTank(state,tankId);const neutral:Command={turn:0,thrust:0,fire:false,grenade:false};if(!tank||!tank.alive)return neutral;
- if(!plan||plan.expiresTick<state.tick)return {...neutral,turn:1};
+ const missingPlan=!plan||plan.expiresTick<state.tick;
+ if(missingPlan)plan={id:'timeout-scan',description:'Locally brake/coast then survey',waypoint:{...tank.position},fire:false,expiresTick:state.tick};
+ // Always run prediction even while the provider is unavailable.
+ if(!plan)return neutral;
  const player=state.players.find(p=>p.id===tankId);const enemy=state.enemies.find(e=>e.id===tankId);const params=player?.movement??movementParamsForEnemy(enemy!.kind,levelConfig(state.level));
  const target=plan.targetId?findTank(state,plan.targetId):undefined;
  // Firing is recomputed from local sight; never follow an unseen target's new position.
@@ -36,6 +39,7 @@ export function commandForPlan(state:GameState,tankId:string,plan:TacticalPlan|n
  if(d<3&&visibleTarget)delta=angleDelta(datan2(visibleTarget.position.x-tank.position.x,visibleTarget.position.z-tank.position.z),tank.heading);
  let turn:Command['turn']=Math.abs(delta)<.045?0:delta>0?1:-1;
  let thrust:Command['thrust']=d>3&&Math.abs(delta)<.7?1:0;
+ if(missingPlan){turn=Math.abs(tank.speed)<.1?1:0;thrust=0;}
  const all=[...state.players,...state.enemies];
  // Tactile spacing reflex: move away from close hulls instead of accepting mutual idle.
  const nearby=all.filter(t=>{
@@ -72,7 +76,7 @@ export function commandForPlan(state:GameState,tankId:string,plan:TacticalPlan|n
  return segmentVsCircle(relativeBefore,relativeAfter,t.position,clearance).hit;
 }))return false;}return true;};
  if(!safe({turn,thrust,fire:false,grenade:false})){if(diagnostics){const end={x:tank.position.x+dsin(tank.heading)*Math.max(4,Math.abs(tank.speed)*LOOKAHEAD_SECONDS),z:tank.position.z+dcos(tank.heading)*Math.max(4,Math.abs(tank.speed)*LOOKAHEAD_SECONDS)};if(all.some(t=>t.id!==tankId&&t.alive&&segmentVsCircle(tank.position,end,t.position,TANK_RADIUS*2+SAFETY_MARGIN).hit))diagnostics.tankAvoided++;else diagnostics.wallAvoided++;}thrust=tank.speed<0?1:-1;if(!safe({turn,thrust,fire:false,grenade:false})){// If already too close to stop, maximize braking rather than unsafe coasting.
- turn=turn||1;
+ turn=missingPlan&&Math.abs(tank.speed)>=.1?turn:turn||1;
  if(Math.abs(tank.speed)<.1)thrust=0;
  }}
  let fire=false;if(plan.fire&&visibleTarget&&Math.abs(angleDelta(datan2(visibleTarget.position.x-tank.position.x,visibleTarget.position.z-tank.position.z),tank.heading))<.08){const end={x:tank.position.x+dsin(tank.heading)*PROJECTILE_RANGE,z:tank.position.z+dcos(tank.heading)*PROJECTILE_RANGE};
