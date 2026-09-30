@@ -1,0 +1,10 @@
+{
+  "captured": "2026-09-29",
+  "available": true,
+  "spentUsd": 0.39157217399999666,
+  "limitUsd": 9.5,
+  "model": "jev-1.13.0",
+  "attemptedCalls": 4608,
+  "pendingReservations": 1,
+  "note": "Conservative cumulative experiment ledger, including one retained unknown-usage reservation. This excludes no own paid calls. Same ledger reused after restart."
+}
