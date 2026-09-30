@@ -2,7 +2,7 @@
 
 ## Current Objective
 
-Optional Jev AI and player autopilot are locally verified at 2 Hz, with bounded commander observations and safe 30 Hz execution. Next prepare the Spectre blog / LinkedIn post draft. Human fun and reliable win-rate estimates remain playtest questions. The Jev experiment's cumulative $10 budget and three-enemy-plus-player cap still apply; never reset its ledger. Implementation history: local Beads epic `asn-cq8`, never remotely synced.
+Extend optional Jev AI at 2 Hz with defensive patrol, survival/retreat/regroup tactics, level-dependent intelligence and a durable, expandable live decision log. Verify exact observation boundaries and behavior locally before handing off. The cumulative $10 test budget and three-enemy-plus-player cap remain unchanged; never reset the ledger. Local Beads epic: `asn-0u1`. After this iteration, prepare the blog / LinkedIn draft.
 
 ## Next Steps
 

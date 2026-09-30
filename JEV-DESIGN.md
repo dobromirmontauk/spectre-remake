@@ -27,7 +27,17 @@ Jev chooses a finite maneuver, not arbitrary controls or executable code. Player
 
 ## Information boundary
 
-The commander receives its own position, heading, speed, shield fraction, ammo and cooldown; contacts within 65 units, a 234-degree forward arc and unobstructed line of sight; visible obstacle geometry or four-unit tactile geometry; and only its own timestamped previous sightings and visited trail. It does not receive the whole simulation, RNG, hidden objectives, opponent health/ammo, other commanders' perspectives, or unseen current target positions. Last-seen moving opponents are not indefinite pursuit targets. Unrelated unseen respawns do not erase another commander's memory.
+The commander always has its own operating status and local vision: contacts within 65 units, a 234-degree forward arc and unobstructed line of sight, plus visible obstacle geometry or four-unit tactile geometry. Intelligence deliberately expands with campaign level:
+
+| Level | Authorized map and squad knowledge |
+| --- | --- |
+| 1–2 | Individually observed objectives; remembered flag coordinates are approximate. No advance objective list or hidden live opponent tracking. |
+| 3–4 | Exact own map location and advance positions of typed flags, ammo and shield items. Visibility still limits opponent sightings. |
+| 5+ | Other AI tank locations and their last accepted strategy. Enemy commanders receive the player's current sighting only while at least one enemy can see the player. |
+
+Tank tracks record their last observed position and heading, observation tick/time, age relative to the current game time, and whether the sighting came from the commander or a shared spotter. Hidden moving targets retain their last observation; they do not acquire fresh coordinates or headings merely because game time advances. No tier reveals opponent health/ammo, RNG or the complete simulation.
+
+Enemies without a visible opponent should patrol a defensive circuit around a known flag and look outward for the player. Protecting a flag remains a distinct deliberate choice. Recent incoming fire and low shield prioritize retreat or regrouping over pursuit. Tactical strategy and maneuver are recorded separately, so several local maneuvers can implement the same survival or patrol strategy.
 
 Each upstream request contains **one tank's perspective only**. Multiple Jev questions share state, so combining all perspectives into one provider call would violate the boundary. Browser batching saves local transport overhead only. At four tanks and 2 Hz, the nominal load is eight provider calls/second. Two upstream calls may run concurrently.
 
@@ -54,3 +64,9 @@ Tick events measure actual contacts/damage. Trajectory distance, stationary seco
 ## Evidence
 
 Reports and gameplay are in [reference/verification/jev/](reference/verification/jev/). Each compact report has a companion `samples.json.gz` preserving its full sampled state for reproduction. Failed and intermediate runs are retained, including the original HTTP400 wire mismatch, a spacing deadlock, dynamic tank contacts and a windmill impact. Later acceptance evidence must be read against the exact code revision and configuration recorded in the evaluation summary.
+
+## Decision audit and live log
+
+Every new upstream call is saved locally before transmission, then completed with its result or error. Entries include UTC timestamps, game tick, tank identity, exact provider state/instructions/choices, selected choice, confidence, usage and cost when available. An unmatched start after interruption remains visibly pending/unknown. Credentials and authorization headers are excluded. The audit is persistent across server restarts and separate from the cumulative spending ledger; it must not be reset during testing.
+
+The live decision window presents concise tank/strategy/maneuver summaries with latency and outcome. Exact input state and options are collapsed by default and expandable per call. Model choices, browser application/staleness and local fallback are distinguished; summaries describe supplied choices rather than inventing model reasoning. The visible list is bounded for responsiveness, while the durable backend history preserves every recorded call. Logging begins with this version; previous calls cannot be reconstructed from aggregate spending statistics.
