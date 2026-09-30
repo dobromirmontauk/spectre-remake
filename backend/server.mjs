@@ -13,7 +13,7 @@ export function validateRequest(body){
  for(const t of body.tanks){
   if(!plain(t)||!id(t.tankId)||ids.has(String(t.tankId))||!['enemy','player'].includes(t.role)||!plain(t.observation)||JSON.stringify(t.observation).length>6000||!Array.isArray(t.candidates)||!t.candidates.length||t.candidates.length>16)throw fail(400,'invalid tank');
   ids.add(String(t.tankId));t.role==='enemy'?enemies++:players++;
-  const choices=new Set();for(const c of t.candidates){if(!plain(c)||typeof c.id!=='string'||!/^[a-zA-Z0-9_-]{1,64}$/.test(c.id)||choices.has(c.id)||typeof c.description!=='string'||!c.description.length||c.description.length>512)throw fail(400,'invalid candidate');choices.add(c.id);}
+  const choices=new Set();for(const c of t.candidates){if(!plain(c)||typeof c.id!=='string'||!/^[a-zA-Z0-9_:-]{1,64}$/.test(c.id)||choices.has(c.id)||typeof c.description!=='string'||!c.description.length||c.description.length>512)throw fail(400,'invalid candidate');choices.add(c.id);}
  }
  if(enemies>3||players>1)throw fail(400,'maximum three enemies and one player');
  return body;
