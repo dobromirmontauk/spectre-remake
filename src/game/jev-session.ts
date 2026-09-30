@@ -27,7 +27,7 @@ export class JevSession {
     // This optional endpoint never invokes the model, and failure leaves the game unaffected.
     if (typeof window !== 'undefined') void globalThis.fetch('/api/jev/audit/browser', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ browserSessionId: record.browserSessionId, sequence: record.sequence, tick: record.tick, event, at: new Date().toISOString(), details: { outcome: record.outcome, error: record.error, decisions: record.decisions, latencyMs: record.latencyMs, ...(event === 'attempt' ? { request: record.request } : {}), ...(event === 'response' ? { response: record.response } : {}) } }),
+      body: JSON.stringify({ browserSessionId: record.browserSessionId, sequence: record.sequence, tick: record.tick, event, at: new Date().toISOString(), details: { outcome: record.outcome, error: record.error, decisions: record.decisions, latencyMs: record.latencyMs, ...(event === 'attempt' ? { request: record.request } : {}), ...(event === 'response' ? { response: record.response, ...(record.responseText !== undefined ? { responseText: record.responseText } : {}) } : {}) } }),
     }).catch(() => {});
   }
   private finishUnapplied(tankId: string, reason: 'superseded' | 'expired' | 'session reset' | 'life ended' | 'budget exhausted'): void {
@@ -163,7 +163,9 @@ export class JevSession {
     const started = performance.now(); this.counters.requests++;
     void this.fetcher('/api/jev/decide', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: abort.signal, body: JSON.stringify(request) })
       .then(async response => {
-        const body: unknown = await response.json().catch(() => null);
+        const responseText = await response.text();
+        let body: unknown;
+        try { body = JSON.parse(responseText); } catch { body = null; audit.responseText = responseText; }
         audit.response = structuredClone(body); audit.latencyMs = performance.now() - started;
         this.saveAudit(audit, 'response');
         if (response.status === 402) {
@@ -177,12 +179,12 @@ export class JevSession {
         }
         if (!response.ok) throw new Error(`Backend ${response.status}`); return body as { sequence: number; tick: number; decisions: { tankId: string; choice: string; confidence?: number; callId?: string }[]; usage?: { inputTokens?: number }; spentUsd?: number }; })
       .then(response => {
+        if (!response || typeof response !== 'object' || Array.isArray(response) || !Array.isArray(response.decisions) || response.decisions.some(d => !d || typeof d.tankId !== 'string' || typeof d.choice !== 'string') || (response.usage?.inputTokens !== undefined && (!Number.isSafeInteger(response.usage.inputTokens) || response.usage.inputTokens < 0)) || (response.spentUsd !== undefined && (!Number.isFinite(response.spentUsd) || response.spentUsd < 0))) throw new Error('Invalid decision response');
         this.counters.inputTokens += response.usage?.inputTokens ?? 0;
         this.counters.spentUsd = response.spentUsd ?? this.counters.spentUsd;
         this.counters.latencyMs = performance.now() - started;
         this.latencySamplesMs.push(this.counters.latencyMs);
         if (this.latencySamplesMs.length > 1000) this.latencySamplesMs.shift();
-        if (!response || !Array.isArray(response.decisions)) throw new Error('Invalid decision response');
         audit.decisions = response.decisions.map(decision => {
           const plan = candidates[decision.tankId]?.find(c => c.id === decision.choice);
           return { tankId: decision.tankId, role: state.players.some(p => p.id === decision.tankId) ? 'player' : 'enemy', choice: decision.choice, description: plan?.description ?? 'Unknown candidate; discarded', strategy: plan?.strategy, confidence: decision.confidence, callId: decision.callId, accepted: false, applied: false };
