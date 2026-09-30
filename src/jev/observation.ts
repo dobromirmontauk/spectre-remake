@@ -17,7 +17,7 @@ export function observeTank(state: GameState, tankId:string, memory:TankMemory):
  const contacts:Contact[]=[];
  for(const t of [...state.players,...state.enemies])if(t.id!==tankId&&t.alive&&visible(t.position))contacts.push({id:t.id,kind:'tank',position:{...t.position},seenTick:state.tick,team:state.players.some(p=>p.id===t.id)?'player':'enemy'});
  for(const f of state.flags)if(!f.collected&&visible(f.position))contacts.push({id:f.id,kind:'flag',position:{...f.position},seenTick:state.tick});
- for(const p of state.pickups)if(!p.collected&&visible(p.position))contacts.push({id:p.id,kind:'pickup',position:{...p.position},seenTick:state.tick});
+ for(const p of state.pickups)if(!p.collected&&visible(p.position))contacts.push({id:p.id,kind:'pickup',pickupKind:p.kind,amount:p.amount,position:{...p.position},seenTick:state.tick});
  for(const [id,c] of Object.entries(memory.seen))if(c.kind!=='tank'&&visible(c.position)&&!contacts.some(v=>v.id===id))delete memory.seen[id];
  for(const c of contacts)memory.seen[c.id]={...c,position:{...c.position}};
  for(const [id,c]of Object.entries(memory.seen))if(state.tick-c.seenTick>MEMORY_TICKS)delete memory.seen[id];
@@ -30,5 +30,5 @@ export function observeTank(state: GameState, tankId:string, memory:TankMemory):
   return d<=SIGHT_RANGE&&Math.abs(angleDelta(datan2(p.x-tank.position.x,p.z-tank.position.z),tank.heading))<=SIGHT_HALF_ANGLE&&!blocked(tank.position,p,state.obstacles.filter(other=>other.id!==o.id));
  }).map(o=>o.kind==='wall'?{...o,min:{...o.min},max:{...o.max}}:{...o,position:{...o.position}});
 
- return {visited:memory.visited.map(p=>({...p})),own:{id:tankId,team,position:{...tank.position},heading:tank.heading,speed:tank.speed,shieldFraction:tank.shield/tank.maxShield,ammo:tank.ammo,fireReady:tank.fireCooldown===0,tick:state.tick},contacts,memory:Object.values(memory.seen).filter(c=>!contacts.some(v=>v.id===c.id)).map(c=>({...c,position:{...c.position}})),geometry,bounds:ARENA_HALF_SIZE};
+ return {visited:memory.visited.map(p=>({...p})),own:{id:tankId,team,position:{...tank.position},heading:tank.heading,speed:tank.speed,shieldFraction:tank.shield/tank.maxShield,ammo:tank.ammo,maxAmmo:tank.maxAmmo,shield:tank.shield,maxShield:tank.maxShield,fireReady:tank.fireCooldown===0,tick:state.tick},contacts,memory:Object.values(memory.seen).filter(c=>!contacts.some(v=>v.id===c.id)).map(c=>({...c,position:{...c.position}})),geometry,bounds:ARENA_HALF_SIZE};
 }

@@ -74,6 +74,7 @@ assert(!enemyChoices.some(c=>c.id.includes('Supply')||c.id.startsWith('flag:')||
 assert(!enemyChoices.some(c=>c.description.includes('for flags')),'enemy exploration searches opponents');
 assert(enemyChoices.some(c=>c.id.startsWith('guard:')),'enemy may guard flag with explicit vantage purpose');
 player.position={x:0,z:0};player.heading=0;e.position={x:0,z:60};
+player.ammo=player.maxAmmo-1;
 const playerChoices=buildCandidates(observeTank(s,'player',{seen:{}}));assert(playerChoices.some(c=>c.id==='flag:knownFlag'),'player collection remains available');assert(playerChoices.some(c=>c.id==='pickup:knownSupply'),'player supplies remain available');
 for(const absent of [null,{...plan,expiresTick:-1}]){
  s.tick=10;s.enemies=[];s.obstacles=[{id:'timeoutWall',kind:'wall',min:{x:-5,z:6.5},max:{x:5,z:8.5}}];player.position={x:0,z:0};player.heading=0;player.speed=15;
@@ -93,3 +94,13 @@ for(let tick=0;tick<180;tick++){
 s.obstacles=[{id:'replanWall',kind:'wall',min:{x:15,z:71},max:{x:18,z:76}}];e.position={x:12.87,z:69.32};e.heading=19.038;e.speed=13.6;
 for(let tick=0;tick<180;tick++){s.tick=tick;const waypoint=Math.floor(tick/15)%2?{x:15.69,z:89.49}:{x:34.878,z:59.277};const cmd=commandForPlan(s,e.id,{...plan,targetId:undefined,fire:false,waypoint,expiresTick:tick+30});applyMovement(e,cmd,movementParamsForEnemy(e.kind,levelConfig(s.level)));const closest={x:Math.max(15,Math.min(18,e.position.x)),z:Math.max(71,Math.min(76,e.position.z))};assert(Math.hypot(e.position.x-closest.x,e.position.z-closest.z)>=1.6,'2Hz alternatingplans never hit wall');}
 console.log('Alternating2Hz exact windmill and wall stop-envelope regressions passed');
+s.enemies=[];s.obstacles=[];player.position={x:0,z:0};player.heading=0;player.ammo=player.maxAmmo;player.shield=player.maxShield;
+s.flags=[{id:'goalFlag',position:{x:0,z:15},collected:false}];s.pickups=[{id:'heal',kind:'shield',position:{x:4,z:20},amount:25,collected:false},{id:'refill',kind:'ammo',position:{x:-4,z:20},amount:20,collected:false}];
+const supplyMemory={seen:{}};let supplyObs=observeTank(s,'player',supplyMemory);let supplyChoices=buildCandidates(supplyObs);
+assert(!supplyChoices.some(c=>c.id==='pickup:heal'),'fullshield never offers healing');assert(!supplyChoices.some(c=>c.id==='pickup:refill'),'fullammo never offers resupply');
+player.shield=player.maxShield/2;player.ammo=player.maxAmmo-10;supplyObs=observeTank(s,'player',supplyMemory);supplyChoices=buildCandidates(supplyObs);
+assert(supplyChoices.find(c=>c.id==='pickup:heal')?.description.includes('shield'),'needed healing explicitly offered');assert(supplyChoices.find(c=>c.id==='pickup:refill')?.description.includes('10'),'ammo benefit bounded by own missingcapacity');
+assert.equal(supplyObs.contacts.find(c=>c.id==='heal')?.pickupKind,'shield','visiblepickupkind supplied');
+player.heading=Math.PI;player.shield=player.maxShield;player.ammo=player.maxAmmo;
+assert(!buildCandidates(observeTank(s,'player',supplyMemory)).some(c=>c.id.includes('heal')||c.id.includes('refill')),'remembered supplies also suppressed whenfull');
+s.pickups.push({id:'hiddenSupply',kind:'shield',position:{x:0,z:90},amount:100,collected:false});assert(!JSON.stringify(observeTank(s,'player',{seen:{}})).includes('hiddenSupply'),'hidden supplymetadata never leaks');
