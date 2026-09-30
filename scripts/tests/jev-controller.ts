@@ -65,3 +65,13 @@ for(const fixture of [{name:'head-on',a:{x:0,z:-14},b:{x:0,z:14},ah:0,bh:Math.PI
  const ap={x:player.position.x+Math.sin(fixture.ah)*50,z:player.position.z+Math.cos(fixture.ah)*50};const bp={x:e.position.x+Math.sin(fixture.bh)*50,z:e.position.z+Math.cos(fixture.bh)*50};
  for(let tick=0;tick<180;tick++){s.tick=tick;const pc=commandForPlan(s,'player',{...plan,waypoint:ap,expiresTick:tick+30});const ec=commandForPlan(s,e.id,{...plan,targetId:'player',waypoint:bp,expiresTick:tick+30});applyMovement(player,pc,player.movement);applyMovement(e,ec,movementParamsForEnemy(e.kind,levelConfig(s.level)));assert(Math.hypot(player.position.x-e.position.x,player.position.z-e.position.z)>=3.2,fixture.name+' moving hulls must never physically contact');}
 }
+// Commander objectives match simulation role: enemies cannot collect supplies or flags.
+s.obstacles=[];s.players[0]!.position={x:0,z:30};e.position={x:0,z:0};e.heading=0;e.speed=0;s.enemies=[e];
+s.flags=[{id:'knownFlag',position:{x:10,z:25},collected:false}];s.pickups=[{id:'knownSupply',kind:'ammo',position:{x:-10,z:25},amount:10,collected:false}];
+const enemyObs=observeTank(s,e.id,{seen:{'pastSupply':{id:'pastSupply',kind:'pickup',position:{x:0,z:-20},seenTick:s.tick},'pastFlag':{id:'pastFlag',kind:'flag',position:{x:20,z:-20},seenTick:s.tick}}});
+const enemyChoices=buildCandidates(enemyObs);
+assert(!enemyChoices.some(c=>c.id.includes('Supply')||c.id.startsWith('flag:')||c.id.startsWith('remember:')),'enemy never chases uncollectable objectives');
+assert(!enemyChoices.some(c=>c.description.includes('for flags')),'enemy exploration searches opponents');
+assert(enemyChoices.some(c=>c.id.startsWith('guard:')),'enemy may guard flag with explicit vantage purpose');
+player.position={x:0,z:0};player.heading=0;e.position={x:0,z:60};
+const playerChoices=buildCandidates(observeTank(s,'player',{seen:{}}));assert(playerChoices.some(c=>c.id==='flag:knownFlag'),'player collection remains available');assert(playerChoices.some(c=>c.id==='pickup:knownSupply'),'player supplies remain available');
