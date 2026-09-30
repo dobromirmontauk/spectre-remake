@@ -18,11 +18,12 @@ export function buildCandidates(o:TankObservation):TacticalPlan[] {
   const benefit=Math.min(c.amount,missing);if(benefit<=0)return;
   add((remembered?'remember:':'pickup:')+c.id,'Collect '+(remembered?'previously seen':'visible')+' '+c.pickupKind+' supply '+c.id+'; restore up to '+benefit+' '+c.pickupKind+' of '+missing+' missing; '+(c.pickupKind==='shield'?'improve survival':'enable more cannon shots'),c.position);
  };
- for(const c of o.contacts){if(c.kind==='tank'&&c.team!==o.own.team){const d=distance(origin,c.position);const dx=(origin.x-c.position.x)/Math.max(d,1),dz=(origin.z-c.position.z)/Math.max(d,1);add('engage:'+c.id,'Engage visible target '+c.id+' while maintaining separation',{x:c.position.x+dx*12,z:c.position.z+dz*12},true,c.id);for(const s of [-1,1])add('flank:'+c.id+':'+s,'Flank '+(s===1?'left':'right')+' of visible target '+c.id,{x:c.position.x+dx*18-dz*s*14,z:c.position.z+dz*18+dx*s*14},true,c.id);add('retreat:'+c.id,'Create distance from visible target '+c.id,{x:origin.x+dx*15,z:origin.z+dz*15},true,c.id);}else if(c.kind==='flag'&&o.own.team==='player')add('flag:'+c.id,'Collect visible flag '+c.id,c.position);else if(c.kind==='pickup')supply(c);}
+ for(const c of o.contacts){if(c.kind==='tank'&&c.team!==o.own.team){const d=distance(origin,c.position);const dx=(origin.x-c.position.x)/Math.max(d,1),dz=(origin.z-c.position.z)/Math.max(d,1);add('hold:'+c.id,'Hold current vantage, aim and fire at visible target '+c.id,origin,true,c.id);add('engage:'+c.id,'Engage visible target '+c.id+' while maintaining separation',{x:c.position.x+dx*12,z:c.position.z+dz*12},true,c.id);for(const s of [-1,1])add('flank:'+c.id+':'+s,'Flank '+(s===1?'left':'right')+' of visible target '+c.id,{x:c.position.x+dx*18-dz*s*14,z:c.position.z+dz*18+dx*s*14},true,c.id);add('retreat:'+c.id,'Create distance from visible target '+c.id,{x:origin.x+dx*15,z:origin.z+dz*15},true,c.id);}else if(c.kind==='flag'&&o.own.team==='player')add('flag:'+c.id,'Collect visible flag '+c.id,c.position);else if(c.kind==='pickup')supply(c);}
  for(const c of o.memory)if(o.own.team==='player'){if(c.kind==='flag')add('remember:'+c.id,'Collect previously seen flag '+c.id,c.position);else if(c.kind==='pickup')supply(c,true);}
- if(o.own.team==='enemy')for(const c of [...o.contacts,...o.memory])if(c.kind==='flag'){
+ if(o.own.team==='enemy'&&!o.contacts.some(c=>c.kind==='tank'&&c.team!==o.own.team))for(const c of [...o.contacts,...o.memory])if(c.kind==='flag'){
   const gap=Math.max(1,distance(origin,c.position));
   add('guard:'+c.id,'Guard '+(c.seenTick===o.own.tick?'visible':'previously seen')+' flag '+c.id+' from a12-unit stand-off vantage; watch for approaching opposing player, do not collect',{x:c.position.x+(origin.x-c.position.x)*12/gap,z:c.position.z+(origin.z-c.position.z)*12/gap});
+  const guard=plans.find(p=>p.id==='guard:'+c.id);if(guard)guard.lookAt={...c.position};
  }
 
  // Sector sweep keeps tanks moving/searching without obtaining hidden coordinates.
@@ -43,6 +44,7 @@ export function commandForPlan(state:GameState,tankId:string,plan:TacticalPlan|n
  const visibleTarget=target?.alive&&distance(tank.position,target.position)<65&&!blocked(tank.position,target.position,state.obstacles)&&Math.abs(angleDelta(datan2(target.position.x-tank.position.x,target.position.z-tank.position.z),tank.heading))<Math.PI*.65?target:undefined;
  const waypoint=plan.waypoint;const d=distance(tank.position,waypoint);const aim=datan2(waypoint.x-tank.position.x,waypoint.z-tank.position.z);let delta=angleDelta(aim,tank.heading);
  if(d<3&&visibleTarget)delta=angleDelta(datan2(visibleTarget.position.x-tank.position.x,visibleTarget.position.z-tank.position.z),tank.heading);
+ else if(d<3&&plan.lookAt)delta=angleDelta(datan2(plan.lookAt.x-tank.position.x,plan.lookAt.z-tank.position.z),tank.heading);
  let turn:Command['turn']=Math.abs(delta)<.045?0:delta>0?1:-1;
  let thrust:Command['thrust']=d>3&&Math.abs(delta)<.7?1:0;
  if(missingPlan){turn=Math.abs(tank.speed)<.1?1:0;thrust=0;}

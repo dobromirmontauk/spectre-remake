@@ -72,7 +72,7 @@ const enemyObs=observeTank(s,e.id,{seen:{'pastSupply':{id:'pastSupply',kind:'pic
 const enemyChoices=buildCandidates(enemyObs);
 assert(!enemyChoices.some(c=>c.id.includes('Supply')||c.id.startsWith('flag:')||c.id.startsWith('remember:')),'enemy never chases uncollectable objectives');
 assert(!enemyChoices.some(c=>c.description.includes('for flags')),'enemy exploration searches opponents');
-assert(enemyChoices.some(c=>c.id.startsWith('guard:')),'enemy may guard flag with explicit vantage purpose');
+assert(!enemyChoices.some(c=>c.id.startsWith('guard:')),'enemy prioritizes visibleopponent over peacefulguard');
 player.position={x:0,z:0};player.heading=0;e.position={x:0,z:60};
 player.ammo=player.maxAmmo-1;
 const playerChoices=buildCandidates(observeTank(s,'player',{seen:{}}));assert(playerChoices.some(c=>c.id==='flag:knownFlag'),'player collection remains available');assert(playerChoices.some(c=>c.id==='pickup:knownSupply'),'player supplies remain available');
@@ -110,3 +110,8 @@ for(let tick=0;tick<180;tick++){s.tick=tick;const cmd=commandForPlan(s,e.id,{...
 assert(e.position.z<96,'outer margin recovers inward within6seconds');console.log('Arena-margin exact fixture recovered inward to z='+e.position.z.toFixed(2));
 e.position={x:-77,z:94};e.heading=Math.PI;e.speed=-10;
 for(let tick=0;tick<180;tick++){s.tick=tick;const cmd=commandForPlan(s,e.id,{...plan,targetId:undefined,fire:false,waypoint:Math.floor(tick/15)%2?{x:-77,z:110}:{x:-50,z:90},expiresTick:tick+30});applyMovement(e,cmd,movementParamsForEnemy(e.kind,levelConfig(s.level)));assert(e.position.z<98.4,'2Hz guard replans never touch physical arena boundary');}
+s.obstacles=[];s.enemies=[e];e.position={x:0,z:0};e.heading=0;e.speed=0;player.position={x:0,z:30};s.flags=[{id:'guardGoal',position:{x:15,z:20},collected:false}];s.pickups=[];
+let guardChoices=buildCandidates(observeTank(s,e.id,{seen:{}}));assert(!guardChoices.some(c=>c.id.startsWith('guard:')),'visible opponent suppresses passiveguard');assert(guardChoices.some(c=>c.id.startsWith('hold:')&&c.fire),'visiblethreat gets holdaimfire');
+player.position={x:0,z:90};guardChoices=buildCandidates(observeTank(s,e.id,{seen:{}}));const peacefulGuard=guardChoices.find(c=>c.id==='guard:guardGoal');assert(peacefulGuard&&!peacefulGuard.fire,'peacefulflagguard remains');
+e.position={...peacefulGuard.waypoint};e.heading=Math.PI;
+const guardCmd=commandForPlan(s,e.id,peacefulGuard);assert(guardCmd.turn!==0,'arrivedguard explicitly turns toward knownflag');assert.equal(guardCmd.fire,false,'peacefulguard never blindfires');
