@@ -1268,3 +1268,8 @@ body {
 .player-left-toast.visible {
   display: block;
 }
+
+.jev-panel { position:absolute; bottom:8px; left:8px; z-index:50; display:flex; gap:12px; align-items:center; max-width:calc(100% - 16px); padding:7px 10px; background:rgba(0,0,0,.85); color:#f2cb60; font:12px monospace; flex-wrap:wrap; }
+.jev-panel label { cursor:pointer; white-space:nowrap; }
+.jev-panel input { vertical-align:middle; }
+.jev-panel[data-live="true"] #jev-status { color:#6eea90; }

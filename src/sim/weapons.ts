@@ -123,7 +123,9 @@ export function updateProjectiles(state: GameState, events: SimEvent[]): void {
       if (!isPlayerTarget && !isPlayerOwner && !state.enemyFriendlyFire) continue;
       const hit = segmentVsCircle(shot.prevPosition, shot.position, target.position, TANK_RADIUS + PROJECTILE_RADIUS);
       if (!hit.hit) continue;
+      const shieldBefore = target.shield;
       damageTank(state, target, shot.ownerId, isPlayerTarget);
+      if (!isPlayerTarget && !isPlayerOwner && target.shield < shieldBefore) events.push({ type: 'FriendlyFireHit', shooterId: shot.ownerId, tankId: target.id, damage: shieldBefore - target.shield });
       events.push({ type: 'ShotHit', position: hit.point, targetKind: isPlayerTarget ? 'player' : 'enemy' });
       consumed = true;
       break;

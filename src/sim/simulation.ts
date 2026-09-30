@@ -295,6 +295,7 @@ function resolveObstacleCollisionsFor(tank: TankState, state: GameState, radius:
 
     if (!hit.hit) continue;
 
+    if (hit.penetration > 0) events.push({ type: 'ObstacleContact', tankId: tank.id, obstacleId: obstacle.id, penetration: hit.penetration });
     tank.position.x += hit.normal.x * hit.penetration;
     tank.position.z += hit.normal.z * hit.penetration;
     if (WALL_STOPS_DEAD) tank.speed = 0;
@@ -305,6 +306,7 @@ function resolveObstacleCollisionsFor(tank: TankState, state: GameState, radius:
 function resolveArenaBoundsFor(tank: TankState, radius: number, events: SimEvent[], emitWallHit: boolean): void {
   const contained = containInArena(tank.position, radius, ARENA_HALF_SIZE);
   if (contained.hitWall) {
+    events.push({ type: 'ObstacleContact', tankId: tank.id, obstacleId: 'arena-bounds', penetration: Math.abs(tank.position.x - contained.x) + Math.abs(tank.position.z - contained.z) });
     tank.position.x = contained.x;
     tank.position.z = contained.z;
     if (WALL_STOPS_DEAD) tank.speed = 0;
@@ -317,7 +319,7 @@ function resolveArenaBoundsFor(tank: TankState, radius: number, events: SimEvent
 // each tank's own obstacle/arena-bounds collision. Position-only (no speed
 // change) — matches the plan's "tanks/flags/pickups = circles" 2D collision
 // model.
-function resolveTankVsTankCollisions(state: GameState): void {
+function resolveTankVsTankCollisions(state: GameState, events: SimEvent[]): void {
   const tanks: TankState[] = [...state.players, ...state.enemies].filter((t) => t.alive);
   for (let i = 0; i < tanks.length; i++) {
     for (let j = i + 1; j < tanks.length; j++) {
@@ -325,6 +327,7 @@ function resolveTankVsTankCollisions(state: GameState): void {
       const b = tanks[j]!;
       const hit = circleVsCircle(a.position, TANK_RADIUS, b.position, TANK_RADIUS);
       if (!hit.hit) continue;
+      if (hit.penetration > 0) events.push({ type: 'TankContact', tankId: a.id, otherTankId: b.id, penetration: hit.penetration });
       const half = hit.penetration / 2;
       a.position.x += hit.normal.x * half;
       a.position.z += hit.normal.z * half;
@@ -625,7 +628,7 @@ export function killAllEnemies(state: GameState): void {
 // is applied to at the very start of THIS tick — driven by a net message all
 // peers apply at the same tick number (see net/CLAUDE.md), never by local
 // disconnect detection; always empty outside net play.
-export function step(state: GameState, commands: Record<string, Command>, drops: number[] = []): void {
+export function step(state: GameState, commands: Record<string, Command>, drops: number[] = [], externalEnemies?: Record<string, { command: Command; fireHeading: number }>): void {
   if (state.gameOver) {
     state.events = [];
     return;
@@ -646,7 +649,7 @@ export function step(state: GameState, commands: Record<string, Command>, drops:
 
   for (const enemy of state.enemies) {
     if (!enemy.alive) continue;
-    const decision = enemyCommand(enemy, state, levelCfg);
+    const decision = externalEnemies?.[enemy.id] ?? enemyCommand(enemy, state, levelCfg);
     const moveParams = movementParamsForEnemy(enemy.kind, levelCfg);
     applyMovement(enemy, decision.command, moveParams);
     resolveObstacleCollisionsFor(enemy, state, ENEMY_TANK_RADIUS, events, false);
@@ -669,7 +672,7 @@ export function step(state: GameState, commands: Record<string, Command>, drops:
   // combat is resolved for the tick.
   updateProjectiles(state, events);
   updateGrenades(state, events);
-  resolveTankVsTankCollisions(state);
+  resolveTankVsTankCollisions(state, events);
   resolveFinalStaticPass(state);
   advanceWindmills(state);
   handleEnemyLifecycle(state, levelCfg, events, ENEMY_RESPAWN_TICKS);
