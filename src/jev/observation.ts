@@ -22,7 +22,13 @@ export function observeTank(state: GameState, tankId:string, memory:TankMemory):
  for(const c of contacts)memory.seen[c.id]={...c,position:{...c.position}};
  for(const [id,c]of Object.entries(memory.seen))if(state.tick-c.seenTick>MEMORY_TICKS)delete memory.seen[id];
  memory.visited??=[]; if(!memory.visited.some(p=>distance(p,tank.position)<10))memory.visited.push({...tank.position}); if(memory.visited.length>64)memory.visited.shift();
- // Nearby geometry is tactile/navigation knowledge; never serialize remote obstacles.
- const geometry=state.obstacles.filter(o=>o.kind==='wall'?distance(tank.position,{x:Math.max(o.min.x,Math.min(o.max.x,tank.position.x)),z:Math.max(o.min.z,Math.min(o.max.z,tank.position.z))})<SIGHT_RANGE:distance(tank.position,o.position)<SIGHT_RANGE).map(o=>o.kind==='wall'?{...o,min:{...o.min},max:{...o.max}}:{...o,position:{...o.position}});
+ // Only visible surfaces or four-unit tactile proximity enter commander knowledge.
+ const geometry=state.obstacles.filter(o=>{
+  const p=o.kind==='wall'?{x:Math.max(o.min.x,Math.min(o.max.x,tank.position.x)),z:Math.max(o.min.z,Math.min(o.max.z,tank.position.z))}:o.position;
+  const d=distance(tank.position,p)-(o.kind==='windmill'?o.pylonRadius:0);
+  if(d<4)return true;
+  return d<=SIGHT_RANGE&&Math.abs(angleDelta(datan2(p.x-tank.position.x,p.z-tank.position.z),tank.heading))<=SIGHT_HALF_ANGLE&&!blocked(tank.position,p,state.obstacles.filter(other=>other.id!==o.id));
+ }).map(o=>o.kind==='wall'?{...o,min:{...o.min},max:{...o.max}}:{...o,position:{...o.position}});
+
  return {visited:memory.visited.map(p=>({...p})),own:{id:tankId,team,position:{...tank.position},heading:tank.heading,speed:tank.speed,shieldFraction:tank.shield/tank.maxShield,ammo:tank.ammo,fireReady:tank.fireCooldown===0,tick:state.tick},contacts,memory:Object.values(memory.seen).filter(c=>!contacts.some(v=>v.id===c.id)).map(c=>({...c,position:{...c.position}})),geometry,bounds:ARENA_HALF_SIZE};
 }
