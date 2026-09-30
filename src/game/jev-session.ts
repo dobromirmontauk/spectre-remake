@@ -1,6 +1,7 @@
 import type { GameState, TankState } from '../sim/types.ts';
 import type { SimEvent } from '../sim/events.ts';
 import type { Command } from '../sim/commands.ts';
+import { PersonalityAssignments } from '../jev/personality.ts';
 import { observeTank } from '../jev/observation.ts';
 import { separateJevSpawns } from '../jev/placement.ts';
 import { buildCandidates, commandForPlan } from '../jev/controller.ts';
@@ -10,6 +11,7 @@ import type { TankMemory, TankObservation, TacticalPlan, Strategy } from '../jev
 const REQUEST_TIMEOUT_MS = 1500;
 const PLAN_MAX_AGE_TICKS = 30;
 export class JevSession {
+  private personalities: PersonalityAssignments;
   private auditStore = new DecisionAuditStore();
   private auditRevision = 0;
   private auditRecords: DecisionAudit[] = [];
@@ -64,7 +66,7 @@ export class JevSession {
   private interventions = { wallAvoided: 0, tankAvoided: 0, allyShotAvoided: 0 };
   private counters = { requests: 0, maxRequestedTanks: 0, modelDecisions: 0, modelCommandTicks: 0, fallbackTicks: 0, staleResponses: 0, failures: 0, inputTokens: 0, spentUsd: 0, latencyMs: 0, wallHits: 0, obstacleContacts: 0, tankContacts: 0, friendlyFireHits: 0, friendlyFireDamage: 0, playerDamage: 0, enemyProjectileDamage: 0, playerDeaths: 0, enemyDeaths: 0, shots: 0, flags: 0, closeCallTicks: 0, tankContactTicks: 0, stationaryTicks: 0, observedTicks: 0 };
   private fetcher: typeof fetch;
-  constructor(fetcher: typeof fetch = (input, init) => globalThis.fetch(input, init)) { this.fetcher = fetcher; }
+  constructor(fetcher: typeof fetch = (input, init) => globalThis.fetch(input, init), random: () => number = Math.random) { this.fetcher = fetcher; this.personalities = new PersonalityAssignments(random); }
   configure(opts: Partial<{ enabled: boolean; playerAutopilot: boolean; hz: number }>): void {
     if (opts.hz !== undefined && opts.hz !== 2 && opts.hz !== 5) throw new Error('Jev cadence must be 2 or 5 Hz');
     this.settings = { ...this.settings, ...Object.fromEntries(Object.entries(opts).filter(([, value]) => value !== undefined)) };
@@ -114,6 +116,7 @@ export class JevSession {
     const active = this.settings.enabled && playing && local && visible && state.mode === 'solo' && state.players.length === 1 && !state.gameOver;
     const player = state.players[0];
     const identity = `${state.level}`;
+    if (identity !== this.identity || state.tick < this.lastTick) this.personalities.reset();
     if (identity !== this.identity || state.tick < this.lastTick || (!active && this.active)) { this.invalidate(); this.identity = identity; }
     if (this.active) {
       const elapsed = Math.max(0, now - this.clockAt);
@@ -141,6 +144,7 @@ export class JevSession {
     const payload = tanks.map(tank => {
       const memory = this.memories[tank.id] ??= { seen: {} };
       const observation = observeTank(state, tank.id, memory, { sharedSightings: state.enemies.some(e => e.id === tank.id) ? sharedSightings : [], strategies: this.acceptedStrategies });
+      observation.own.personality = this.personalities.get(tank.id, tank.id === player?.id);
       this.observations[tank.id] = observation;
       const choices = buildCandidates(observation, tank.position); candidates[tank.id] = choices;
       return { tankId: tank.id, role: tank.id === player?.id ? 'player' : 'enemy', observation, candidates: choices.map(c => ({ id: c.id, description: c.description })) };
@@ -241,6 +245,7 @@ export class JevSession {
       }
       if (event.type === 'EnemyRespawned' || event.type === 'EnemyDestroyed' || event.type === 'PlayerRespawned' || event.type === 'PlayerDestroyed') {
         const id = event.type === 'EnemyRespawned' || event.type === 'EnemyDestroyed' ? event.enemyId : event.tankId;
+        this.personalities.forget(id);
         this.finishUnapplied(id, 'life ended');
         this.lifeSerial[id] = (this.lifeSerial[id] ?? 0) + 1;
         delete this.memories[id]; delete this.observations[id]; delete this.plans[id]; delete this.acceptedStrategies[id];
