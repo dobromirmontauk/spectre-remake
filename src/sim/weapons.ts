@@ -8,6 +8,7 @@ import { dcos, dsin } from './dmath.ts';
 import {
   ARENA_HALF_SIZE,
   ENEMY_DAMAGE_PER_SHOT,
+  ENEMY_FIRE_RANGE,
   GRENADE_BLAST_RADIUS,
   GRENADE_DAMAGE,
   GRENADE_DAMAGE_PLAYER,
@@ -36,6 +37,26 @@ function noseOf(tank: TankState, aheadDistance: number): Vec2 {
     x: tank.position.x + dsin(tank.heading) * aheadDistance,
     z: tank.position.z + dcos(tank.heading) * aheadDistance,
   };
+}
+
+// Recheck the actual post-movement muzzle ray. The first hit must be an
+// opposing living tank; stale/pre-turn headings cannot authorize a shot.
+export function safeExternalEnemyShot(state: GameState, owner: TankState): boolean {
+  const end = { x: owner.position.x + dsin(owner.heading) * ENEMY_FIRE_RANGE, z: owner.position.z + dcos(owner.heading) * ENEMY_FIRE_RANGE };
+  let first = Infinity;
+  let opposing = false;
+  for (const tank of [...state.players, ...state.enemies]) {
+    if (!tank.alive || tank.id === owner.id) continue;
+    const hit = segmentVsCircle(owner.position, end, tank.position, TANK_RADIUS + PROJECTILE_RADIUS);
+    if (hit.hit && hit.t <= first) { first = hit.t; opposing = state.players.some(p => p.id === tank.id); }
+  }
+  for (const obstacle of state.obstacles) {
+    const hit = obstacle.kind === 'wall'
+      ? segmentVsAABB(owner.position, end, { x: obstacle.min.x - PROJECTILE_RADIUS, z: obstacle.min.z - PROJECTILE_RADIUS }, { x: obstacle.max.x + PROJECTILE_RADIUS, z: obstacle.max.z + PROJECTILE_RADIUS })
+      : segmentVsCircle(owner.position, end, obstacle.position, obstacle.pylonRadius + PROJECTILE_RADIUS);
+    if (hit.hit && hit.t <= first) { first = hit.t; opposing = false; }
+  }
+  return opposing;
 }
 
 export function fireProjectile(state: GameState, owner: TankState, heading: number, events: SimEvent[]): void {
