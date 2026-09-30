@@ -6,6 +6,16 @@ None.
 
 ## Resolved
 
+### 2026-09-30 — Publish live AI test evidence to repository
+
+**Context:** Automatic approval review rejected a combined commit/push of `test/validation/jev-ai/2026-09-30/` because it includes full provider prompts/responses and detailed game telemetry; no credentials are included. Source changes continue independently.
+
+**Question:** May the gameplay videos, action traces and provider examples be committed and pushed to the spectre-remake GitHub repository, or should they remain local?
+
+**Blocking:** Remote evidence handoff and cleanup of the isolated verification worktree.
+
+**Answered 2026-09-30:** User approved committing the recordings, traces and full Jev call examples, and requested a `test/validation/` folder structure so they are clearly separate from the main application. Reflected in `test/validation/README.md`, artifact commit `0e9a025`, and `TODO.md`.
+
 ### 2026-09-29 — Identify Jev and fast Luna
 
 **Context:** User requested research on replacing Spectre’s enemy AI using “Jev” and “fast Luna.” These identifiers are not defined in the project and a public search did not establish their identities.

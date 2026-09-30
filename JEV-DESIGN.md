@@ -27,7 +27,17 @@ Jev chooses a finite maneuver, not arbitrary controls or executable code. Player
 
 ## Information boundary
 
-The commander receives its own position, heading, speed, shield fraction, ammo and cooldown; contacts within 65 units, a 234-degree forward arc and unobstructed line of sight; visible obstacle geometry or four-unit tactile geometry; and only its own timestamped previous sightings and visited trail. It does not receive the whole simulation, RNG, hidden objectives, opponent health/ammo, other commanders' perspectives, or unseen current target positions. Last-seen moving opponents are not indefinite pursuit targets. Unrelated unseen respawns do not erase another commander's memory.
+The commander always has its own operating status, public total/remaining flag counts, and local vision: contacts within 65 units, a 234-degree forward arc and unobstructed line of sight, plus visible obstacle geometry or four-unit tactile geometry. Intelligence deliberately expands with campaign level:
+
+| Level | Authorized map and squad knowledge |
+| --- | --- |
+| 1–2 | Individually observed objectives; remembered flag coordinates are approximate. No advance objective list or hidden live opponent tracking. |
+| 3–4 | Exact own map location and advance positions of typed flags, ammo and shield items. Visibility still limits opponent sightings. |
+| 5+ | Other AI tank locations and their last accepted strategy. Enemy commanders receive the player's current sighting only while at least one enemy can see the player. |
+
+Tank tracks record their last observed position and heading, observation tick/time, age relative to the current game time, and whether the sighting came from the commander or a shared spotter. Hidden moving targets retain their last observation; they do not acquire fresh coordinates or headings merely because game time advances. No tier reveals opponent health/ammo, RNG or the complete simulation.
+
+Enemy mission instructions explicitly say to stop the player taking their flags. Two or fewer remaining flags increase interception urgency without bypassing survival or safety rules. Healthy enemies without a visible opponent receive progressing patrol/exploration choices; automatic idle guarding and peaceful regrouping are excluded after recorded tests showed long stationary stretches. Enemies without a visible opponent should patrol a defensive circuit around a known flag and look outward for the player. Protecting a flag remains a distinct deliberate choice. Recent incoming fire and low shield prioritize retreat or regrouping over pursuit. Tactical strategy and maneuver are recorded separately, so several local maneuvers can implement the same survival or patrol strategy.
 
 Each upstream request contains **one tank's perspective only**. Multiple Jev questions share state, so combining all perspectives into one provider call would violate the boundary. Browser batching saves local transport overhead only. At four tanks and 2 Hz, the nominal load is eight provider calls/second. Two upstream calls may run concurrently.
 
@@ -54,3 +64,25 @@ Tick events measure actual contacts/damage. Trajectory distance, stationary seco
 ## Evidence
 
 Reports and gameplay are in [reference/verification/jev/](reference/verification/jev/). Each compact report has a companion `samples.json.gz` preserving its full sampled state for reproduction. Failed and intermediate runs are retained, including the original HTTP400 wire mismatch, a spacing deadlock, dynamic tank contacts and a windmill impact. Later acceptance evidence must be read against the exact code revision and configuration recorded in the evaluation summary.
+
+## Decision audit and live log
+
+Every new upstream call is saved locally before transmission, then completed with its result or error. Entries include UTC timestamps, game tick, tank identity, exact provider state/instructions/choices, selected choice, confidence, usage and cost when available. An unmatched start after interruption remains visibly pending/unknown. Credentials and authorization headers are excluded. The audit is persistent across server restarts and separate from the cumulative spending ledger; it must not be reset during testing.
+
+The live decision window presents concise tank/strategy/maneuver summaries with latency and outcome. Exact input state and options are collapsed by default and expandable per call. Model choices, browser application/staleness and local fallback are distinguished; summaries describe supplied choices rather than inventing model reasoning. The visible list is bounded for responsiveness, while the durable backend history preserves every recorded call. Logging begins with this version; previous calls cannot be reconstructed from aggregate spending statistics.
+
+## September 30 review refinements
+
+Enemy personality is assigned per life with 60% aggressive, 20% neutral and 20% cowardly probability; the player autopilot is neutral. The personality draw is outside the pure simulation RNG and persists across pause/configuration. Risk preferences never override survival or physical safety. The exact commander observation includes the assigned personality.
+
+The local controller forecasts moving-body separation independently of short static route checks, considers a peer braking abruptly, and rejects offensive destinations crowded by known allies. A turn deadzone accounts for the actual per-tick turn increment. Stationary holds are unavailable when a fresh known friendly occupies their firing corridor. A six-tick neutral grace during brief plan expiry avoids scan/reacquire oscillation; it disables firing, retains physical guards, and then resumes fallback scanning.
+
+Friendly-fire safeguards check the shell's full flight, including allies beyond a dodging target and reachable movement during flight. Enemy firing rechecks the actual post-movement muzzle pose. These safeguards preserve normal weapon cooldowns and the unchanged normal simulation.
+
+Provider instructions state horizontal x/z game units, signed speed per second, headings in radians (0 toward +z, pi/2 toward +x), and 30 simulation ticks per second. Only the provider copy normalizes tank headings; simulation steering is unchanged. Approximate early coordinates and observation ages are explicitly explained. Candidate descriptions promise checks against known geometry, never guaranteed future safety.
+
+Every parsed provider response envelope is retained with the request and result/error, without authorization headers. Legacy extracted-only records are not reconstructed. Malformed browser responses are rejected before usage counters update; invalid JSON text is retained for review. All calls use the same persistent cumulative ledger and conservative unknown-cost accounting.
+
+Spacing recovery retains a chosen escape direction until nine-unit clearance, with a 120-tick maximum lifetime and level/rollback/lifecycle resets. It lives only in local controller memory, outside provider observations and pure simulation state. Actual session regressions cover the motor memory and expired-plan grace, rather than only isolated controller calls.
+
+Approved September 30 recordings, exact example calls and review reports: `test/validation/README.md` and `test/validation/jev-ai/2026-09-30/EVALUATION.md`. This directory is validation evidence, not runtime code or deployment assets. The user approved its repository publication.
