@@ -1,0 +1,81 @@
+import { createServer } from 'node:http';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { Budget, MAX_INPUT_TOKENS } from './budget.mjs';
+const BODY_LIMIT=32768;
+const fail=(status,message)=>Object.assign(new Error(message),{status});
+const plain=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
+const id=x=>(typeof x==='string'&&/^[a-zA-Z0-9_-]{1,64}$/.test(x))||(Number.isSafeInteger(x)&&x>=0);
+export function validateRequest(body){
+ if(!plain(body)||body.version!==1||!Number.isSafeInteger(body.sequence)||body.sequence<0||!Number.isSafeInteger(body.tick)||body.tick<0||!Array.isArray(body.tanks)||body.tanks.length<1||body.tanks.length>4)throw fail(400,'invalid decision request');
+ let enemies=0,players=0;const ids=new Set();
+ for(const t of body.tanks){
+  if(!plain(t)||!id(t.tankId)||ids.has(String(t.tankId))||!['enemy','player'].includes(t.role)||!plain(t.observation)||JSON.stringify(t.observation).length>6000||!Array.isArray(t.candidates)||!t.candidates.length||t.candidates.length>16)throw fail(400,'invalid tank');
+  ids.add(String(t.tankId));t.role==='enemy'?enemies++:players++;
+  const choices=new Set();for(const c of t.candidates){if(!plain(c)||typeof c.id!=='string'||!/^[a-zA-Z0-9_-]{1,64}$/.test(c.id)||choices.has(c.id)||typeof c.description!=='string'||!c.description.length||c.description.length>512)throw fail(400,'invalid candidate');choices.add(c.id);}
+ }
+ if(enemies>3||players>1)throw fail(400,'maximum three enemies and one player');
+ return body;
+}
+export function providerRequest(body){
+ const observations=Object.fromEntries(body.tanks.map(t=>[String(t.tankId),t.observation]));
+ const questions=Object.fromEntries(body.tanks.map((t,i)=>['tank_'+i,{type:'choice',instructions:`You command tank ${JSON.stringify(t.tankId)}. Use ONLY observations[${JSON.stringify(String(t.tankId))}], your tank's perception; other tanks' observations are unavailable to you. Pick the best available maneuver for the next 200 milliseconds. Preserve your tank, avoid barriers and tank collisions, never fire through teammates, avoid ineffective chasing, use safe cover and firing lanes. ${t.role==='player'?'Collect flags and survive while fighting enemies.':'Challenge the opposing player with purposeful attacks and flanks.'} Candidate descriptions specify validated local outcomes. Prefer progress toward your objective over idle behavior unless holding or retreating is tactically necessary.`,criteria:Object.fromEntries(t.candidates.map(c=>[c.id,c.description]))}]));
+ // Caller supplies one tank at a time, isolating perception at the provider boundary.
+ return {model:'jev-1.13.0',state:{observations},questions};
+}
+export function normalizeAnswers(body,result){
+ if(!plain(result)||!plain(result.answers)||!plain(result.usage)||!Number.isSafeInteger(result.usage.input_tokens)||result.usage.input_tokens<0||result.usage.input_tokens>MAX_INPUT_TOKENS)throw fail(502,'invalid upstream response');
+ return body.tanks.map((t,i)=>{const a=result.answers['tank_'+i];const choices=t.candidates.map(c=>c.id);if(!plain(a)||a.type!=='choice'||!choices.includes(a.choice)||!Number.isFinite(a.confidence)||a.confidence<0||a.confidence>1||!plain(a.probabilities)||choices.some(c=>!Number.isFinite(a.probabilities[c])||a.probabilities[c]<0||a.probabilities[c]>1)||Object.keys(a.probabilities).some(c=>!choices.includes(c))||Math.abs(Object.values(a.probabilities).reduce((s,v)=>s+v,0)-1)>0.02)throw fail(502,'invalid upstream choice');return {tankId:t.tankId,choice:a.choice,confidence:a.confidence,probabilities:a.probabilities};});
+}
+function localOrigin(origin){try{const u=new URL(origin);return u.protocol==='http:'&&['localhost','127.0.0.1','[::1]'].includes(u.hostname)&&!u.username&&!u.password&&u.pathname==='/'&&!u.search&&!u.hash;}catch{return false;}}
+async function readBody(req){let size=0;const chunks=[];for await(const c of req){size+=c.length;if(size>BODY_LIMIT)throw fail(413,'request too large');chunks.push(c);}try{return JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{throw fail(400,'invalid JSON');}}
+export function createJevServer({apiKey='',ledgerFile,fetchImpl=globalThis.fetch,timeoutMs=1500,limitUsd=9.5}={}){
+ const budget=new Budget(ledgerFile,{limitUsd});let active=0;let calls=[];let upstreamActive=0;const waiters=[];
+ const acquire=async()=>{if(upstreamActive>=2)await new Promise(r=>waiters.push(r));else upstreamActive++;};
+ const release=()=>{if(waiters.length)waiters.shift()();else upstreamActive--;};
+ const server=createServer(async(req,res)=>{
+  const send=(status,data)=>{res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify(data));};
+  try{
+   const origin=req.headers.origin;if(origin&&!localOrigin(origin))throw fail(403,'localhost origins only');
+   // Block browser navigation/simple requests and non-local Host DNS rebinding.
+   if(!/^(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/.test(req.headers.host??''))throw fail(403,'localhost host only');
+   if(origin){res.setHeader('Access-Control-Allow-Origin',origin);res.setHeader('Vary','Origin');}
+   if(req.method==='OPTIONS'){res.setHeader('Access-Control-Allow-Methods','GET, POST, OPTIONS');res.setHeader('Access-Control-Allow-Headers','Content-Type');res.writeHead(204);res.end();return;}
+   if(req.method==='GET'&&['/health','/api/jev/health'].includes(req.url)){send(200,{available:!!apiKey,spentUsd:budget.spentUsd,limitUsd,model:'jev-1.13.0',attemptedCalls:budget.data.calls,pendingReservations:budget.pending.size});return;}
+   if(req.method!=='POST'||req.url!=='/api/jev/decide')throw fail(404,'not found');
+   if(!(req.headers['content-type']??'').startsWith('application/json'))throw fail(415,'JSON required');
+   if(!apiKey)throw fail(503,'Jev key not configured');
+   if(active>=2)throw fail(429,'too many in-flight requests');
+   const now=Date.now();calls=calls.filter(t=>now-t<1000);if(calls.length>=6)throw fail(429,'local rate limit');calls.push(now);
+   active++;
+   try{
+    const body=validateRequest(await readBody(req));
+    const results=await Promise.all(body.tanks.map(async(t)=>{
+     // One tank per provider call: shared-state batching would reveal another tank's vision.
+     const one={...body,tanks:[t]};const payload=providerRequest(one);
+     if(Buffer.byteLength(JSON.stringify(payload))>BODY_LIMIT)throw fail(413,'upstream payload too large');
+     await acquire();
+     let reservation;try{reservation=budget.reserve();}catch{release();throw fail(402,'Jev test budget exhausted');}
+     const controller=new AbortController();let timer;
+     const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>{controller.abort();reject(fail(504,'Jev request timed out'));},timeoutMs);});
+     try{
+      const result=await Promise.race([(async()=>{const upstream=await fetchImpl('https://api.typesafe.ai/v1/systemone',{method:'POST',headers:{Authorization:`Bearer ${apiKey}`,'Content-Type':'application/json'},body:JSON.stringify(payload),signal:controller.signal});if(!upstream.ok)throw fail(502,'Jev upstream rejected request');const text=await upstream.text();if(Buffer.byteLength(text)>65536)throw fail(502,'upstream response too large');try{return JSON.parse(text);}catch{throw fail(502,'invalid upstream JSON');}})(),timeout]);
+      const decisions=normalizeAnswers(one,result);const costUsd=budget.settle(reservation,result.usage.input_tokens);return {decision:decisions[0],inputTokens:result.usage.input_tokens,costUsd};
+     }finally{clearTimeout(timer);release();}
+    }));
+    const costUsd=results.reduce((s,r)=>s+r.costUsd,0);const inputTokens=results.reduce((s,r)=>s+r.inputTokens,0);
+    send(200,{sequence:body.sequence,tick:body.tick,decisions:results.map(r=>r.decision),usage:{inputTokens,costUsd},costUsd,spentUsd:budget.spentUsd});
+   }finally{active--;}
+  }catch(e){send(e.status??500,{error:e.status?e.message:'backend unavailable',spentUsd:budget.spentUsd});}
+ });
+ server.on('close',()=>budget.close());return {server,budget};
+}
+export function loadApiKey(env=process.env){
+ if(env.TYPESAFE_API_KEY)return env.TYPESAFE_API_KEY;
+ if(!env.JEV_ENV_FILE)return '';
+ const text=readFileSync(env.JEV_ENV_FILE,'utf8');const line=text.split(/\r?\n/).find(x=>/^\s*(?:export\s+)?TYPESAFE_API_KEY\s*=/.test(x));if(!line)return '';let key=line.slice(line.indexOf('=')+1).trim();if((key[0]==='"'&&key.at(-1)==='"')||(key[0]==="'"&&key.at(-1)==="'"))key=key.slice(1,-1);return key;
+}
+if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
+ try{if(!process.env.JEV_LEDGER_FILE)throw new Error('Set absolute JEV_LEDGER_FILE to the persistent test ledger');const {server}=createJevServer({apiKey:loadApiKey(),ledgerFile:process.env.JEV_LEDGER_FILE});server.listen(Number(process.env.JEV_PORT??8787),'127.0.0.1',()=>console.log('Jev local backend listening on 127.0.0.1'));for(const signal of ['SIGINT','SIGTERM'])process.on(signal,()=>server.close());}catch{console.error('Jev backend could not start; check ledger path, lock, and environment configuration');process.exitCode=1;}
+}
