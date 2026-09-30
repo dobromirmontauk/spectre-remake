@@ -99,7 +99,7 @@ s.enemies=[];s.obstacles=[];player.position={x:0,z:0};player.heading=0;player.am
 s.flags=[{id:'goalFlag',position:{x:0,z:15},collected:false}];s.pickups=[{id:'heal',kind:'shield',position:{x:4,z:20},amount:25,collected:false},{id:'refill',kind:'ammo',position:{x:-4,z:20},amount:20,collected:false}];
 const supplyMemory={seen:{}};let supplyObs=observeTank(s,'player',supplyMemory);let supplyChoices=buildCandidates(supplyObs);
 assert(!supplyChoices.some(c=>c.id==='pickup:heal'),'fullshield never offers healing');assert(!supplyChoices.some(c=>c.id==='pickup:refill'),'fullammo never offers resupply');
-player.shield=player.maxShield/2;player.ammo=player.maxAmmo-10;supplyObs=observeTank(s,'player',supplyMemory);supplyChoices=buildCandidates(supplyObs);
+player.shield=player.maxShield/2;player.ammo=player.maxAmmo-10;supplyObs=observeTank(s,'player',{seen:{}});supplyChoices=buildCandidates(supplyObs);
 assert(supplyChoices.find(c=>c.id==='pickup:heal')?.description.includes('shield'),'needed healing explicitly offered');assert(supplyChoices.find(c=>c.id==='pickup:refill')?.description.includes('10'),'ammo benefit bounded by own missingcapacity');
 assert.equal(supplyObs.contacts.find(c=>c.id==='heal')?.pickupKind,'shield','visiblepickupkind supplied');
 player.heading=Math.PI;player.shield=player.maxShield;player.ammo=player.maxAmmo;
