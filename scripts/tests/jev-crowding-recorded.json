@@ -1,0 +1,1553 @@
+{
+  "state": {
+    "tick": 1922,
+    "level": 5,
+    "rng": {
+      "state": 2094110878
+    },
+    "mode": "solo",
+    "players": [
+      {
+        "id": "player",
+        "slot": 0,
+        "position": {
+          "x": 54.390571207155986,
+          "z": -14.0310172810793
+        },
+        "prevPosition": {
+          "x": 54.390571207155986,
+          "z": -14.0310172810793
+        },
+        "heading": -11.403981332530941,
+        "prevHeading": -11.403981332530941,
+        "speed": 17.4,
+        "shield": 40,
+        "maxShield": 100,
+        "ammo": 77,
+        "maxAmmo": 80,
+        "alive": true,
+        "fireCooldown": 0,
+        "grenadeCooldown": 0,
+        "invulnerableTicks": 0,
+        "lastHitBy": "enemy-L5-0",
+        "respawnTicksRemaining": 0,
+        "lives": 3,
+        "kills": 0,
+        "loadout": {
+          "id": "balanced",
+          "name": "Balanced",
+          "speed": 9,
+          "shields": 100,
+          "ammo": 80
+        },
+        "movement": {
+          "turnRate": 2.827433388230814,
+          "thrustAccel": 40,
+          "reverseAccel": 26,
+          "coastFriction": 18,
+          "maxSpeed": 18,
+          "maxReverseSpeed": 14
+        },
+        "name": "Player 1",
+        "removed": false
+      }
+    ],
+    "obstacles": [
+      {
+        "id": "wall-0",
+        "kind": "wall",
+        "min": {
+          "x": -72.68515452486463,
+          "z": 80.76240441156551
+        },
+        "max": {
+          "x": -68.44037090125494,
+          "z": 89.24009149195626
+        }
+      },
+      {
+        "id": "wall-1",
+        "kind": "wall",
+        "min": {
+          "x": -68.57655119244009,
+          "z": -54.76315437001176
+        },
+        "max": {
+          "x": -62.43973265122622,
+          "z": -45.408722451655194
+        }
+      },
+      {
+        "id": "wall-2",
+        "kind": "wall",
+        "min": {
+          "x": -63.93609281629324,
+          "z": 24.36873621866107
+        },
+        "max": {
+          "x": -58.96445455402136,
+          "z": 30.366719972342253
+        }
+      },
+      {
+        "id": "wall-3",
+        "kind": "wall",
+        "min": {
+          "x": 50.46124530071393,
+          "z": 66.17422497388907
+        },
+        "max": {
+          "x": 56.30734479194507,
+          "z": 71.58253151434474
+        }
+      },
+      {
+        "id": "wall-4",
+        "kind": "wall",
+        "min": {
+          "x": 17.675276921596378,
+          "z": -52.329674841836095
+        },
+        "max": {
+          "x": 23.90757147828117,
+          "z": -45.561050372198224
+        }
+      },
+      {
+        "id": "wall-5",
+        "kind": "wall",
+        "min": {
+          "x": 30.087048772489652,
+          "z": 56.98302025580779
+        },
+        "max": {
+          "x": 34.323286425555125,
+          "z": 61.26450396841392
+        }
+      },
+      {
+        "id": "wall-6",
+        "kind": "wall",
+        "min": {
+          "x": 67.34294444462284,
+          "z": 25.793210863368586
+        },
+        "max": {
+          "x": 73.45089478651062,
+          "z": 31.59100688691251
+        }
+      },
+      {
+        "id": "wall-7",
+        "kind": "wall",
+        "min": {
+          "x": -22.95976282353513,
+          "z": 57.43695752113126
+        },
+        "max": {
+          "x": -16.64040420507081,
+          "z": 66.51372298807837
+        }
+      },
+      {
+        "id": "windmill-0",
+        "kind": "windmill",
+        "position": {
+          "x": -54.81508445739746,
+          "z": 53.20848507061601
+        },
+        "pylonRadius": 1.2,
+        "bladeLength": 6,
+        "bladeAngle": 102.50217673824636,
+        "prevBladeAngle": 102.44981686068654
+      },
+      {
+        "id": "windmill-1",
+        "kind": "windmill",
+        "position": {
+          "x": 83.70280100218952,
+          "z": 80.08490033634007
+        },
+        "pylonRadius": 1.2,
+        "bladeLength": 6,
+        "bladeAngle": 104.39719513997468,
+        "prevBladeAngle": 104.34483526241486
+      },
+      {
+        "id": "windmill-2",
+        "kind": "windmill",
+        "position": {
+          "x": 87.238855317235,
+          "z": -9.97455658391118
+        },
+        "pylonRadius": 1.2,
+        "bladeLength": 6,
+        "bladeAngle": 104.30467826666414,
+        "prevBladeAngle": 104.25231838910432
+      },
+      {
+        "id": "windmill-3",
+        "kind": "windmill",
+        "position": {
+          "x": 5.81032632663846,
+          "z": 85.65863162092865
+        },
+        "pylonRadius": 1.2,
+        "bladeLength": 6,
+        "bladeAngle": 104.18913974266087,
+        "prevBladeAngle": 104.13677986510105
+      }
+    ],
+    "flags": [
+      {
+        "id": "flag-0",
+        "position": {
+          "x": 17.31922663934529,
+          "z": -78.42652659676969
+        },
+        "collected": true
+      },
+      {
+        "id": "flag-1",
+        "position": {
+          "x": 79.10710690915585,
+          "z": 48.13521848991513
+        },
+        "collected": true
+      },
+      {
+        "id": "flag-2",
+        "position": {
+          "x": 48.474374156445265,
+          "z": -5.380623249337077
+        },
+        "collected": true
+      },
+      {
+        "id": "flag-3",
+        "position": {
+          "x": -88.83585252985358,
+          "z": -77.50427957251668
+        },
+        "collected": false
+      },
+      {
+        "id": "flag-4",
+        "position": {
+          "x": 64.14217022806406,
+          "z": -40.005798352882266
+        },
+        "collected": true
+      },
+      {
+        "id": "flag-5",
+        "position": {
+          "x": 55.52214901894331,
+          "z": -82.46493305452168
+        },
+        "collected": true
+      },
+      {
+        "id": "flag-6",
+        "position": {
+          "x": -36.7149197999388,
+          "z": -40.62740289606154
+        },
+        "collected": true
+      },
+      {
+        "id": "flag-7",
+        "position": {
+          "x": -12.355919681489468,
+          "z": -77.13110386766493
+        },
+        "collected": true
+      },
+      {
+        "id": "flag-8",
+        "position": {
+          "x": -42.883547792211175,
+          "z": 76.58331468887627
+        },
+        "collected": true
+      },
+      {
+        "id": "flag-9",
+        "position": {
+          "x": 42.234303968027234,
+          "z": 21.931909224018455
+        },
+        "collected": true
+      }
+    ],
+    "pickups": [
+      {
+        "id": "pickup-0",
+        "kind": "ammo",
+        "amount": 20,
+        "position": {
+          "x": 80.8338748048991,
+          "z": -54.29587615840137
+        },
+        "collected": true
+      },
+      {
+        "id": "pickup-1",
+        "kind": "ammo",
+        "amount": 20,
+        "position": {
+          "x": -35.91294688731432,
+          "z": -85.99042478948832
+        },
+        "collected": false
+      },
+      {
+        "id": "pickup-2",
+        "kind": "ammo",
+        "amount": 20,
+        "position": {
+          "x": 56.47337435744703,
+          "z": 48.18805932253599
+        },
+        "collected": false
+      },
+      {
+        "id": "pickup-3",
+        "kind": "ammo",
+        "amount": 20,
+        "position": {
+          "x": -70.4236500710249,
+          "z": -15.28566568903625
+        },
+        "collected": false
+      },
+      {
+        "id": "pickup-4",
+        "kind": "shield",
+        "amount": 25,
+        "position": {
+          "x": -45.98952777124941,
+          "z": -20.382914999499917
+        },
+        "collected": false
+      },
+      {
+        "id": "pickup-5",
+        "kind": "shield",
+        "amount": 25,
+        "position": {
+          "x": 31.098116721957922,
+          "z": 88.90555928647518
+        },
+        "collected": false
+      },
+      {
+        "id": "pickup-6",
+        "kind": "shield",
+        "amount": 25,
+        "position": {
+          "x": 25.451837776228786,
+          "z": 38.72869201004505
+        },
+        "collected": true
+      },
+      {
+        "id": "pickup-7",
+        "kind": "shield",
+        "amount": 25,
+        "position": {
+          "x": -60.145766384899616,
+          "z": -85.12069047987461
+        },
+        "collected": false
+      }
+    ],
+    "flagsCollected": 9,
+    "enemies": [
+      {
+        "id": "enemy-L5-0",
+        "position": {
+          "x": 26.46370932818469,
+          "z": -22.529482767880783
+        },
+        "prevPosition": {
+          "x": 26.46370932818469,
+          "z": -22.529482767880783
+        },
+        "heading": 1.633628179866693,
+        "prevHeading": 1.633628179866693,
+        "speed": 20.166666666666664,
+        "shield": 3,
+        "maxShield": 3,
+        "ammo": 999999,
+        "maxAmmo": 999999,
+        "alive": true,
+        "fireCooldown": 34,
+        "grenadeCooldown": 0,
+        "invulnerableTicks": 0,
+        "lastHitBy": "player",
+        "respawnTicksRemaining": 0,
+        "kind": "drone",
+        "aiState": "PURSUE",
+        "stuckTicks": 0,
+        "unstickTicksRemaining": 0,
+        "unstickTurnDir": 1
+      },
+      {
+        "id": "enemy-L5-1",
+        "position": {
+          "x": 13.756788671140447,
+          "z": -19.52541025305213
+        },
+        "prevPosition": {
+          "x": 13.756788671140447,
+          "z": -19.52541025305213
+        },
+        "heading": 1.696460032938489,
+        "prevHeading": 1.696460032938489,
+        "speed": 20.266666666666666,
+        "shield": 3,
+        "maxShield": 3,
+        "ammo": 999999,
+        "maxAmmo": 999999,
+        "alive": true,
+        "fireCooldown": 0,
+        "grenadeCooldown": 0,
+        "invulnerableTicks": 0,
+        "lastHitBy": null,
+        "respawnTicksRemaining": 0,
+        "kind": "drone",
+        "aiState": "PURSUE",
+        "stuckTicks": 0,
+        "unstickTicksRemaining": 0,
+        "unstickTurnDir": 1
+      },
+      {
+        "id": "enemy-L5-2",
+        "position": {
+          "x": -0.8643213049279299,
+          "z": -88.80452833522502
+        },
+        "prevPosition": {
+          "x": -0.8643213049279299,
+          "z": -88.80452833522502
+        },
+        "heading": 16.399113651738656,
+        "prevHeading": 16.399113651738656,
+        "speed": 11.89999999999999,
+        "shield": 1,
+        "maxShield": 3,
+        "ammo": 999999,
+        "maxAmmo": 999999,
+        "alive": true,
+        "fireCooldown": 0,
+        "grenadeCooldown": 0,
+        "invulnerableTicks": 0,
+        "lastHitBy": "player",
+        "respawnTicksRemaining": 0,
+        "kind": "drone",
+        "aiState": "PURSUE",
+        "stuckTicks": 0,
+        "unstickTicksRemaining": 0,
+        "unstickTurnDir": 1
+      }
+    ],
+    "projectiles": [],
+    "grenades": [],
+    "score": 1100,
+    "bonusRemaining": 259,
+    "winner": null,
+    "gameOver": false,
+    "god": false,
+    "enemyFriendlyFire": true,
+    "nextEntityId": 15,
+    "events": []
+  },
+  "plans": {
+    "enemy-L5-1": {
+      "id": "intercept:player:flag-3",
+      "strategy": "pursue",
+      "description": "Strategy pursue: URGENT 1 flags remain: intercept observed opponent player on known flag flag-3 approach; keep at least12-unit target separation, aim to stop capture; travel 26 units at -3 degrees relative heading; known obstacle route clear; destination target range 16 units",
+      "waypoint": {
+        "x": 34.2298832325971,
+        "z": -22.203162615683432
+      },
+      "fire": true,
+      "targetId": "player",
+      "expiresTick": 1941
+    },
+    "enemy-L5-2": {
+      "id": "retreat:safe:2",
+      "strategy": "retreat",
+      "description": "Strategy retreat: Break contact after low shields; move away and regain stopping room; travel 18 units at 43 degrees relative heading; known obstacle route clear; destination target range 97 units",
+      "waypoint": {
+        "x": -15.304144504303641,
+        "z": -87.81821596291643
+      },
+      "fire": true,
+      "targetId": "player",
+      "expiresTick": 1941
+    },
+    "player": {
+      "id": "engage:enemy-L5-0",
+      "strategy": "pursue",
+      "description": "Strategy pursue: Engage spotter-reported target enemy-L5-0 at last reported position (age 0 seconds) while maintaining separation; travel 19 units at -176 degrees relative heading; known obstacle route clear; destination target range 12 units",
+      "waypoint": {
+        "x": 30.33012606359881,
+        "z": -20.088698892328924
+      },
+      "fire": true,
+      "targetId": "enemy-L5-0",
+      "expiresTick": 1941
+    },
+    "enemy-L5-0": {
+      "id": "intercept:player:flag-3",
+      "strategy": "pursue",
+      "description": "Strategy pursue: URGENT 1 flags remain: intercept observed opponent player on known flag flag-3 approach; keep at least12-unit target separation, aim to stop capture; travel 16 units at 1 degrees relative heading; known obstacle route clear; destination target range 16 units",
+      "waypoint": {
+        "x": 34.2298832325971,
+        "z": -22.203162615683432
+      },
+      "fire": true,
+      "targetId": "player",
+      "expiresTick": 1941
+    }
+  },
+  "updates": [
+    {
+      "tick": 1928,
+      "plans": {
+        "enemy-L5-1": {
+          "id": "intercept:player:flag-3",
+          "strategy": "pursue",
+          "description": "Strategy pursue: URGENT 1 flags remain: intercept observed opponent player on known flag flag-3 approach; keep at least12-unit target separation, aim to stop capture; travel 26 units at -3 degrees relative heading; known obstacle route clear; destination target range 16 units",
+          "waypoint": {
+            "x": 34.2298832325971,
+            "z": -22.203162615683432
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 1941
+        },
+        "enemy-L5-2": {
+          "id": "retreat:safe:2",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after low shields; move away and regain stopping room; travel 18 units at 43 degrees relative heading; known obstacle route clear; destination target range 97 units",
+          "waypoint": {
+            "x": -15.304144504303641,
+            "z": -87.81821596291643
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 1941
+        },
+        "player": {
+          "id": "engage:enemy-L5-0",
+          "strategy": "pursue",
+          "description": "Strategy pursue: Engage spotter-reported target enemy-L5-0 at last reported position (age 0 seconds) while maintaining separation; travel 19 units at -176 degrees relative heading; known obstacle route clear; destination target range 12 units",
+          "waypoint": {
+            "x": 30.33012606359881,
+            "z": -20.088698892328924
+          },
+          "fire": true,
+          "targetId": "enemy-L5-0",
+          "expiresTick": 1941
+        },
+        "enemy-L5-0": {
+          "id": "intercept:player:flag-3",
+          "strategy": "pursue",
+          "description": "Strategy pursue: URGENT 1 flags remain: intercept observed opponent player on known flag flag-3 approach; keep at least12-unit target separation, aim to stop capture; travel 16 units at 1 degrees relative heading; known obstacle route clear; destination target range 16 units",
+          "waypoint": {
+            "x": 34.2298832325971,
+            "z": -22.203162615683432
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 1941
+        }
+      }
+    },
+    {
+      "tick": 1935,
+      "plans": {
+        "enemy-L5-1": {
+          "id": "intercept:player:flag-3",
+          "strategy": "pursue",
+          "description": "Strategy pursue: URGENT 1 flags remain: intercept observed opponent player on known flag flag-3 approach; keep at least12-unit target separation, aim to stop capture; travel 26 units at -3 degrees relative heading; known obstacle route clear; destination target range 16 units",
+          "waypoint": {
+            "x": 34.2298832325971,
+            "z": -22.203162615683432
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 1941
+        },
+        "enemy-L5-2": {
+          "id": "retreat:safe:2",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after low shields; move away and regain stopping room; travel 18 units at 43 degrees relative heading; known obstacle route clear; destination target range 97 units",
+          "waypoint": {
+            "x": -15.304144504303641,
+            "z": -87.81821596291643
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 1941
+        },
+        "player": {
+          "id": "engage:enemy-L5-0",
+          "strategy": "pursue",
+          "description": "Strategy pursue: Engage spotter-reported target enemy-L5-0 at last reported position (age 0 seconds) while maintaining separation; travel 19 units at -176 degrees relative heading; known obstacle route clear; destination target range 12 units",
+          "waypoint": {
+            "x": 30.33012606359881,
+            "z": -20.088698892328924
+          },
+          "fire": true,
+          "targetId": "enemy-L5-0",
+          "expiresTick": 1941
+        },
+        "enemy-L5-0": {
+          "id": "intercept:player:flag-3",
+          "strategy": "pursue",
+          "description": "Strategy pursue: URGENT 1 flags remain: intercept observed opponent player on known flag flag-3 approach; keep at least12-unit target separation, aim to stop capture; travel 16 units at 1 degrees relative heading; known obstacle route clear; destination target range 16 units",
+          "waypoint": {
+            "x": 34.2298832325971,
+            "z": -22.203162615683432
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 1941
+        }
+      }
+    },
+    {
+      "tick": 1941,
+      "plans": {
+        "enemy-L5-1": {
+          "id": "intercept:player:flag-3",
+          "strategy": "pursue",
+          "description": "Strategy pursue: URGENT 1 flags remain: intercept observed opponent player on known flag flag-3 approach; keep at least12-unit target separation, aim to stop capture; travel 25 units at -9 degrees relative heading; known obstacle route clear; destination target range 16 units",
+          "waypoint": {
+            "x": 41.47329361890764,
+            "z": -19.298139662867726
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 1956
+        },
+        "enemy-L5-2": {
+          "id": "retreat:safe:2",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after low shields; move away and regain stopping room; travel 18 units at 28 degrees relative heading; known obstacle route clear; destination target range 110 units",
+          "waypoint": {
+            "x": -19.739662550364304,
+            "z": -92.24333665230493
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 1956
+        },
+        "player": {
+          "id": "engage:enemy-L5-0",
+          "strategy": "pursue",
+          "description": "Strategy pursue: Engage spotter-reported target enemy-L5-0 at last reported position (age 0 seconds) while maintaining separation; travel 17 units at -155 degrees relative heading; known obstacle route clear; destination target range 12 units",
+          "waypoint": {
+            "x": 40.545825083946916,
+            "z": -18.346464480602933
+          },
+          "fire": true,
+          "targetId": "enemy-L5-0",
+          "expiresTick": 1956
+        },
+        "enemy-L5-0": {
+          "id": "intercept:player:flag-3",
+          "strategy": "pursue",
+          "description": "Strategy pursue: URGENT 1 flags remain: intercept observed opponent player on known flag flag-3 approach; keep at least12-unit target separation, aim to stop capture; travel 13 units at -11 degrees relative heading; known obstacle route clear; destination target range 16 units",
+          "waypoint": {
+            "x": 41.47329361890764,
+            "z": -19.298139662867726
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 1956
+        }
+      }
+    },
+    {
+      "tick": 1947,
+      "plans": {
+        "enemy-L5-1": {
+          "id": "intercept:player:flag-3",
+          "strategy": "pursue",
+          "description": "Strategy pursue: URGENT 1 flags remain: intercept observed opponent player on known flag flag-3 approach; keep at least12-unit target separation, aim to stop capture; travel 25 units at -9 degrees relative heading; known obstacle route clear; destination target range 16 units",
+          "waypoint": {
+            "x": 41.47329361890764,
+            "z": -19.298139662867726
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 1956
+        },
+        "enemy-L5-2": {
+          "id": "retreat:safe:2",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after low shields; move away and regain stopping room; travel 18 units at 28 degrees relative heading; known obstacle route clear; destination target range 110 units",
+          "waypoint": {
+            "x": -19.739662550364304,
+            "z": -92.24333665230493
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 1956
+        },
+        "player": {
+          "id": "engage:enemy-L5-0",
+          "strategy": "pursue",
+          "description": "Strategy pursue: Engage spotter-reported target enemy-L5-0 at last reported position (age 0 seconds) while maintaining separation; travel 17 units at -155 degrees relative heading; known obstacle route clear; destination target range 12 units",
+          "waypoint": {
+            "x": 40.545825083946916,
+            "z": -18.346464480602933
+          },
+          "fire": true,
+          "targetId": "enemy-L5-0",
+          "expiresTick": 1956
+        },
+        "enemy-L5-0": {
+          "id": "intercept:player:flag-3",
+          "strategy": "pursue",
+          "description": "Strategy pursue: URGENT 1 flags remain: intercept observed opponent player on known flag flag-3 approach; keep at least12-unit target separation, aim to stop capture; travel 13 units at -11 degrees relative heading; known obstacle route clear; destination target range 16 units",
+          "waypoint": {
+            "x": 41.47329361890764,
+            "z": -19.298139662867726
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 1956
+        }
+      }
+    },
+    {
+      "tick": 1954,
+      "plans": {
+        "enemy-L5-1": {
+          "id": "intercept:player:flag-3",
+          "strategy": "pursue",
+          "description": "Strategy pursue: URGENT 1 flags remain: intercept observed opponent player on known flag flag-3 approach; keep at least12-unit target separation, aim to stop capture; travel 16 units at -21 degrees relative heading; known obstacle route clear; destination target range 16 units",
+          "waypoint": {
+            "x": 42.288724285440715,
+            "z": -14.98894023504165
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 1971
+        },
+        "enemy-L5-2": {
+          "id": "retreat:safe:2",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after low shields; move away and regain stopping room; travel 18 units at -7 degrees relative heading; known obstacle route clear; destination target range 119 units",
+          "waypoint": {
+            "x": -26.34124967977999,
+            "z": -92.8366762372854
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 1971
+        },
+        "player": {
+          "id": "engage:enemy-L5-0",
+          "strategy": "pursue",
+          "description": "Strategy pursue: Engage visible target enemy-L5-0 while maintaining separation; travel 12 units at -85 degrees relative heading; known obstacle route clear; destination target range 12 units",
+          "waypoint": {
+            "x": 46.75239648792675,
+            "z": -14.172150388850906
+          },
+          "fire": true,
+          "targetId": "enemy-L5-0",
+          "expiresTick": 1971
+        },
+        "enemy-L5-0": {
+          "id": "intercept:player:flag-3",
+          "strategy": "pursue",
+          "description": "Strategy pursue: URGENT 1 flags remain: intercept observed opponent player on known flag flag-3 approach; keep at least12-unit target separation, aim to stop capture; travel 8 units at -14 degrees relative heading; known obstacle route clear; destination target range 16 units",
+          "waypoint": {
+            "x": 42.288724285440715,
+            "z": -14.98894023504165
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 1971
+        }
+      }
+    },
+    {
+      "tick": 1958,
+      "plans": {
+        "enemy-L5-1": {
+          "id": "intercept:player:flag-3",
+          "strategy": "pursue",
+          "description": "Strategy pursue: URGENT 1 flags remain: intercept observed opponent player on known flag flag-3 approach; keep at least12-unit target separation, aim to stop capture; travel 16 units at -21 degrees relative heading; known obstacle route clear; destination target range 16 units",
+          "waypoint": {
+            "x": 42.288724285440715,
+            "z": -14.98894023504165
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 1971
+        },
+        "enemy-L5-2": {
+          "id": "retreat:safe:2",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after low shields; move away and regain stopping room; travel 18 units at -7 degrees relative heading; known obstacle route clear; destination target range 119 units",
+          "waypoint": {
+            "x": -26.34124967977999,
+            "z": -92.8366762372854
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 1971
+        },
+        "player": {
+          "id": "engage:enemy-L5-0",
+          "strategy": "pursue",
+          "description": "Strategy pursue: Engage visible target enemy-L5-0 while maintaining separation; travel 12 units at -85 degrees relative heading; known obstacle route clear; destination target range 12 units",
+          "waypoint": {
+            "x": 46.75239648792675,
+            "z": -14.172150388850906
+          },
+          "fire": true,
+          "targetId": "enemy-L5-0",
+          "expiresTick": 1971
+        },
+        "enemy-L5-0": {
+          "id": "intercept:player:flag-3",
+          "strategy": "pursue",
+          "description": "Strategy pursue: URGENT 1 flags remain: intercept observed opponent player on known flag flag-3 approach; keep at least12-unit target separation, aim to stop capture; travel 8 units at -14 degrees relative heading; known obstacle route clear; destination target range 16 units",
+          "waypoint": {
+            "x": 42.288724285440715,
+            "z": -14.98894023504165
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 1971
+        }
+      }
+    },
+    {
+      "tick": 1964,
+      "plans": {
+        "enemy-L5-1": {
+          "id": "intercept:player:flag-3",
+          "strategy": "pursue",
+          "description": "Strategy pursue: URGENT 1 flags remain: intercept observed opponent player on known flag flag-3 approach; keep at least12-unit target separation, aim to stop capture; travel 16 units at -21 degrees relative heading; known obstacle route clear; destination target range 16 units",
+          "waypoint": {
+            "x": 42.288724285440715,
+            "z": -14.98894023504165
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 1971
+        },
+        "enemy-L5-2": {
+          "id": "retreat:safe:2",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after low shields; move away and regain stopping room; travel 18 units at -7 degrees relative heading; known obstacle route clear; destination target range 119 units",
+          "waypoint": {
+            "x": -26.34124967977999,
+            "z": -92.8366762372854
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 1971
+        },
+        "player": {
+          "id": "engage:enemy-L5-0",
+          "strategy": "pursue",
+          "description": "Strategy pursue: Engage visible target enemy-L5-0 while maintaining separation; travel 12 units at -85 degrees relative heading; known obstacle route clear; destination target range 12 units",
+          "waypoint": {
+            "x": 46.75239648792675,
+            "z": -14.172150388850906
+          },
+          "fire": true,
+          "targetId": "enemy-L5-0",
+          "expiresTick": 1971
+        },
+        "enemy-L5-0": {
+          "id": "intercept:player:flag-3",
+          "strategy": "pursue",
+          "description": "Strategy pursue: URGENT 1 flags remain: intercept observed opponent player on known flag flag-3 approach; keep at least12-unit target separation, aim to stop capture; travel 8 units at -14 degrees relative heading; known obstacle route clear; destination target range 16 units",
+          "waypoint": {
+            "x": 42.288724285440715,
+            "z": -14.98894023504165
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 1971
+        }
+      }
+    },
+    {
+      "tick": 1973,
+      "plans": {
+        "enemy-L5-1": {
+          "id": "intercept:player:flag-3",
+          "strategy": "pursue",
+          "description": "Strategy pursue: URGENT 1 flags remain: intercept observed opponent player on known flag flag-3 approach; keep at least12-unit target separation, aim to stop capture; travel 8 units at -36 degrees relative heading; known obstacle route clear; destination target range 16 units",
+          "waypoint": {
+            "x": 40.809418221811875,
+            "z": -14.893684302658551
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 1987
+        },
+        "enemy-L5-2": {
+          "id": "retreat:safe:2",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after low shields; move away and regain stopping room; travel 18 units at 2 degrees relative heading; known obstacle route clear; destination target range 122 units",
+          "waypoint": {
+            "x": -32.66985963176544,
+            "z": -92.73677266959831
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 1987
+        },
+        "player": {
+          "id": "engage:enemy-L5-0",
+          "strategy": "pursue",
+          "description": "Strategy pursue: Engage visible target enemy-L5-0 while maintaining separation; travel 8 units at -2 degrees relative heading; known obstacle route clear; destination target range 12 units",
+          "waypoint": {
+            "x": 48.880840077348154,
+            "z": -12.270357473911766
+          },
+          "fire": true,
+          "targetId": "enemy-L5-0",
+          "expiresTick": 1987
+        },
+        "enemy-L5-0": {
+          "id": "intercept:player:flag-3",
+          "strategy": "pursue",
+          "description": "Strategy pursue: URGENT 1 flags remain: intercept observed opponent player on known flag flag-3 approach; keep at least12-unit target separation, aim to stop capture; travel 5 units at -37 degrees relative heading; known obstacle route clear; destination target range 16 units",
+          "waypoint": {
+            "x": 40.809418221811875,
+            "z": -14.893684302658551
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 1987
+        }
+      }
+    },
+    {
+      "tick": 1977,
+      "plans": {
+        "enemy-L5-1": {
+          "id": "intercept:player:flag-3",
+          "strategy": "pursue",
+          "description": "Strategy pursue: URGENT 1 flags remain: intercept observed opponent player on known flag flag-3 approach; keep at least12-unit target separation, aim to stop capture; travel 8 units at -36 degrees relative heading; known obstacle route clear; destination target range 16 units",
+          "waypoint": {
+            "x": 40.809418221811875,
+            "z": -14.893684302658551
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 1987
+        },
+        "enemy-L5-2": {
+          "id": "retreat:safe:2",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after low shields; move away and regain stopping room; travel 18 units at 2 degrees relative heading; known obstacle route clear; destination target range 122 units",
+          "waypoint": {
+            "x": -32.66985963176544,
+            "z": -92.73677266959831
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 1987
+        },
+        "player": {
+          "id": "engage:enemy-L5-0",
+          "strategy": "pursue",
+          "description": "Strategy pursue: Engage visible target enemy-L5-0 while maintaining separation; travel 8 units at -2 degrees relative heading; known obstacle route clear; destination target range 12 units",
+          "waypoint": {
+            "x": 48.880840077348154,
+            "z": -12.270357473911766
+          },
+          "fire": true,
+          "targetId": "enemy-L5-0",
+          "expiresTick": 1987
+        }
+      }
+    },
+    {
+      "tick": 1986,
+      "plans": {
+        "enemy-L5-1": {
+          "id": "intercept:player:flag-3",
+          "strategy": "pursue",
+          "description": "Strategy pursue: URGENT 1 flags remain: intercept observed opponent player on known flag flag-3 approach; keep at least12-unit target separation, aim to stop capture; travel 4 units at -60 degrees relative heading; known obstacle route clear; destination target range 16 units",
+          "waypoint": {
+            "x": 38.525443471260786,
+            "z": -16.422351782508002
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 2003
+        },
+        "enemy-L5-2": {
+          "id": "retreat:safe:2",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after low shields; move away and regain stopping room; travel 18 units at 6 degrees relative heading; known obstacle route clear; destination target range 128 units",
+          "waypoint": {
+            "x": -43.404868416535564,
+            "z": -93.04931051492802
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 2003
+        },
+        "player": {
+          "id": "engage:enemy-L5-0",
+          "strategy": "pursue",
+          "description": "Strategy pursue: Engage visible target enemy-L5-0 while maintaining separation; travel 5 units at -2 degrees relative heading; known obstacle route clear; destination target range 12 units",
+          "waypoint": {
+            "x": 49.03431427529314,
+            "z": -12.194876747365756
+          },
+          "fire": true,
+          "targetId": "enemy-L5-0",
+          "expiresTick": 2003
+        }
+      }
+    },
+    {
+      "tick": 1991,
+      "plans": {
+        "enemy-L5-1": {
+          "id": "intercept:player:flag-3",
+          "strategy": "pursue",
+          "description": "Strategy pursue: URGENT 1 flags remain: intercept observed opponent player on known flag flag-3 approach; keep at least12-unit target separation, aim to stop capture; travel 4 units at -60 degrees relative heading; known obstacle route clear; destination target range 16 units",
+          "waypoint": {
+            "x": 38.525443471260786,
+            "z": -16.422351782508002
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 2003
+        },
+        "enemy-L5-2": {
+          "id": "retreat:safe:2",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after low shields; move away and regain stopping room; travel 18 units at 6 degrees relative heading; known obstacle route clear; destination target range 128 units",
+          "waypoint": {
+            "x": -43.404868416535564,
+            "z": -93.04931051492802
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 2003
+        },
+        "player": {
+          "id": "engage:enemy-L5-0",
+          "strategy": "pursue",
+          "description": "Strategy pursue: Engage visible target enemy-L5-0 while maintaining separation; travel 5 units at -2 degrees relative heading; known obstacle route clear; destination target range 12 units",
+          "waypoint": {
+            "x": 49.03431427529314,
+            "z": -12.194876747365756
+          },
+          "fire": true,
+          "targetId": "enemy-L5-0",
+          "expiresTick": 2003
+        }
+      }
+    },
+    {
+      "tick": 1994,
+      "plans": {
+        "enemy-L5-1": {
+          "id": "intercept:player:flag-3",
+          "strategy": "pursue",
+          "description": "Strategy pursue: URGENT 1 flags remain: intercept observed opponent player on known flag flag-3 approach; keep at least12-unit target separation, aim to stop capture; travel 4 units at -60 degrees relative heading; known obstacle route clear; destination target range 16 units",
+          "waypoint": {
+            "x": 38.525443471260786,
+            "z": -16.422351782508002
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 2003
+        },
+        "enemy-L5-2": {
+          "id": "retreat:safe:2",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after low shields; move away and regain stopping room; travel 18 units at 6 degrees relative heading; known obstacle route clear; destination target range 128 units",
+          "waypoint": {
+            "x": -43.404868416535564,
+            "z": -93.04931051492802
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 2003
+        },
+        "player": {
+          "id": "engage:enemy-L5-0",
+          "strategy": "pursue",
+          "description": "Strategy pursue: Engage visible target enemy-L5-0 while maintaining separation; travel 5 units at -2 degrees relative heading; known obstacle route clear; destination target range 12 units",
+          "waypoint": {
+            "x": 49.03431427529314,
+            "z": -12.194876747365756
+          },
+          "fire": true,
+          "targetId": "enemy-L5-0",
+          "expiresTick": 2003
+        }
+      }
+    },
+    {
+      "tick": 2004,
+      "plans": {
+        "enemy-L5-1": {
+          "id": "intercept:player:flag-3",
+          "strategy": "pursue",
+          "description": "Strategy pursue: URGENT 1 flags remain: intercept observed opponent player on known flag flag-3 approach; keep at least12-unit target separation, aim to stop capture; travel 2 units at -64 degrees relative heading; known obstacle route clear; destination target range 16 units",
+          "waypoint": {
+            "x": 36.30164893933113,
+            "z": -17.867746384992074
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 2018
+        },
+        "enemy-L5-2": {
+          "id": "retreat:safe:2",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after low shields; move away and regain stopping room; travel 18 units at 2 degrees relative heading; known obstacle route clear; destination target range 132 units",
+          "waypoint": {
+            "x": -54.00340329207721,
+            "z": -92.11799416407096
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 2018
+        },
+        "player": {
+          "id": "engage:enemy-L5-1",
+          "strategy": "pursue",
+          "description": "Strategy pursue: Engage visible target enemy-L5-1 while maintaining separation; travel 5 units at 1 degrees relative heading; known obstacle route clear; destination target range 12 units",
+          "waypoint": {
+            "x": 46.33220699561272,
+            "z": -13.71570056063267
+          },
+          "fire": true,
+          "targetId": "enemy-L5-1",
+          "expiresTick": 2018
+        }
+      }
+    },
+    {
+      "tick": 2015,
+      "plans": {
+        "enemy-L5-1": {
+          "id": "intercept:player:flag-3",
+          "strategy": "pursue",
+          "description": "Strategy pursue: URGENT 1 flags remain: intercept observed opponent player on known flag flag-3 approach; keep at least12-unit target separation, aim to stop capture; travel 2 units at -64 degrees relative heading; known obstacle route clear; destination target range 16 units",
+          "waypoint": {
+            "x": 36.30164893933113,
+            "z": -17.867746384992074
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 2018
+        },
+        "enemy-L5-2": {
+          "id": "retreat:safe:2",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after low shields; move away and regain stopping room; travel 18 units at 2 degrees relative heading; known obstacle route clear; destination target range 132 units",
+          "waypoint": {
+            "x": -54.00340329207721,
+            "z": -92.11799416407096
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 2018
+        },
+        "player": {
+          "id": "engage:enemy-L5-1",
+          "strategy": "pursue",
+          "description": "Strategy pursue: Engage visible target enemy-L5-1 while maintaining separation; travel 5 units at 1 degrees relative heading; known obstacle route clear; destination target range 12 units",
+          "waypoint": {
+            "x": 46.33220699561272,
+            "z": -13.71570056063267
+          },
+          "fire": true,
+          "targetId": "enemy-L5-1",
+          "expiresTick": 2018
+        }
+      }
+    },
+    {
+      "tick": 2019,
+      "plans": {
+        "enemy-L5-2": {
+          "id": "retreat:safe:2",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after low shields; move away and regain stopping room; travel 18 units at 2 degrees relative heading; known obstacle route clear; destination target range 132 units",
+          "waypoint": {
+            "x": -54.00340329207721,
+            "z": -92.11799416407096
+          },
+          "fire": true,
+          "targetId": "player",
+          "expiresTick": 2018
+        },
+        "player": {
+          "id": "engage:enemy-L5-1",
+          "strategy": "pursue",
+          "description": "Strategy pursue: Engage visible target enemy-L5-1 while maintaining separation; travel 5 units at 1 degrees relative heading; known obstacle route clear; destination target range 12 units",
+          "waypoint": {
+            "x": 46.33220699561272,
+            "z": -13.71570056063267
+          },
+          "fire": true,
+          "targetId": "enemy-L5-1",
+          "expiresTick": 2018
+        }
+      }
+    },
+    {
+      "tick": 2029,
+      "plans": {
+        "enemy-L5-2": {
+          "id": "retreat:safe:0",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after low shields; move away and regain stopping room; travel 18 units at -180 degrees relative heading; known obstacle route clear",
+          "waypoint": {
+            "x": -39.33388371579383,
+            "z": -94.97024036591996
+          },
+          "fire": false,
+          "expiresTick": 2052
+        },
+        "player": {
+          "id": "retreat:safe:0",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after damage; move away and regain stopping room; travel 18 units at 176 degrees relative heading; known obstacle route clear; destination target range 150 units",
+          "waypoint": {
+            "x": 63.27549254266464,
+            "z": -1.3766002051419104
+          },
+          "fire": true,
+          "targetId": "enemy-L5-2",
+          "expiresTick": 2052
+        }
+      }
+    },
+    {
+      "tick": 2035,
+      "plans": {
+        "enemy-L5-2": {
+          "id": "retreat:safe:0",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after low shields; move away and regain stopping room; travel 18 units at -180 degrees relative heading; known obstacle route clear",
+          "waypoint": {
+            "x": -39.33388371579383,
+            "z": -94.97024036591996
+          },
+          "fire": false,
+          "expiresTick": 2052
+        },
+        "player": {
+          "id": "retreat:safe:0",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after damage; move away and regain stopping room; travel 18 units at 176 degrees relative heading; known obstacle route clear; destination target range 150 units",
+          "waypoint": {
+            "x": 63.27549254266464,
+            "z": -1.3766002051419104
+          },
+          "fire": true,
+          "targetId": "enemy-L5-2",
+          "expiresTick": 2052
+        }
+      }
+    },
+    {
+      "tick": 2041,
+      "plans": {
+        "enemy-L5-2": {
+          "id": "retreat:safe:0",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after low shields; move away and regain stopping room; travel 18 units at -180 degrees relative heading; known obstacle route clear",
+          "waypoint": {
+            "x": -39.33388371579383,
+            "z": -94.97024036591996
+          },
+          "fire": false,
+          "expiresTick": 2052
+        },
+        "player": {
+          "id": "retreat:safe:0",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after damage; move away and regain stopping room; travel 18 units at 176 degrees relative heading; known obstacle route clear; destination target range 150 units",
+          "waypoint": {
+            "x": 63.27549254266464,
+            "z": -1.3766002051419104
+          },
+          "fire": true,
+          "targetId": "enemy-L5-2",
+          "expiresTick": 2052
+        }
+      }
+    },
+    {
+      "tick": 2047,
+      "plans": {
+        "enemy-L5-2": {
+          "id": "retreat:safe:0",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after low shields; move away and regain stopping room; travel 18 units at 180 degrees relative heading; known obstacle route clear",
+          "waypoint": {
+            "x": -50.70029586637691,
+            "z": -80.90033219061073
+          },
+          "fire": false,
+          "expiresTick": 2068
+        },
+        "player": {
+          "id": "retreat:safe:0",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after damage; move away and regain stopping room; travel 18 units at 90 degrees relative heading; known obstacle route clear; destination target range 157 units",
+          "waypoint": {
+            "x": 63.213575319452275,
+            "z": -1.7572666192411575
+          },
+          "fire": true,
+          "targetId": "enemy-L5-2",
+          "expiresTick": 2068
+        }
+      }
+    },
+    {
+      "tick": 2053,
+      "plans": {
+        "enemy-L5-2": {
+          "id": "retreat:safe:0",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after low shields; move away and regain stopping room; travel 18 units at 180 degrees relative heading; known obstacle route clear",
+          "waypoint": {
+            "x": -50.70029586637691,
+            "z": -80.90033219061073
+          },
+          "fire": false,
+          "expiresTick": 2068
+        },
+        "player": {
+          "id": "retreat:safe:0",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after damage; move away and regain stopping room; travel 18 units at 90 degrees relative heading; known obstacle route clear; destination target range 157 units",
+          "waypoint": {
+            "x": 63.213575319452275,
+            "z": -1.7572666192411575
+          },
+          "fire": true,
+          "targetId": "enemy-L5-2",
+          "expiresTick": 2068
+        }
+      }
+    },
+    {
+      "tick": 2060,
+      "plans": {
+        "enemy-L5-2": {
+          "id": "retreat:safe:0",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after low shields; move away and regain stopping room; travel 18 units at -180 degrees relative heading; known obstacle route clear",
+          "waypoint": {
+            "x": -67.16767508615222,
+            "z": -77.72857102618823
+          },
+          "fire": false,
+          "expiresTick": 2083
+        },
+        "player": {
+          "id": "retreat:safe:0",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after damage; move away and regain stopping room; travel 18 units at 9 degrees relative heading; known obstacle route clear; destination target range 159 units",
+          "waypoint": {
+            "x": 63.50940554490257,
+            "z": -1.0830157890132064
+          },
+          "fire": true,
+          "targetId": "enemy-L5-2",
+          "expiresTick": 2083
+        }
+      }
+    },
+    {
+      "tick": 2066,
+      "plans": {
+        "enemy-L5-2": {
+          "id": "retreat:safe:0",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after low shields; move away and regain stopping room; travel 18 units at -180 degrees relative heading; known obstacle route clear",
+          "waypoint": {
+            "x": -67.16767508615222,
+            "z": -77.72857102618823
+          },
+          "fire": false,
+          "expiresTick": 2083
+        },
+        "player": {
+          "id": "retreat:safe:0",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after damage; move away and regain stopping room; travel 18 units at 9 degrees relative heading; known obstacle route clear; destination target range 159 units",
+          "waypoint": {
+            "x": 63.50940554490257,
+            "z": -1.0830157890132064
+          },
+          "fire": true,
+          "targetId": "enemy-L5-2",
+          "expiresTick": 2083
+        }
+      }
+    },
+    {
+      "tick": 2077,
+      "plans": {
+        "enemy-L5-2": {
+          "id": "retreat:safe:0",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after low shields; move away and regain stopping room; travel 18 units at -180 degrees relative heading; known obstacle route clear",
+          "waypoint": {
+            "x": -67.16767508615222,
+            "z": -77.72857102618823
+          },
+          "fire": false,
+          "expiresTick": 2083
+        },
+        "player": {
+          "id": "retreat:safe:0",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after damage; move away and regain stopping room; travel 18 units at 9 degrees relative heading; known obstacle route clear; destination target range 159 units",
+          "waypoint": {
+            "x": 63.50940554490257,
+            "z": -1.0830157890132064
+          },
+          "fire": true,
+          "targetId": "enemy-L5-2",
+          "expiresTick": 2083
+        }
+      }
+    },
+    {
+      "tick": 2082,
+      "plans": {
+        "enemy-L5-2": {
+          "id": "retreat:safe:0",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after low shields; move away and regain stopping room; travel 18 units at -180 degrees relative heading; known obstacle route clear",
+          "waypoint": {
+            "x": -81.1866523503185,
+            "z": -87.97797779004439
+          },
+          "fire": false,
+          "expiresTick": 2099
+        },
+        "player": {
+          "id": "retreat:safe:0",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after damage; move away and regain stopping room; travel 18 units at 3 degrees relative heading; known obstacle route clear; destination target range 168 units",
+          "waypoint": {
+            "x": 70.12250886919155,
+            "z": 3.7141207261394964
+          },
+          "fire": true,
+          "targetId": "enemy-L5-2",
+          "expiresTick": 2099
+        }
+      }
+    },
+    {
+      "tick": 2089,
+      "plans": {
+        "enemy-L5-2": {
+          "id": "retreat:safe:0",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after low shields; move away and regain stopping room; travel 18 units at -180 degrees relative heading; known obstacle route clear",
+          "waypoint": {
+            "x": -81.1866523503185,
+            "z": -87.97797779004439
+          },
+          "fire": false,
+          "expiresTick": 2099
+        },
+        "player": {
+          "id": "retreat:safe:0",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after damage; move away and regain stopping room; travel 18 units at 3 degrees relative heading; known obstacle route clear; destination target range 168 units",
+          "waypoint": {
+            "x": 70.12250886919155,
+            "z": 3.7141207261394964
+          },
+          "fire": true,
+          "targetId": "enemy-L5-2",
+          "expiresTick": 2099
+        }
+      }
+    },
+    {
+      "tick": 2096,
+      "plans": {
+        "enemy-L5-2": {
+          "id": "retreat:safe:2",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after low shields; move away and regain stopping room; travel 18 units at -135 degrees relative heading; known obstacle route clear",
+          "waypoint": {
+            "x": -82.18505174811496,
+            "z": -90.62016512950956
+          },
+          "fire": false,
+          "expiresTick": 2114
+        },
+        "player": {
+          "id": "retreat:safe:0",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after damage; move away and regain stopping room; travel 18 units at 3 degrees relative heading; known obstacle route clear; destination target range 177 units",
+          "waypoint": {
+            "x": 77.40020467946115,
+            "z": 8.993900149098785
+          },
+          "fire": true,
+          "targetId": "enemy-L5-2",
+          "expiresTick": 2114
+        }
+      }
+    },
+    {
+      "tick": 2102,
+      "plans": {
+        "enemy-L5-2": {
+          "id": "retreat:safe:2",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after low shields; move away and regain stopping room; travel 18 units at -135 degrees relative heading; known obstacle route clear",
+          "waypoint": {
+            "x": -82.18505174811496,
+            "z": -90.62016512950956
+          },
+          "fire": false,
+          "expiresTick": 2114
+        },
+        "player": {
+          "id": "retreat:safe:0",
+          "strategy": "retreat",
+          "description": "Strategy retreat: Break contact after damage; move away and regain stopping room; travel 18 units at 3 degrees relative heading; known obstacle route clear; destination target range 177 units",
+          "waypoint": {
+            "x": 77.40020467946115,
+            "z": 8.993900149098785
+          },
+          "fire": true,
+          "targetId": "enemy-L5-2",
+          "expiresTick": 2114
+        }
+      }
+    }
+  ]
+}
