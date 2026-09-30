@@ -1,0 +1,302 @@
+{
+  "endpoint": "https://api.typesafe.ai/v1/systemone",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer [REDACTED]"
+  },
+  "requestBody": {
+    "model": "jev-1.13.0",
+    "state": {
+      "observations": {
+        "enemy-L3-2": {
+          "remainingFlags": 4,
+          "totalFlags": 10,
+          "level": 3,
+          "nowSeconds": 52.03333333333333,
+          "visited": [
+            {
+              "x": 6.978569757800187,
+              "z": 63.11014713700934
+            },
+            {
+              "x": -0.5136125469876338,
+              "z": 72.08708950140576
+            },
+            {
+              "x": -2.1808110520045663,
+              "z": 53.348166580171764
+            },
+            {
+              "x": -12.09781397430271,
+              "z": 50.7821151795803
+            },
+            {
+              "x": -23.46409588246072,
+              "z": 53.50522562953331
+            },
+            {
+              "x": -28.445594532756445,
+              "z": 62.99882583508673
+            },
+            {
+              "x": -27.07079100697114,
+              "z": 75.79897269637554
+            },
+            {
+              "x": -15.465802050714647,
+              "z": 86.61416380149785
+            }
+          ],
+          "own": {
+            "id": "enemy-L3-2",
+            "team": "enemy",
+            "position": {
+              "x": 1.1299268551163757,
+              "z": 52.548038625577746
+            },
+            "heading": 2.576105975943607,
+            "speed": 5.966666666666653,
+            "shieldFraction": 1,
+            "ammo": 999999,
+            "maxAmmo": 999999,
+            "shield": 3,
+            "maxShield": 3,
+            "fireReady": true,
+            "tick": 1561,
+            "lastStrategy": "protect",
+            "personality": "cowardly"
+          },
+          "contacts": [
+            {
+              "id": "player",
+              "kind": "tank",
+              "position": {
+                "x": 31.259801344454715,
+                "z": 33.917369335901796
+              },
+              "heading": 5.497787143782129,
+              "seenTick": 1561,
+              "source": "own",
+              "team": "player",
+              "seenSeconds": 52.03333333333333,
+              "ageSeconds": 0
+            },
+            {
+              "id": "enemy-L3-0",
+              "kind": "tank",
+              "position": {
+                "x": 55.672172235927974,
+                "z": 82.53332129264886
+              },
+              "heading": 1.06814150222041,
+              "seenTick": 1561,
+              "source": "own",
+              "team": "enemy",
+              "seenSeconds": 52.03333333333333,
+              "ageSeconds": 0
+            },
+            {
+              "id": "enemy-L3-1",
+              "kind": "tank",
+              "position": {
+                "x": -59.228461772749085,
+                "z": 44.38352761777972
+              },
+              "heading": 5.529203070318452,
+              "seenTick": 1561,
+              "source": "own",
+              "team": "enemy",
+              "seenSeconds": 52.03333333333333,
+              "ageSeconds": 0
+            },
+            {
+              "id": "flag-3",
+              "kind": "flag",
+              "position": {
+                "x": -11.609525902196765,
+                "z": 70.08837599866092
+              },
+              "seenTick": 1561,
+              "source": "map",
+              "seenSeconds": 52.03333333333333,
+              "ageSeconds": 0
+            },
+            {
+              "id": "flag-5",
+              "kind": "flag",
+              "position": {
+                "x": -69.95959266833961,
+                "z": 54.81463869847357
+              },
+              "seenTick": 1561,
+              "source": "map",
+              "seenSeconds": 52.03333333333333,
+              "ageSeconds": 0
+            },
+            {
+              "id": "flag-6",
+              "kind": "flag",
+              "position": {
+                "x": -27.608189651742578,
+                "z": 33.49044111929834
+              },
+              "seenTick": 1561,
+              "source": "map",
+              "seenSeconds": 52.03333333333333,
+              "ageSeconds": 0
+            },
+            {
+              "id": "flag-8",
+              "kind": "flag",
+              "position": {
+                "x": -58.710400158539414,
+                "z": 71.18011444620788
+              },
+              "seenTick": 1561,
+              "source": "map",
+              "seenSeconds": 52.03333333333333,
+              "ageSeconds": 0
+            },
+            {
+              "id": "pickup-0",
+              "kind": "pickup",
+              "pickupKind": "ammo",
+              "amount": 20,
+              "position": {
+                "x": 12.928410030901432,
+                "z": -40.816576171666384
+              },
+              "seenTick": 1561,
+              "source": "map",
+              "seenSeconds": 52.03333333333333,
+              "ageSeconds": 0
+            },
+            {
+              "id": "pickup-1",
+              "kind": "pickup",
+              "pickupKind": "ammo",
+              "amount": 20,
+              "position": {
+                "x": -37.42651786468923,
+                "z": -77.0806328188628
+              },
+              "seenTick": 1561,
+              "source": "map",
+              "seenSeconds": 52.03333333333333,
+              "ageSeconds": 0
+            },
+            {
+              "id": "pickup-2",
+              "kind": "pickup",
+              "pickupKind": "ammo",
+              "amount": 20,
+              "position": {
+                "x": -48.65533908456564,
+                "z": 49.877829398959875
+              },
+              "seenTick": 1561,
+              "source": "map",
+              "seenSeconds": 52.03333333333333,
+              "ageSeconds": 0
+            },
+            {
+              "id": "pickup-5",
+              "kind": "pickup",
+              "pickupKind": "shield",
+              "amount": 25,
+              "position": {
+                "x": 17.239724239334464,
+                "z": 46.73210511729121
+              },
+              "seenTick": 1561,
+              "source": "map",
+              "seenSeconds": 52.03333333333333,
+              "ageSeconds": 0
+            }
+          ],
+          "memory": [],
+          "geometry": [
+            {
+              "id": "windmill-0",
+              "kind": "windmill",
+              "position": {
+                "x": -51.585966028273106,
+                "z": 23.058774331584573
+              },
+              "pylonRadius": 1.2,
+              "bladeLength": 6,
+              "bladeAngle": 82.9785654973483,
+              "prevBladeAngle": 82.92620561978848
+            },
+            {
+              "id": "windmill-3",
+              "kind": "windmill",
+              "position": {
+                "x": 16.3087968043983,
+                "z": 73.36144505813718
+              },
+              "pylonRadius": 1.2,
+              "bladeLength": 6,
+              "bladeAngle": 87.38991670072352,
+              "prevBladeAngle": 87.3375568231637
+            }
+          ],
+          "bounds": 100
+        }
+      }
+    },
+    "questions": {
+      "tank_0": {
+        "type": "choice",
+        "instructions": "You command tank \"enemy-L3-2\". Use ONLY observations[\"enemy-L3-2\"], your tank's perception; other tanks' observations are unavailable to you. Positions x/z and distances are game units in the horizontal arena plane; speed is signed game units/second (negative means reverse). Heading is radians in [0, 2*pi): 0 faces +z, pi/2 faces +x; forward direction is (sin(heading), cos(heading)), bearing to a point is atan2(delta x, delta z). At levels 1\u20132 own position, flag/supply positions and visited navigation positions are rounded to the nearest 10 game units; observed tank positions remain precise. Level 3+ authorized positions are precise; map access to flags/supplies does not reveal hidden opponents. Source own means personally observed; shared means squad report, not own line of sight; map means authorized objective/supply map. nowSeconds, seenSeconds and ageSeconds are simulation seconds; tick/seenTick use 30 ticks/second. Remembered/reported positions are dated, never guaranteed current. Pick the best available maneuver for the next 500 milliseconds. Preserve your tank, avoid barriers and tank collisions, never fire through teammates, avoid ineffective chasing, use safe cover and firing lanes. Your mission is to STOP the opposing tank from taking your flags; do not fail this mission. Use remainingFlags and totalFlags in your own observation as the public objective score. As fewer flags remain, increase urgency: prioritize interception and active flag defense, especially when remainingFlags is 2 or less. Use visible or previously observed opponent positions and known flag routes only; never invent hidden targets. Challenge observed opposing players with purposeful attacks and flanks. When opponents are unseen and you are healthy, patrol known flags or explore unvisited sectors; peaceful regrouping or idling without a tactical reason wastes the defense window. Under recent fire or low shields, survival, cover, retreat and regrouping remain valid ways to protect the mission; avoid suicidal charging. Choose feasible purposeful movement and safe firing lanes rather than repetitive chasing. Commander personality: cowardly. Among feasible options prefer low-exposure cover, safer flanking and defensive standoff; withdraw sooner under credible danger, then patrol safely rather than idle. Your flag-defense mission still matters. Never override collision or friendly-fire constraints. Candidate routes are checked against known geometry, not guaranteed outcomes; moving threats and final collision/fire safety are handled locally. Choose only an offered option; never invent unavailable maneuvers. Prefer progress toward your objective over idle behavior unless holding or retreating is tactically necessary.",
+        "criteria": {
+          "hold:player": "Strategy protect: Hold current vantage, aim and fire at visible target player; travel 0 units at -148 degrees relative heading; known obstacle route clear; destination target range 35 units",
+          "engage:player": "Strategy pursue: Engage visible target player while maintaining separation; travel 23 units at -26 degrees relative heading; known obstacle route clear; destination target range 12 units",
+          "flank:player:-1": "Strategy pursue: Flank right of visible target player; travel 22 units at -65 degrees relative heading; known obstacle route clear; destination target range 23 units",
+          "flank:player:1": "Strategy pursue: Flank left of visible target player; travel 22 units at 13 degrees relative heading; known obstacle route clear; destination target range 23 units",
+          "retreat:player": "Strategy retreat: Create distance from visible target player; travel 15 units at 154 degrees relative heading; known obstacle route clear; destination target range 50 units",
+          "explore:1": "Strategy explore: Search unvisited clear sector 1 for opposing player; reacquire visual contact; travel 24 units at -103 degrees relative heading; known obstacle route clear",
+          "explore:2": "Strategy explore: Search unvisited clear sector 2 for opposing player; reacquire visual contact; travel 24 units at -58 degrees relative heading; known obstacle route clear",
+          "explore:3": "Strategy explore: Search unvisited clear sector 3 for opposing player; reacquire visual contact; travel 24 units at -13 degrees relative heading; known obstacle route clear",
+          "explore:4": "Strategy explore: Search unvisited clear sector 4 for opposing player; reacquire visual contact; travel 24 units at 32 degrees relative heading; known obstacle route clear",
+          "explore:5": "Strategy explore: Search unvisited clear sector 5 for opposing player; reacquire visual contact; travel 24 units at 77 degrees relative heading; known obstacle route clear",
+          "explore:7": "Strategy explore: Search unvisited clear sector 7 for opposing player; reacquire visual contact; travel 24 units at 167 degrees relative heading; known obstacle route clear"
+        }
+      }
+    }
+  },
+  "responseBody": {
+    "model": "jev-1.13.0",
+    "answers": {
+      "tank_0": {
+        "type": "choice",
+        "choice": "hold:player",
+        "confidence": 0.45,
+        "probabilities": {
+          "explore:5": 0.01,
+          "explore:2": 0.01,
+          "flank:player:-1": 0.03,
+          "explore:4": 0.02,
+          "explore:3": 0.02,
+          "flank:player:1": 0.03,
+          "explore:1": 0.04,
+          "engage:player": 0.06,
+          "explore:7": 0.01,
+          "retreat:player": 0.26,
+          "hold:player": 0.51
+        }
+      }
+    },
+    "usage": {
+      "input_tokens": 3894,
+      "output_tokens": 140
+    }
+  },
+  "auditMetadata": {
+    "callId": "1121ea42-ad65-4087-bdbc-c467e760b8ed",
+    "timestamp": "2026-09-30T17:09:04.771Z",
+    "durationMs": 121,
+    "costUsd": 0.00016354800000000001
+  }
+}

@@ -1,0 +1,1876 @@
+{
+  "mocked": false,
+  "level": 5,
+  "duration": 120,
+  "actions": 14016,
+  "metrics": {
+    "requests": 231,
+    "maxRequestedTanks": 4,
+    "modelDecisions": 900,
+    "modelCommandTicks": 13738,
+    "fallbackTicks": 278,
+    "staleResponses": 0,
+    "failures": 1,
+    "inputTokens": 3491556,
+    "spentUsd": 1.6118580239999734,
+    "latencyMs": 393.2999999821186,
+    "wallHits": 0,
+    "obstacleContacts": 0,
+    "tankContacts": 0,
+    "friendlyFireHits": 0,
+    "friendlyFireDamage": 0,
+    "playerDamage": 132,
+    "enemyProjectileDamage": 6,
+    "playerDeaths": 0,
+    "enemyDeaths": 2,
+    "shots": 24,
+    "flags": 5,
+    "closeCallTicks": 98,
+    "tankContactTicks": 0,
+    "stationaryTicks": 0,
+    "observedTicks": 3564,
+    "interventions": {
+      "wallAvoided": 1972,
+      "tankAvoided": 11,
+      "allyShotAvoided": 431
+    },
+    "enabled": false,
+    "playerAutopilot": false,
+    "hz": 2,
+    "activeSeconds": 120.22300000000597,
+    "activeTankSeconds": {
+      "enemy": 352.83590000001914,
+      "player": 120.22300000000597
+    },
+    "acceptedHzPerTank": 1.9025115054382282,
+    "acceptedHzByRole": {
+      "enemy": 1.9017339221999905,
+      "player": 1.9047935919082757
+    },
+    "latencySamplesMs": [
+      488.40000000596046,
+      360.90000000596046,
+      358.7000000178814,
+      455.80000001192093,
+      353.2000000178814,
+      404.19999998807907,
+      328.2000000178814,
+      335.19999998807907,
+      350.90000000596046,
+      346.10000002384186,
+      367.19999998807907,
+      334.90000000596046,
+      391.59999999403954,
+      539.8999999761581,
+      345.40000000596046,
+      352.40000000596046,
+      361.80000001192093,
+      425.69999998807907,
+      391.2000000178814,
+      364.59999999403954,
+      355.7999999821186,
+      346.90000000596046,
+      361.80000001192093,
+      486.90000000596046,
+      399.5,
+      423.90000000596046,
+      366.80000001192093,
+      350.7999999821186,
+      328.7999999821186,
+      487.09999999403954,
+      330.80000001192093,
+      352.69999998807907,
+      467.60000002384186,
+      395.09999999403954,
+      350.5,
+      388.90000000596046,
+      404.09999999403954,
+      583.6999999880791,
+      540.3000000119209,
+      498.2999999821186,
+      375.80000001192093,
+      411.69999998807907,
+      425.60000002384186,
+      418.7000000178814,
+      485.2999999821186,
+      450.19999998807907,
+      387.5,
+      393,
+      365.7999999821186,
+      458.60000002384186,
+      394,
+      368.80000001192093,
+      353.09999999403954,
+      358.7999999821186,
+      391.19999998807907,
+      396.5,
+      371.90000000596046,
+      314,
+      359.5,
+      340.80000001192093,
+      356.2999999821186,
+      390.69999998807907,
+      403.89999997615814,
+      356.5,
+      390.30000001192093,
+      597.1999999880791,
+      500.09999999403954,
+      404.59999999403954,
+      369.09999999403954,
+      418.90000000596046,
+      414.09999999403954,
+      378.59999999403954,
+      408.80000001192093,
+      427.2000000178814,
+      613.7999999821186,
+      450.69999998807907,
+      386.2000000178814,
+      367.5,
+      367.39999997615814,
+      383,
+      372.30000001192093,
+      344.69999998807907,
+      347.5,
+      308.59999999403954,
+      360.60000002384186,
+      410.40000000596046,
+      388.09999999403954,
+      387.40000000596046,
+      370.40000000596046,
+      339.60000002384186,
+      160,
+      208.10000002384186,
+      191.60000002384186,
+      183.2999999821186,
+      176.90000000596046,
+      201.69999998807907,
+      309.69999998807907,
+      359.69999998807907,
+      370,
+      457,
+      329.60000002384186,
+      390.39999997615814,
+      409.90000000596046,
+      334.40000000596046,
+      383.19999998807907,
+      368.40000000596046,
+      328.40000000596046,
+      425.69999998807907,
+      452.59999999403954,
+      321.69999998807907,
+      386.5,
+      385.7999999821186,
+      491.90000000596046,
+      359.09999999403954,
+      370.10000002384186,
+      396,
+      393.19999998807907,
+      357.5,
+      379,
+      394.89999997615814,
+      335.2000000178814,
+      351.59999999403954,
+      377.90000000596046,
+      364.30000001192093,
+      383.80000001192093,
+      343,
+      343.5,
+      361.59999999403954,
+      381.10000002384186,
+      412.90000000596046,
+      350.5,
+      452.2000000178814,
+      436.40000000596046,
+      405.59999999403954,
+      688.4000000059605,
+      485.80000001192093,
+      375,
+      389.40000000596046,
+      386,
+      402.80000001192093,
+      298.40000000596046,
+      557.7999999821186,
+      408,
+      435.80000001192093,
+      417.5,
+      416.69999998807907,
+      381.7000000178814,
+      390,
+      406.09999999403954,
+      362.2000000178814,
+      413.80000001192093,
+      431.7000000178814,
+      387.59999999403954,
+      330.5,
+      432.5,
+      411.7999999821186,
+      429.5,
+      393.69999998807907,
+      396.7999999821186,
+      369.30000001192093,
+      356.39999997615814,
+      388.69999998807907,
+      387,
+      451.59999999403954,
+      429.59999999403954,
+      345.40000000596046,
+      348.2000000178814,
+      507.19999998807907,
+      350.59999999403954,
+      301.7999999821186,
+      407.69999998807907,
+      419.7000000178814,
+      328.69999998807907,
+      449.80000001192093,
+      434.7000000178814,
+      346.69999998807907,
+      310,
+      363.2999999821186,
+      359.7000000178814,
+      371.69999998807907,
+      321.90000000596046,
+      466.80000001192093,
+      410.90000000596046,
+      397.30000001192093,
+      400.19999998807907,
+      380.5,
+      359.39999997615814,
+      363,
+      314.2000000178814,
+      489.2999999821186,
+      334,
+      325.2999999821186,
+      332.59999999403954,
+      377.2000000178814,
+      335.40000000596046,
+      390.80000001192093,
+      418.30000001192093,
+      554,
+      434,
+      360.5,
+      366.19999998807907,
+      359.30000001192093,
+      437.90000000596046,
+      354.59999999403954,
+      398.5,
+      378.40000000596046,
+      432.5,
+      312.09999999403954,
+      338.7999999821186,
+      349.80000001192093,
+      411.40000000596046,
+      331.5,
+      362.60000002384186,
+      357.80000001192093,
+      297.09999999403954,
+      397.5,
+      384.59999999403954,
+      339,
+      315.30000001192093,
+      342.59999999403954,
+      335.69999998807907,
+      354.10000002384186,
+      334,
+      383.60000002384186,
+      359.30000001192093,
+      307.30000001192093,
+      328.09999999403954,
+      356.80000001192093,
+      393.2999999821186
+    ],
+    "latencyP50Ms": 378.40000000596046,
+    "latencyP95Ms": 491.90000000596046,
+    "appliedChoiceHistogram": {
+      "enemy:patrol:flag-8:approach:0": {
+        "role": "enemy",
+        "id": "patrol:flag-8:approach:0",
+        "category": "patrol",
+        "count": 22
+      },
+      "enemy:patrol:flag-1:-1": {
+        "role": "enemy",
+        "id": "patrol:flag-1:-1",
+        "category": "patrol",
+        "count": 5
+      },
+      "enemy:patrol:flag-1:approach:0": {
+        "role": "enemy",
+        "id": "patrol:flag-1:approach:0",
+        "category": "patrol",
+        "count": 9
+      },
+      "player:flag:flag-2": {
+        "role": "player",
+        "id": "flag:flag-2",
+        "category": "flag",
+        "count": 7
+      },
+      "enemy:patrol:flag-8:1": {
+        "role": "enemy",
+        "id": "patrol:flag-8:1",
+        "category": "patrol",
+        "count": 260
+      },
+      "enemy:patrol:flag-1:1": {
+        "role": "enemy",
+        "id": "patrol:flag-1:1",
+        "category": "patrol",
+        "count": 9
+      },
+      "player:flag:flag-9": {
+        "role": "player",
+        "id": "flag:flag-9",
+        "category": "flag",
+        "count": 4
+      },
+      "enemy:explore:4": {
+        "role": "enemy",
+        "id": "explore:4",
+        "category": "explore",
+        "count": 8
+      },
+      "enemy:engage:player": {
+        "role": "enemy",
+        "id": "engage:player",
+        "category": "engage",
+        "count": 98
+      },
+      "enemy:hold:player": {
+        "role": "enemy",
+        "id": "hold:player",
+        "category": "hold",
+        "count": 22
+      },
+      "player:flag:flag-1": {
+        "role": "player",
+        "id": "flag:flag-1",
+        "category": "flag",
+        "count": 1
+      },
+      "player:engage:enemy-L5-0": {
+        "role": "player",
+        "id": "engage:enemy-L5-0",
+        "category": "engage",
+        "count": 5
+      },
+      "player:pickup:pickup-6": {
+        "role": "player",
+        "id": "pickup:pickup-6",
+        "category": "pickup",
+        "count": 3
+      },
+      "player:retreat:safe:0": {
+        "role": "player",
+        "id": "retreat:safe:0",
+        "category": "retreat",
+        "count": 43
+      },
+      "player:retreat:enemy-L5-1": {
+        "role": "player",
+        "id": "retreat:enemy-L5-1",
+        "category": "retreat",
+        "count": 22
+      },
+      "player:retreat:safe:2": {
+        "role": "player",
+        "id": "retreat:safe:2",
+        "category": "retreat",
+        "count": 15
+      },
+      "enemy:retreat:player": {
+        "role": "enemy",
+        "id": "retreat:player",
+        "category": "retreat",
+        "count": 32
+      },
+      "player:retreat:enemy-L5-0": {
+        "role": "player",
+        "id": "retreat:enemy-L5-0",
+        "category": "retreat",
+        "count": 5
+      },
+      "player:retreat:safe:1": {
+        "role": "player",
+        "id": "retreat:safe:1",
+        "category": "retreat",
+        "count": 26
+      },
+      "player:pickup:pickup-5": {
+        "role": "player",
+        "id": "pickup:pickup-5",
+        "category": "pickup",
+        "count": 30
+      },
+      "enemy:retreat:safe:0": {
+        "role": "enemy",
+        "id": "retreat:safe:0",
+        "category": "retreat",
+        "count": 11
+      },
+      "enemy:flank:player:1": {
+        "role": "enemy",
+        "id": "flank:player:1",
+        "category": "flank",
+        "count": 4
+      },
+      "enemy:regroup:enemy-L5-1": {
+        "role": "enemy",
+        "id": "regroup:enemy-L5-1",
+        "category": "regroup",
+        "count": 10
+      },
+      "enemy:explore:5": {
+        "role": "enemy",
+        "id": "explore:5",
+        "category": "explore",
+        "count": 4
+      },
+      "enemy:regroup:enemy-L5-0": {
+        "role": "enemy",
+        "id": "regroup:enemy-L5-0",
+        "category": "regroup",
+        "count": 8
+      },
+      "player:flag:flag-8": {
+        "role": "player",
+        "id": "flag:flag-8",
+        "category": "flag",
+        "count": 1
+      },
+      "enemy:explore:0": {
+        "role": "enemy",
+        "id": "explore:0",
+        "category": "explore",
+        "count": 8
+      },
+      "enemy:patrol:flag-8:approach:2": {
+        "role": "enemy",
+        "id": "patrol:flag-8:approach:2",
+        "category": "patrol",
+        "count": 7
+      },
+      "enemy:patrol:flag-4:approach:0": {
+        "role": "enemy",
+        "id": "patrol:flag-4:approach:0",
+        "category": "patrol",
+        "count": 2
+      },
+      "enemy:patrol:flag-4:1": {
+        "role": "enemy",
+        "id": "patrol:flag-4:1",
+        "category": "patrol",
+        "count": 143
+      },
+      "enemy:patrol:flag-5:approach:0": {
+        "role": "enemy",
+        "id": "patrol:flag-5:approach:0",
+        "category": "patrol",
+        "count": 1
+      },
+      "enemy:patrol:flag-5:1": {
+        "role": "enemy",
+        "id": "patrol:flag-5:1",
+        "category": "patrol",
+        "count": 4
+      },
+      "player:pickup:pickup-4": {
+        "role": "player",
+        "id": "pickup:pickup-4",
+        "category": "pickup",
+        "count": 12
+      },
+      "player:flag:flag-6": {
+        "role": "player",
+        "id": "flag:flag-6",
+        "category": "flag",
+        "count": 2
+      },
+      "player:pickup:pickup-7": {
+        "role": "player",
+        "id": "pickup:pickup-7",
+        "category": "pickup",
+        "count": 9
+      },
+      "enemy:explore:7": {
+        "role": "enemy",
+        "id": "explore:7",
+        "category": "explore",
+        "count": 3
+      },
+      "enemy:explore:6": {
+        "role": "enemy",
+        "id": "explore:6",
+        "category": "explore",
+        "count": 1
+      },
+      "player:flag:flag-3": {
+        "role": "player",
+        "id": "flag:flag-3",
+        "category": "flag",
+        "count": 4
+      },
+      "player:engage:enemy-L5-1": {
+        "role": "player",
+        "id": "engage:enemy-L5-1",
+        "category": "engage",
+        "count": 1
+      },
+      "player:pickup:pickup-3": {
+        "role": "player",
+        "id": "pickup:pickup-3",
+        "category": "pickup",
+        "count": 27
+      },
+      "player:explore:1": {
+        "role": "player",
+        "id": "explore:1",
+        "category": "explore",
+        "count": 4
+      },
+      "player:flag:flag-0": {
+        "role": "player",
+        "id": "flag:flag-0",
+        "category": "flag",
+        "count": 3
+      },
+      "player:flag:flag-5": {
+        "role": "player",
+        "id": "flag:flag-5",
+        "category": "flag",
+        "count": 1
+      },
+      "player:retreat:enemy-L5-2": {
+        "role": "player",
+        "id": "retreat:enemy-L5-2",
+        "category": "retreat",
+        "count": 3
+      },
+      "player:explore:0": {
+        "role": "player",
+        "id": "explore:0",
+        "category": "explore",
+        "count": 1
+      }
+    },
+    "latestPlans": {},
+    "latestStrategies": {},
+    "lastSafetyEvents": [],
+    "budgetExhausted": false,
+    "pending": false,
+    "status": "Disabled \u00b7 scripted AI",
+    "active": false
+  },
+  "realism": {
+    "enemy-L5-0": {
+      "nonFiringStationaryJiggleWindows": 0,
+      "ownVisibleNowTicks": 882,
+      "ownVisibleFireTicks": 305,
+      "seconds": 114.8,
+      "maxStationarySeconds": 3.6666666666666665,
+      "turnReversals": 108,
+      "quickTurnFlips": 49,
+      "underFireTicks": 234,
+      "survivalStrategyTicks": 192,
+      "visibleOpponentTicks": 1050,
+      "fireCommandTicks": 305,
+      "pursuitTicks": 579,
+      "damageEvents": 2
+    },
+    "enemy-L5-1": {
+      "nonFiringStationaryJiggleWindows": 0,
+      "ownVisibleNowTicks": 994,
+      "ownVisibleFireTicks": 375,
+      "seconds": 114.8,
+      "maxStationarySeconds": 4.8,
+      "turnReversals": 118,
+      "quickTurnFlips": 60,
+      "underFireTicks": 225,
+      "survivalStrategyTicks": 203,
+      "visibleOpponentTicks": 1081,
+      "fireCommandTicks": 375,
+      "pursuitTicks": 823,
+      "damageEvents": 2
+    },
+    "enemy-L5-2": {
+      "nonFiringStationaryJiggleWindows": 0,
+      "ownVisibleNowTicks": 173,
+      "ownVisibleFireTicks": 45,
+      "seconds": 118.8,
+      "maxStationarySeconds": 1.5666666666666667,
+      "turnReversals": 200,
+      "quickTurnFlips": 127,
+      "underFireTicks": 0,
+      "survivalStrategyTicks": 0,
+      "visibleOpponentTicks": 1084,
+      "fireCommandTicks": 45,
+      "pursuitTicks": 190,
+      "damageEvents": 0
+    }
+  },
+  "auditVerification": {
+    "batchId": "f676f1b6-02da-4e27-8800-9857d817cefb:230",
+    "allPerspectivesMatch": true,
+    "records": [
+      {
+        "callId": "98016e93-ac22-4158-905c-09ff0631a58e",
+        "sequence": 230,
+        "tick": 3541,
+        "tankId": "enemy-L5-0",
+        "type": "request",
+        "payload": {
+          "model": "jev-1.13.0",
+          "state": {
+            "observations": {
+              "enemy-L5-0": {
+                "remainingFlags": 5,
+                "totalFlags": 10,
+                "level": 5,
+                "nowSeconds": 118.03333333333333,
+                "visited": [
+                  {
+                    "x": -49.50827705923059,
+                    "z": 70.4267462583112
+                  },
+                  {
+                    "x": -60.06053399661941,
+                    "z": 82.59465950990133
+                  },
+                  {
+                    "x": -51.29054340616694,
+                    "z": 92.61431656280453
+                  },
+                  {
+                    "x": -38.40321145341683,
+                    "z": 92.57525483648975
+                  },
+                  {
+                    "x": -26.303146574237882,
+                    "z": 79.81818989343647
+                  },
+                  {
+                    "x": -32.244358072073936,
+                    "z": 62.469145947238864
+                  },
+                  {
+                    "x": -45.01552601156662,
+                    "z": 61.00690519339305
+                  },
+                  {
+                    "x": -59.629463823806184,
+                    "z": 72.39709254769379
+                  }
+                ],
+                "own": {
+                  "id": "enemy-L5-0",
+                  "team": "enemy",
+                  "position": {
+                    "x": -42.69488895888312,
+                    "z": 60.00623609685157
+                  },
+                  "heading": 4.838052686529302,
+                  "speed": 12.966666666666653,
+                  "shieldFraction": 1,
+                  "ammo": 999999,
+                  "maxAmmo": 999999,
+                  "shield": 3,
+                  "maxShield": 3,
+                  "fireReady": true,
+                  "tick": 3541,
+                  "lastStrategy": "patrol",
+                  "personality": "aggressive"
+                },
+                "contacts": [
+                  {
+                    "id": "enemy-L5-1",
+                    "kind": "tank",
+                    "position": {
+                      "x": -35.91584467268641,
+                      "z": 91.29831517553751
+                    },
+                    "heading": 2.0106192982983444,
+                    "seenTick": 3541,
+                    "source": "own",
+                    "team": "enemy",
+                    "strategy": "patrol",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "flag-0",
+                    "kind": "flag",
+                    "position": {
+                      "x": 17.31922663934529,
+                      "z": -78.42652659676969
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "flag-1",
+                    "kind": "flag",
+                    "position": {
+                      "x": 79.10710690915585,
+                      "z": 48.13521848991513
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "flag-4",
+                    "kind": "flag",
+                    "position": {
+                      "x": 64.14217022806406,
+                      "z": -40.005798352882266
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "flag-5",
+                    "kind": "flag",
+                    "position": {
+                      "x": 55.52214901894331,
+                      "z": -82.46493305452168
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "flag-8",
+                    "kind": "flag",
+                    "position": {
+                      "x": -42.883547792211175,
+                      "z": 76.58331468887627
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "pickup-0",
+                    "kind": "pickup",
+                    "pickupKind": "ammo",
+                    "amount": 20,
+                    "position": {
+                      "x": 80.8338748048991,
+                      "z": -54.29587615840137
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "pickup-2",
+                    "kind": "pickup",
+                    "pickupKind": "ammo",
+                    "amount": 20,
+                    "position": {
+                      "x": 56.47337435744703,
+                      "z": 48.18805932253599
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "pickup-3",
+                    "kind": "pickup",
+                    "pickupKind": "ammo",
+                    "amount": 20,
+                    "position": {
+                      "x": -70.4236500710249,
+                      "z": -15.28566568903625
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "pickup-5",
+                    "kind": "pickup",
+                    "pickupKind": "shield",
+                    "amount": 25,
+                    "position": {
+                      "x": 31.098116721957922,
+                      "z": 88.90555928647518
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "enemy-L5-2",
+                    "kind": "tank",
+                    "team": "enemy",
+                    "position": {
+                      "x": 48.957539889489404,
+                      "z": -31.89475318239031
+                    },
+                    "heading": 0.4398229715049595,
+                    "seenTick": 3541,
+                    "source": "shared",
+                    "strategy": "patrol",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  }
+                ],
+                "memory": [],
+                "geometry": [
+                  {
+                    "id": "wall-0",
+                    "kind": "wall",
+                    "min": {
+                      "x": -72.68515452486463,
+                      "z": 80.76240441156551
+                    },
+                    "max": {
+                      "x": -68.44037090125494,
+                      "z": 89.24009149195626
+                    }
+                  },
+                  {
+                    "id": "wall-2",
+                    "kind": "wall",
+                    "min": {
+                      "x": -63.93609281629324,
+                      "z": 24.36873621866107
+                    },
+                    "max": {
+                      "x": -58.96445455402136,
+                      "z": 30.366719972342253
+                    }
+                  },
+                  {
+                    "id": "windmill-0",
+                    "kind": "windmill",
+                    "position": {
+                      "x": -54.81508445739746,
+                      "z": 53.20848507061601
+                    },
+                    "pylonRadius": 1.2,
+                    "bladeLength": 6,
+                    "bladeAngle": 187.27281850761602,
+                    "prevBladeAngle": 187.22045863005619
+                  }
+                ],
+                "bounds": 100
+              }
+            }
+          },
+          "questions": {
+            "tank_0": {
+              "type": "choice",
+              "instructions": "You command tank \"enemy-L5-0\". Use ONLY observations[\"enemy-L5-0\"], your tank's perception; other tanks' observations are unavailable to you. Positions x/z and distances are game units in the horizontal arena plane; speed is signed game units/second (negative means reverse). Heading is radians in [0, 2*pi): 0 faces +z, pi/2 faces +x; forward direction is (sin(heading), cos(heading)), bearing to a point is atan2(delta x, delta z). At levels 1\u20132 own position, flag/supply positions and visited navigation positions are rounded to the nearest 10 game units; observed tank positions remain precise. Level 3+ authorized positions are precise; map access to flags/supplies does not reveal hidden opponents. Source own means personally observed; shared means squad report, not own line of sight; map means authorized objective/supply map. nowSeconds, seenSeconds and ageSeconds are simulation seconds; tick/seenTick use 30 ticks/second. Remembered/reported positions are dated, never guaranteed current. Pick the best available maneuver for the next 500 milliseconds. Preserve your tank, avoid barriers and tank collisions, never fire through teammates, avoid ineffective chasing, use safe cover and firing lanes. Your mission is to STOP the opposing tank from taking your flags; do not fail this mission. Use remainingFlags and totalFlags in your own observation as the public objective score. As fewer flags remain, increase urgency: prioritize interception and active flag defense, especially when remainingFlags is 2 or less. Use visible or previously observed opponent positions and known flag routes only; never invent hidden targets. Challenge observed opposing players with purposeful attacks and flanks. When opponents are unseen and you are healthy, patrol known flags or explore unvisited sectors; peaceful regrouping or idling without a tactical reason wastes the defense window. Under recent fire or low shields, survival, cover, retreat and regrouping remain valid ways to protect the mission; avoid suicidal charging. Choose feasible purposeful movement and safe firing lanes rather than repetitive chasing. Commander personality: aggressive. Among feasible options prefer purposeful pressure, interception and flanking over passive defense; accept moderate exposure when healthy to stop flag capture. Never override recent-fire fear, low-shield survival, collision or friendly-fire constraints. Candidate routes are checked against known geometry, not guaranteed outcomes; moving threats and final collision/fire safety are handled locally. Choose only an offered option; never invent unavailable maneuvers. Prefer progress toward your objective over idle behavior unless holding or retreating is tactically necessary.",
+              "criteria": {
+                "patrol:flag-8:1": "Strategy patrol: Circle clockwise around known flag flag-8 at18-unit radius; continuously survey for opponents; travel 13 units at 9 degrees relative heading; known obstacle route clear",
+                "patrol:flag-1:approach:0": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-1; keep moving then circle and survey; travel 24 units at 178 degrees relative heading; known obstacle route clear",
+                "explore:2": "Strategy explore: Search unvisited clear sector 2 for opposing player; reacquire visual contact; travel 24 units at 173 degrees relative heading; known obstacle route clear",
+                "explore:3": "Strategy explore: Search unvisited clear sector 3 for opposing player; reacquire visual contact; travel 24 units at -142 degrees relative heading; known obstacle route clear",
+                "explore:4": "Strategy explore: Search unvisited clear sector 4 for opposing player; reacquire visual contact; travel 24 units at -97 degrees relative heading; known obstacle route clear",
+                "explore:5": "Strategy explore: Search unvisited clear sector 5 for opposing player; reacquire visual contact; travel 24 units at -52 degrees relative heading; known obstacle route clear",
+                "explore:6": "Strategy explore: Search unvisited clear sector 6 for opposing player; reacquire visual contact; travel 24 units at -7 degrees relative heading; known obstacle route clear"
+              }
+            }
+          }
+        },
+        "reservedCostUsd": 0.0027525120000000004,
+        "recordId": "9b8be571-576a-45f3-825f-0ccbaff493ee",
+        "timestamp": "2026-09-30T17:35:50.590Z"
+      },
+      {
+        "callId": "98016e93-ac22-4158-905c-09ff0631a58e",
+        "sequence": 230,
+        "tick": 3541,
+        "tankId": "enemy-L5-0",
+        "type": "result",
+        "choice": "patrol:flag-8:1",
+        "confidence": 0.82,
+        "probabilities": {
+          "patrol:flag-8:1": 0.85,
+          "explore:6": 0.02,
+          "explore:2": 0.03,
+          "patrol:flag-1:approach:0": 0.04,
+          "explore:3": 0.02,
+          "explore:5": 0.02,
+          "explore:4": 0.02
+        },
+        "upstreamResponse": {
+          "model": "jev-1.13.0",
+          "answers": {
+            "tank_0": {
+              "type": "choice",
+              "choice": "patrol:flag-8:1",
+              "confidence": 0.82,
+              "probabilities": {
+                "patrol:flag-8:1": 0.85,
+                "explore:6": 0.02,
+                "explore:2": 0.03,
+                "patrol:flag-1:approach:0": 0.04,
+                "explore:3": 0.02,
+                "explore:5": 0.02,
+                "explore:4": 0.02
+              }
+            }
+          },
+          "usage": {
+            "input_tokens": 3799,
+            "output_tokens": 111
+          }
+        },
+        "usage": {
+          "input_tokens": 3799,
+          "output_tokens": 111
+        },
+        "costUsd": 0.00015955800000000002,
+        "spentUsd": 1.6141775999999735,
+        "durationMs": 142,
+        "recordId": "fe9c12ca-bbc9-4d3d-8046-5f64be6cf37b",
+        "timestamp": "2026-09-30T17:35:50.732Z"
+      },
+      {
+        "callId": "d4ea8072-df93-4eff-a065-64b7bbb099a7",
+        "sequence": 230,
+        "tick": 3541,
+        "tankId": "enemy-L5-1",
+        "type": "request",
+        "payload": {
+          "model": "jev-1.13.0",
+          "state": {
+            "observations": {
+              "enemy-L5-1": {
+                "remainingFlags": 5,
+                "totalFlags": 10,
+                "level": 5,
+                "nowSeconds": 118.03333333333333,
+                "visited": [
+                  {
+                    "x": -47.42203576319974,
+                    "z": 69.65303821347652
+                  },
+                  {
+                    "x": -62.97983074796535,
+                    "z": 74.8099032520672
+                  },
+                  {
+                    "x": -59.21490926793782,
+                    "z": 85.12704152307154
+                  },
+                  {
+                    "x": -50.66865864339003,
+                    "z": 91.10547941023397
+                  },
+                  {
+                    "x": -35.929573010922965,
+                    "z": 92.95924188592683
+                  },
+                  {
+                    "x": -25.03432992135493,
+                    "z": 77.57525783426372
+                  },
+                  {
+                    "x": -31.566660353830915,
+                    "z": 63.2439408564458
+                  },
+                  {
+                    "x": -41.02743775054716,
+                    "z": 59.53103254495894
+                  }
+                ],
+                "own": {
+                  "id": "enemy-L5-1",
+                  "team": "enemy",
+                  "position": {
+                    "x": -35.91584467268641,
+                    "z": 91.29831517553751
+                  },
+                  "heading": 2.0106192982983444,
+                  "speed": 13.49999999999999,
+                  "shieldFraction": 1,
+                  "ammo": 999999,
+                  "maxAmmo": 999999,
+                  "shield": 3,
+                  "maxShield": 3,
+                  "fireReady": true,
+                  "tick": 3541,
+                  "lastStrategy": "patrol",
+                  "personality": "aggressive"
+                },
+                "contacts": [
+                  {
+                    "id": "enemy-L5-0",
+                    "kind": "tank",
+                    "position": {
+                      "x": -42.69488895888312,
+                      "z": 60.00623609685157
+                    },
+                    "heading": 4.838052686529302,
+                    "seenTick": 3541,
+                    "source": "own",
+                    "team": "enemy",
+                    "strategy": "patrol",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "flag-0",
+                    "kind": "flag",
+                    "position": {
+                      "x": 17.31922663934529,
+                      "z": -78.42652659676969
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "flag-1",
+                    "kind": "flag",
+                    "position": {
+                      "x": 79.10710690915585,
+                      "z": 48.13521848991513
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "flag-4",
+                    "kind": "flag",
+                    "position": {
+                      "x": 64.14217022806406,
+                      "z": -40.005798352882266
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "flag-5",
+                    "kind": "flag",
+                    "position": {
+                      "x": 55.52214901894331,
+                      "z": -82.46493305452168
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "flag-8",
+                    "kind": "flag",
+                    "position": {
+                      "x": -42.883547792211175,
+                      "z": 76.58331468887627
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "pickup-0",
+                    "kind": "pickup",
+                    "pickupKind": "ammo",
+                    "amount": 20,
+                    "position": {
+                      "x": 80.8338748048991,
+                      "z": -54.29587615840137
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "pickup-2",
+                    "kind": "pickup",
+                    "pickupKind": "ammo",
+                    "amount": 20,
+                    "position": {
+                      "x": 56.47337435744703,
+                      "z": 48.18805932253599
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "pickup-3",
+                    "kind": "pickup",
+                    "pickupKind": "ammo",
+                    "amount": 20,
+                    "position": {
+                      "x": -70.4236500710249,
+                      "z": -15.28566568903625
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "pickup-5",
+                    "kind": "pickup",
+                    "pickupKind": "shield",
+                    "amount": 25,
+                    "position": {
+                      "x": 31.098116721957922,
+                      "z": 88.90555928647518
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "enemy-L5-2",
+                    "kind": "tank",
+                    "team": "enemy",
+                    "position": {
+                      "x": 48.957539889489404,
+                      "z": -31.89475318239031
+                    },
+                    "heading": 0.4398229715049595,
+                    "seenTick": 3541,
+                    "source": "shared",
+                    "strategy": "patrol",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  }
+                ],
+                "memory": [],
+                "geometry": [
+                  {
+                    "id": "wall-7",
+                    "kind": "wall",
+                    "min": {
+                      "x": -22.95976282353513,
+                      "z": 57.43695752113126
+                    },
+                    "max": {
+                      "x": -16.64040420507081,
+                      "z": 66.51372298807837
+                    }
+                  },
+                  {
+                    "id": "windmill-0",
+                    "kind": "windmill",
+                    "position": {
+                      "x": -54.81508445739746,
+                      "z": 53.20848507061601
+                    },
+                    "pylonRadius": 1.2,
+                    "bladeLength": 6,
+                    "bladeAngle": 187.27281850761602,
+                    "prevBladeAngle": 187.22045863005619
+                  },
+                  {
+                    "id": "windmill-3",
+                    "kind": "windmill",
+                    "position": {
+                      "x": 5.81032632663846,
+                      "z": 85.65863162092865
+                    },
+                    "pylonRadius": 1.2,
+                    "bladeLength": 6,
+                    "bladeAngle": 188.959781512031,
+                    "prevBladeAngle": 188.90742163447115
+                  }
+                ],
+                "bounds": 100
+              }
+            }
+          },
+          "questions": {
+            "tank_0": {
+              "type": "choice",
+              "instructions": "You command tank \"enemy-L5-1\". Use ONLY observations[\"enemy-L5-1\"], your tank's perception; other tanks' observations are unavailable to you. Positions x/z and distances are game units in the horizontal arena plane; speed is signed game units/second (negative means reverse). Heading is radians in [0, 2*pi): 0 faces +z, pi/2 faces +x; forward direction is (sin(heading), cos(heading)), bearing to a point is atan2(delta x, delta z). At levels 1\u20132 own position, flag/supply positions and visited navigation positions are rounded to the nearest 10 game units; observed tank positions remain precise. Level 3+ authorized positions are precise; map access to flags/supplies does not reveal hidden opponents. Source own means personally observed; shared means squad report, not own line of sight; map means authorized objective/supply map. nowSeconds, seenSeconds and ageSeconds are simulation seconds; tick/seenTick use 30 ticks/second. Remembered/reported positions are dated, never guaranteed current. Pick the best available maneuver for the next 500 milliseconds. Preserve your tank, avoid barriers and tank collisions, never fire through teammates, avoid ineffective chasing, use safe cover and firing lanes. Your mission is to STOP the opposing tank from taking your flags; do not fail this mission. Use remainingFlags and totalFlags in your own observation as the public objective score. As fewer flags remain, increase urgency: prioritize interception and active flag defense, especially when remainingFlags is 2 or less. Use visible or previously observed opponent positions and known flag routes only; never invent hidden targets. Challenge observed opposing players with purposeful attacks and flanks. When opponents are unseen and you are healthy, patrol known flags or explore unvisited sectors; peaceful regrouping or idling without a tactical reason wastes the defense window. Under recent fire or low shields, survival, cover, retreat and regrouping remain valid ways to protect the mission; avoid suicidal charging. Choose feasible purposeful movement and safe firing lanes rather than repetitive chasing. Commander personality: aggressive. Among feasible options prefer purposeful pressure, interception and flanking over passive defense; accept moderate exposure when healthy to stop flag capture. Never override recent-fire fear, low-shield survival, collision or friendly-fire constraints. Candidate routes are checked against known geometry, not guaranteed outcomes; moving threats and final collision/fire safety are handled locally. Choose only an offered option; never invent unavailable maneuvers. Prefer progress toward your objective over idle behavior unless holding or retreating is tactically necessary.",
+              "criteria": {
+                "patrol:flag-8:1": "Strategy patrol: Circle clockwise around known flag flag-8 at18-unit radius; continuously survey for opponents; travel 13 units at 16 degrees relative heading; known obstacle route clear",
+                "patrol:flag-1:approach:0": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-1; keep moving then circle and survey; travel 24 units at -5 degrees relative heading; known obstacle route clear",
+                "explore:2": "Strategy explore: Search unvisited clear sector 2 for opposing player; reacquire visual contact; travel 24 units at -25 degrees relative heading; known obstacle route clear"
+              }
+            }
+          }
+        },
+        "reservedCostUsd": 0.0027525120000000004,
+        "recordId": "6b406ae3-436f-4d48-ac92-f617d162d204",
+        "timestamp": "2026-09-30T17:35:50.602Z"
+      },
+      {
+        "callId": "d4ea8072-df93-4eff-a065-64b7bbb099a7",
+        "sequence": 230,
+        "tick": 3541,
+        "tankId": "enemy-L5-1",
+        "type": "result",
+        "choice": "patrol:flag-8:1",
+        "confidence": 0.74,
+        "probabilities": {
+          "explore:2": 0.1,
+          "patrol:flag-1:approach:0": 0.08,
+          "patrol:flag-8:1": 0.82
+        },
+        "upstreamResponse": {
+          "model": "jev-1.13.0",
+          "answers": {
+            "tank_0": {
+              "type": "choice",
+              "choice": "patrol:flag-8:1",
+              "confidence": 0.74,
+              "probabilities": {
+                "explore:2": 0.1,
+                "patrol:flag-1:approach:0": 0.08,
+                "patrol:flag-8:1": 0.82
+              }
+            }
+          },
+          "usage": {
+            "input_tokens": 3607,
+            "output_tokens": 71
+          }
+        },
+        "usage": {
+          "input_tokens": 3607,
+          "output_tokens": 71
+        },
+        "costUsd": 0.000151494,
+        "spentUsd": 1.6143290939999735,
+        "durationMs": 190,
+        "recordId": "f8094a67-7a8a-4f87-9338-7343433fa338",
+        "timestamp": "2026-09-30T17:35:50.792Z"
+      },
+      {
+        "callId": "ea8c3884-feff-4de1-84a1-0215d68d9148",
+        "sequence": 230,
+        "tick": 3541,
+        "tankId": "enemy-L5-2",
+        "type": "request",
+        "payload": {
+          "model": "jev-1.13.0",
+          "state": {
+            "observations": {
+              "enemy-L5-2": {
+                "remainingFlags": 5,
+                "totalFlags": 10,
+                "level": 5,
+                "nowSeconds": 118.03333333333333,
+                "visited": [
+                  {
+                    "x": 83.10719950998306,
+                    "z": -85.01900778098472
+                  },
+                  {
+                    "x": 91.4252556499434,
+                    "z": -78.29521936705207
+                  },
+                  {
+                    "x": 91.17170992353613,
+                    "z": -66.95371868619408
+                  },
+                  {
+                    "x": 63.74274387250937,
+                    "z": -44.27020370403947
+                  },
+                  {
+                    "x": 56.87192382596732,
+                    "z": -55.81357666675248
+                  },
+                  {
+                    "x": 46.69965567645271,
+                    "z": -41.11491466316837
+                  },
+                  {
+                    "x": 55.23293558309004,
+                    "z": -24.973130138545514
+                  },
+                  {
+                    "x": 65.05573585566854,
+                    "z": -22.63944086422653
+                  }
+                ],
+                "own": {
+                  "id": "enemy-L5-2",
+                  "team": "enemy",
+                  "position": {
+                    "x": 48.957539889489404,
+                    "z": -31.89475318239031
+                  },
+                  "heading": 0.4398229715049595,
+                  "speed": 20.433333333333316,
+                  "shieldFraction": 1,
+                  "ammo": 999999,
+                  "maxAmmo": 999999,
+                  "shield": 3,
+                  "maxShield": 3,
+                  "fireReady": true,
+                  "tick": 3541,
+                  "lastStrategy": "patrol",
+                  "personality": "cowardly"
+                },
+                "contacts": [
+                  {
+                    "id": "flag-0",
+                    "kind": "flag",
+                    "position": {
+                      "x": 17.31922663934529,
+                      "z": -78.42652659676969
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "flag-1",
+                    "kind": "flag",
+                    "position": {
+                      "x": 79.10710690915585,
+                      "z": 48.13521848991513
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "flag-4",
+                    "kind": "flag",
+                    "position": {
+                      "x": 64.14217022806406,
+                      "z": -40.005798352882266
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "flag-5",
+                    "kind": "flag",
+                    "position": {
+                      "x": 55.52214901894331,
+                      "z": -82.46493305452168
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "flag-8",
+                    "kind": "flag",
+                    "position": {
+                      "x": -42.883547792211175,
+                      "z": 76.58331468887627
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "pickup-0",
+                    "kind": "pickup",
+                    "pickupKind": "ammo",
+                    "amount": 20,
+                    "position": {
+                      "x": 80.8338748048991,
+                      "z": -54.29587615840137
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "pickup-2",
+                    "kind": "pickup",
+                    "pickupKind": "ammo",
+                    "amount": 20,
+                    "position": {
+                      "x": 56.47337435744703,
+                      "z": 48.18805932253599
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "pickup-3",
+                    "kind": "pickup",
+                    "pickupKind": "ammo",
+                    "amount": 20,
+                    "position": {
+                      "x": -70.4236500710249,
+                      "z": -15.28566568903625
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "pickup-5",
+                    "kind": "pickup",
+                    "pickupKind": "shield",
+                    "amount": 25,
+                    "position": {
+                      "x": 31.098116721957922,
+                      "z": 88.90555928647518
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "enemy-L5-0",
+                    "kind": "tank",
+                    "team": "enemy",
+                    "position": {
+                      "x": -42.69488895888312,
+                      "z": 60.00623609685157
+                    },
+                    "heading": 4.838052686529302,
+                    "seenTick": 3541,
+                    "source": "shared",
+                    "strategy": "patrol",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "enemy-L5-1",
+                    "kind": "tank",
+                    "team": "enemy",
+                    "position": {
+                      "x": -35.91584467268641,
+                      "z": 91.29831517553751
+                    },
+                    "heading": 2.0106192982983444,
+                    "seenTick": 3541,
+                    "source": "shared",
+                    "strategy": "patrol",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  }
+                ],
+                "memory": [],
+                "geometry": [
+                  {
+                    "id": "wall-6",
+                    "kind": "wall",
+                    "min": {
+                      "x": 67.34294444462284,
+                      "z": 25.793210863368586
+                    },
+                    "max": {
+                      "x": 73.45089478651062,
+                      "z": 31.59100688691251
+                    }
+                  },
+                  {
+                    "id": "windmill-2",
+                    "kind": "windmill",
+                    "position": {
+                      "x": 87.238855317235,
+                      "z": -9.97455658391118
+                    },
+                    "pylonRadius": 1.2,
+                    "bladeLength": 6,
+                    "bladeAngle": 189.07532003603427,
+                    "prevBladeAngle": 189.02296015847443
+                  }
+                ],
+                "bounds": 100
+              }
+            }
+          },
+          "questions": {
+            "tank_0": {
+              "type": "choice",
+              "instructions": "You command tank \"enemy-L5-2\". Use ONLY observations[\"enemy-L5-2\"], your tank's perception; other tanks' observations are unavailable to you. Positions x/z and distances are game units in the horizontal arena plane; speed is signed game units/second (negative means reverse). Heading is radians in [0, 2*pi): 0 faces +z, pi/2 faces +x; forward direction is (sin(heading), cos(heading)), bearing to a point is atan2(delta x, delta z). At levels 1\u20132 own position, flag/supply positions and visited navigation positions are rounded to the nearest 10 game units; observed tank positions remain precise. Level 3+ authorized positions are precise; map access to flags/supplies does not reveal hidden opponents. Source own means personally observed; shared means squad report, not own line of sight; map means authorized objective/supply map. nowSeconds, seenSeconds and ageSeconds are simulation seconds; tick/seenTick use 30 ticks/second. Remembered/reported positions are dated, never guaranteed current. Pick the best available maneuver for the next 500 milliseconds. Preserve your tank, avoid barriers and tank collisions, never fire through teammates, avoid ineffective chasing, use safe cover and firing lanes. Your mission is to STOP the opposing tank from taking your flags; do not fail this mission. Use remainingFlags and totalFlags in your own observation as the public objective score. As fewer flags remain, increase urgency: prioritize interception and active flag defense, especially when remainingFlags is 2 or less. Use visible or previously observed opponent positions and known flag routes only; never invent hidden targets. Challenge observed opposing players with purposeful attacks and flanks. When opponents are unseen and you are healthy, patrol known flags or explore unvisited sectors; peaceful regrouping or idling without a tactical reason wastes the defense window. Under recent fire or low shields, survival, cover, retreat and regrouping remain valid ways to protect the mission; avoid suicidal charging. Choose feasible purposeful movement and safe firing lanes rather than repetitive chasing. Commander personality: cowardly. Among feasible options prefer low-exposure cover, safer flanking and defensive standoff; withdraw sooner under credible danger, then patrol safely rather than idle. Your flag-defense mission still matters. Never override collision or friendly-fire constraints. Candidate routes are checked against known geometry, not guaranteed outcomes; moving threats and final collision/fire safety are handled locally. Choose only an offered option; never invent unavailable maneuvers. Prefer progress toward your objective over idle behavior unless holding or retreating is tactically necessary.",
+              "criteria": {
+                "patrol:flag-4:1": "Strategy patrol: Circle clockwise around known flag flag-4 at18-unit radius; continuously survey for opponents; travel 13 units at 22 degrees relative heading; known obstacle route clear",
+                "patrol:flag-5:approach:0": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-5; keep moving then circle and survey; travel 24 units at 147 degrees relative heading; known obstacle route clear",
+                "explore:0": "Strategy explore: Search unvisited clear sector 0 for opposing player; reacquire visual contact; travel 24 units at -25 degrees relative heading; known obstacle route clear",
+                "explore:2": "Strategy explore: Search unvisited clear sector 2 for opposing player; reacquire visual contact; travel 24 units at 65 degrees relative heading; known obstacle route clear",
+                "explore:5": "Strategy explore: Search unvisited clear sector 5 for opposing player; reacquire visual contact; travel 24 units at -160 degrees relative heading; known obstacle route clear",
+                "explore:6": "Strategy explore: Search unvisited clear sector 6 for opposing player; reacquire visual contact; travel 24 units at -115 degrees relative heading; known obstacle route clear",
+                "explore:7": "Strategy explore: Search unvisited clear sector 7 for opposing player; reacquire visual contact; travel 24 units at -70 degrees relative heading; known obstacle route clear"
+              }
+            }
+          }
+        },
+        "reservedCostUsd": 0.0027525120000000004,
+        "recordId": "23ed49cf-8137-46e3-801d-ac51e0571cb0",
+        "timestamp": "2026-09-30T17:35:50.735Z"
+      },
+      {
+        "callId": "ea8c3884-feff-4de1-84a1-0215d68d9148",
+        "sequence": 230,
+        "tick": 3541,
+        "tankId": "enemy-L5-2",
+        "type": "result",
+        "choice": "patrol:flag-4:1",
+        "confidence": 0.57,
+        "probabilities": {
+          "explore:2": 0.03,
+          "patrol:flag-4:1": 0.63,
+          "explore:0": 0.06,
+          "explore:7": 0.02,
+          "patrol:flag-5:approach:0": 0.21,
+          "explore:6": 0.02,
+          "explore:5": 0.03
+        },
+        "upstreamResponse": {
+          "model": "jev-1.13.0",
+          "answers": {
+            "tank_0": {
+              "type": "choice",
+              "choice": "patrol:flag-4:1",
+              "confidence": 0.57,
+              "probabilities": {
+                "explore:2": 0.03,
+                "patrol:flag-4:1": 0.63,
+                "explore:0": 0.06,
+                "explore:7": 0.02,
+                "patrol:flag-5:approach:0": 0.21,
+                "explore:6": 0.02,
+                "explore:5": 0.03
+              }
+            }
+          },
+          "usage": {
+            "input_tokens": 3676,
+            "output_tokens": 111
+          }
+        },
+        "usage": {
+          "input_tokens": 3676,
+          "output_tokens": 111
+        },
+        "costUsd": 0.00015439200000000002,
+        "spentUsd": 1.6144834859999735,
+        "durationMs": 146,
+        "recordId": "5a998813-3ba4-4b71-b024-c3ff092ca13d",
+        "timestamp": "2026-09-30T17:35:50.881Z"
+      },
+      {
+        "callId": "6169b058-26e0-4f07-be04-984912f7e2a0",
+        "sequence": 230,
+        "tick": 3541,
+        "tankId": "player",
+        "type": "request",
+        "payload": {
+          "model": "jev-1.13.0",
+          "state": {
+            "observations": {
+              "player": {
+                "remainingFlags": 5,
+                "totalFlags": 10,
+                "level": 5,
+                "nowSeconds": 118.03333333333333,
+                "visited": [
+                  {
+                    "x": -35.98152750049971,
+                    "z": -88.96472013791349
+                  },
+                  {
+                    "x": -54.91312616941231,
+                    "z": -85.87067310471065
+                  },
+                  {
+                    "x": -67.21941867382864,
+                    "z": -86.96546325399166
+                  },
+                  {
+                    "x": -83.73392072991547,
+                    "z": -91.49354430166186
+                  },
+                  {
+                    "x": -88.23242940240401,
+                    "z": -75.91649656546628
+                  },
+                  {
+                    "x": -79.78776235159664,
+                    "z": -67.02642680839296
+                  },
+                  {
+                    "x": -77.13834874073122,
+                    "z": -81.88661284928175
+                  },
+                  {
+                    "x": -94.50626629637839,
+                    "z": -90.29914767623441
+                  }
+                ],
+                "own": {
+                  "id": "player",
+                  "team": "player",
+                  "position": {
+                    "x": -83.62698846545148,
+                    "z": -87.54688061066649
+                  },
+                  "heading": 4.209734155810323,
+                  "speed": 13.866666666666667,
+                  "shieldFraction": 0.3,
+                  "ammo": 75,
+                  "maxAmmo": 80,
+                  "shield": 30,
+                  "maxShield": 100,
+                  "fireReady": true,
+                  "tick": 3541,
+                  "lastStrategy": "retreat",
+                  "personality": "neutral"
+                },
+                "contacts": [
+                  {
+                    "id": "flag-0",
+                    "kind": "flag",
+                    "position": {
+                      "x": 17.31922663934529,
+                      "z": -78.42652659676969
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "flag-1",
+                    "kind": "flag",
+                    "position": {
+                      "x": 79.10710690915585,
+                      "z": 48.13521848991513
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "flag-4",
+                    "kind": "flag",
+                    "position": {
+                      "x": 64.14217022806406,
+                      "z": -40.005798352882266
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "flag-5",
+                    "kind": "flag",
+                    "position": {
+                      "x": 55.52214901894331,
+                      "z": -82.46493305452168
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "flag-8",
+                    "kind": "flag",
+                    "position": {
+                      "x": -42.883547792211175,
+                      "z": 76.58331468887627
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "pickup-0",
+                    "kind": "pickup",
+                    "pickupKind": "ammo",
+                    "amount": 20,
+                    "position": {
+                      "x": 80.8338748048991,
+                      "z": -54.29587615840137
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "pickup-2",
+                    "kind": "pickup",
+                    "pickupKind": "ammo",
+                    "amount": 20,
+                    "position": {
+                      "x": 56.47337435744703,
+                      "z": 48.18805932253599
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "pickup-3",
+                    "kind": "pickup",
+                    "pickupKind": "ammo",
+                    "amount": 20,
+                    "position": {
+                      "x": -70.4236500710249,
+                      "z": -15.28566568903625
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "pickup-5",
+                    "kind": "pickup",
+                    "pickupKind": "shield",
+                    "amount": 25,
+                    "position": {
+                      "x": 31.098116721957922,
+                      "z": 88.90555928647518
+                    },
+                    "seenTick": 3541,
+                    "source": "map",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "enemy-L5-0",
+                    "kind": "tank",
+                    "team": "enemy",
+                    "position": {
+                      "x": -42.69488895888312,
+                      "z": 60.00623609685157
+                    },
+                    "heading": 4.838052686529302,
+                    "seenTick": 3541,
+                    "source": "shared",
+                    "strategy": "patrol",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "enemy-L5-1",
+                    "kind": "tank",
+                    "team": "enemy",
+                    "position": {
+                      "x": -35.91584467268641,
+                      "z": 91.29831517553751
+                    },
+                    "heading": 2.0106192982983444,
+                    "seenTick": 3541,
+                    "source": "shared",
+                    "strategy": "patrol",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  },
+                  {
+                    "id": "enemy-L5-2",
+                    "kind": "tank",
+                    "team": "enemy",
+                    "position": {
+                      "x": 48.957539889489404,
+                      "z": -31.89475318239031
+                    },
+                    "heading": 0.4398229715049595,
+                    "seenTick": 3541,
+                    "source": "shared",
+                    "strategy": "patrol",
+                    "seenSeconds": 118.03333333333333,
+                    "ageSeconds": 0
+                  }
+                ],
+                "memory": [],
+                "geometry": [],
+                "bounds": 100
+              }
+            }
+          },
+          "questions": {
+            "tank_0": {
+              "type": "choice",
+              "instructions": "You command tank \"player\". Use ONLY observations[\"player\"], your tank's perception; other tanks' observations are unavailable to you. Positions x/z and distances are game units in the horizontal arena plane; speed is signed game units/second (negative means reverse). Heading is radians in [0, 2*pi): 0 faces +z, pi/2 faces +x; forward direction is (sin(heading), cos(heading)), bearing to a point is atan2(delta x, delta z). At levels 1\u20132 own position, flag/supply positions and visited navigation positions are rounded to the nearest 10 game units; observed tank positions remain precise. Level 3+ authorized positions are precise; map access to flags/supplies does not reveal hidden opponents. Source own means personally observed; shared means squad report, not own line of sight; map means authorized objective/supply map. nowSeconds, seenSeconds and ageSeconds are simulation seconds; tick/seenTick use 30 ticks/second. Remembered/reported positions are dated, never guaranteed current. Pick the best available maneuver for the next 500 milliseconds. Preserve your tank, avoid barriers and tank collisions, never fire through teammates, avoid ineffective chasing, use safe cover and firing lanes. Collect flags and survive while fighting enemies.  Candidate routes are checked against known geometry, not guaranteed outcomes; moving threats and final collision/fire safety are handled locally. Choose only an offered option; never invent unavailable maneuvers. Prefer progress toward your objective over idle behavior unless holding or retreating is tactically necessary.",
+              "criteria": {
+                "pickup:pickup-5": "Strategy explore: Collect visible shield supply pickup-5; restore up to 25 shield of 70 missing; improve survival; travel 210 units at 152 degrees relative heading; known obstacle route clear"
+              }
+            }
+          }
+        },
+        "reservedCostUsd": 0.0027525120000000004,
+        "recordId": "fddd9b14-3ba7-4756-b617-2682ede338bd",
+        "timestamp": "2026-09-30T17:35:50.795Z"
+      },
+      {
+        "callId": "6169b058-26e0-4f07-be04-984912f7e2a0",
+        "sequence": 230,
+        "tick": 3541,
+        "tankId": "player",
+        "type": "result",
+        "choice": "pickup:pickup-5",
+        "confidence": 1,
+        "probabilities": {
+          "pickup:pickup-5": 1
+        },
+        "upstreamResponse": {
+          "model": "jev-1.13.0",
+          "answers": {
+            "tank_0": {
+              "type": "choice",
+              "choice": "pickup:pickup-5",
+              "confidence": 1,
+              "probabilities": {
+                "pickup:pickup-5": 1
+              }
+            }
+          },
+          "usage": {
+            "input_tokens": 3025,
+            "output_tokens": 36
+          }
+        },
+        "usage": {
+          "input_tokens": 3025,
+          "output_tokens": 36
+        },
+        "costUsd": 0.00012705000000000003,
+        "spentUsd": 1.6118580239999734,
+        "durationMs": 169,
+        "recordId": "f4189df1-fdbd-4255-a2a5-9a76dce58ca2",
+        "timestamp": "2026-09-30T17:35:50.964Z"
+      }
+    ]
+  },
+  "errors": [],
+  "notes": [
+    "Model choices and exact per-tick executor commands recorded separately.",
+    "Stationary uses abs(speed)<0.5; turn reversals are diagnostics requiring visual review, not automatically defects.",
+    "Opponents are last request observations; exact own visibility at execution may differ; safe fire requires current cannon alignment."
+  ],
+  "sourceRevision": "84d64cc0f5ecb730df9e3ca7b09ac86c4640d8b6",
+  "acceptance": "passed bounded live safety and stationary-oscillation checks; human fun not measured"
+}

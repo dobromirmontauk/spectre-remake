@@ -1,0 +1,200 @@
+{
+  "endpoint": "https://api.typesafe.ai/v1/systemone",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer [REDACTED]"
+  },
+  "requestBody": {
+    "model": "jev-1.13.0",
+    "state": {
+      "observations": {
+        "enemy-L2-0": {
+          "remainingFlags": 7,
+          "totalFlags": 10,
+          "level": 2,
+          "nowSeconds": 46.6,
+          "visited": [
+            {
+              "x": -80,
+              "z": 20
+            },
+            {
+              "x": -80,
+              "z": 0
+            },
+            {
+              "x": -60,
+              "z": 10
+            },
+            {
+              "x": -50,
+              "z": 0
+            },
+            {
+              "x": -50,
+              "z": -10
+            },
+            {
+              "x": -60,
+              "z": -20
+            },
+            {
+              "x": -70,
+              "z": -30
+            },
+            {
+              "x": -80,
+              "z": -20
+            }
+          ],
+          "own": {
+            "id": "enemy-L2-0",
+            "team": "enemy",
+            "position": {
+              "x": -90,
+              "z": -20
+            },
+            "heading": 12.126547642856561,
+            "speed": 20.6,
+            "shieldFraction": 1,
+            "ammo": 999999,
+            "maxAmmo": 999999,
+            "shield": 3,
+            "maxShield": 3,
+            "fireReady": true,
+            "tick": 1398,
+            "lastStrategy": "patrol"
+          },
+          "contacts": [
+            {
+              "id": "flag-0",
+              "kind": "flag",
+              "position": {
+                "x": -70,
+                "z": -10
+              },
+              "seenTick": 1398,
+              "source": "own",
+              "seenSeconds": 46.6,
+              "ageSeconds": 0
+            },
+            {
+              "id": "flag-6",
+              "kind": "flag",
+              "position": {
+                "x": -80,
+                "z": 40
+              },
+              "seenTick": 1398,
+              "source": "own",
+              "seenSeconds": 46.6,
+              "ageSeconds": 0
+            },
+            {
+              "id": "pickup-3",
+              "kind": "pickup",
+              "pickupKind": "ammo",
+              "amount": 20,
+              "position": {
+                "x": -90,
+                "z": 20
+              },
+              "seenTick": 1398,
+              "source": "own",
+              "seenSeconds": 46.6,
+              "ageSeconds": 0
+            }
+          ],
+          "memory": [
+            {
+              "id": "flag-5",
+              "kind": "flag",
+              "position": {
+                "x": -70,
+                "z": 70
+              },
+              "seenTick": 1257,
+              "source": "own",
+              "seenSeconds": 41.9,
+              "ageSeconds": 4.7
+            },
+            {
+              "id": "flag-4",
+              "kind": "flag",
+              "position": {
+                "x": -50,
+                "z": 50
+              },
+              "seenTick": 1243,
+              "source": "own",
+              "seenSeconds": 41.43333333333333,
+              "ageSeconds": 5.166666666666667
+            },
+            {
+              "id": "pickup-1",
+              "kind": "pickup",
+              "pickupKind": "ammo",
+              "amount": 20,
+              "position": {
+                "x": 0,
+                "z": 80
+              },
+              "seenTick": 903,
+              "source": "own",
+              "seenSeconds": 30.1,
+              "ageSeconds": 16.5
+            },
+            {
+              "id": "pickup-4",
+              "kind": "pickup",
+              "pickupKind": "shield",
+              "amount": 25,
+              "position": {
+                "x": -50,
+                "z": -60
+              },
+              "seenTick": 1336,
+              "source": "own",
+              "seenSeconds": 44.53333333333333,
+              "ageSeconds": 2.066666666666667
+            }
+          ],
+          "geometry": [],
+          "bounds": 100
+        }
+      }
+    },
+    "questions": {
+      "tank_0": {
+        "type": "choice",
+        "instructions": "You command tank \"enemy-L2-0\". Use ONLY observations[\"enemy-L2-0\"], your tank's perception; other tanks' observations are unavailable to you. Pick the best available maneuver for the next 500 milliseconds. Preserve your tank, avoid barriers and tank collisions, never fire through teammates, avoid ineffective chasing, use safe cover and firing lanes. Your mission is to STOP the opposing tank from taking your flags; do not fail this mission. Use remainingFlags and totalFlags in your own observation as the public objective score. As fewer flags remain, increase urgency: prioritize interception and active flag defense, especially when remainingFlags is 2 or less. Use visible or previously observed opponent positions and known flag routes only; never invent hidden targets. Challenge observed opposing players with purposeful attacks and flanks. When opponents are unseen and you are healthy, patrol known flags or explore unvisited sectors; peaceful regrouping or idling without a tactical reason wastes the defense window. Under recent fire or low shields, survival, cover, retreat and regrouping remain valid ways to protect the mission; avoid suicidal charging. Choose feasible purposeful movement and safe firing lanes rather than repetitive chasing. Candidate descriptions specify validated local outcomes. Prefer progress toward your objective over idle behavior unless holding or retreating is tactically necessary.",
+        "criteria": {
+          "patrol:flag-0:1": "Strategy patrol: Circle clockwise around known flag flag-0 at18-unit radius; continuously survey for opponents; travel 14 units at 22 degrees relative heading; known obstacle route clear",
+          "patrol:flag-6:approach:0": "Strategy patrol: Advance toward an18-unit orbit around known flag flag-6; keep moving then circle and survey; travel 24 units at 31 degrees relative heading; known obstacle route clear",
+          "explore:4": "Strategy explore: Search unvisited clear sector 4 for opposing player; reacquire visual contact; travel 24 units at -155 degrees relative heading; known obstacle route clear"
+        }
+      }
+    }
+  },
+  "savedResponseFields": {
+    "choice": "patrol:flag-0:1",
+    "confidence": 0.58,
+    "probabilities": {
+      "patrol:flag-0:1": 0.72,
+      "explore:4": 0.09,
+      "patrol:flag-6:approach:0": 0.19
+    },
+    "usage": {
+      "input_tokens": 1775,
+      "output_tokens": 71
+    }
+  },
+  "auditMetadata": {
+    "callId": "4845a910-e8b3-42eb-88a8-e092f3b3b6d1",
+    "timestamp": "2026-09-30T16:43:30.603Z",
+    "durationMs": 133,
+    "costUsd": 7.455000000000001e-05
+  },
+  "note": "Request body is exact. Saved response fields are exact extracted provider values, not the original raw HTTP response envelope. Personality support landed after this recording."
+}

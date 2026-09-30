@@ -1,0 +1,1 @@
+This recording completed gameplay but its pre-normalization audit equality assertion failed before action serialization. Do not treat it as a complete action trace. Provider headings were intentionally normalized server-side; the corrected harness compares that exact transformation in the subsequent level3 run.

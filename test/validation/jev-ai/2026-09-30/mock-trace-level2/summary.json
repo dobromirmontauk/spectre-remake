@@ -1,0 +1,227 @@
+{
+  "mocked": true,
+  "level": 2,
+  "duration": 5,
+  "actions": 472,
+  "metrics": {
+    "requests": 9,
+    "maxRequestedTanks": 4,
+    "modelDecisions": 36,
+    "modelCommandTicks": 436,
+    "fallbackTicks": 36,
+    "staleResponses": 0,
+    "failures": 0,
+    "inputTokens": 0,
+    "spentUsd": 0,
+    "latencyMs": 4.4000000059604645,
+    "wallHits": 0,
+    "obstacleContacts": 0,
+    "tankContacts": 1,
+    "friendlyFireHits": 0,
+    "friendlyFireDamage": 0,
+    "playerDamage": 0,
+    "enemyProjectileDamage": 0,
+    "playerDeaths": 0,
+    "enemyDeaths": 0,
+    "shots": 0,
+    "flags": 0,
+    "closeCallTicks": 0,
+    "tankContactTicks": 0,
+    "stationaryTicks": 0,
+    "observedTicks": 118,
+    "interventions": {
+      "wallAvoided": 122,
+      "tankAvoided": 17,
+      "allyShotAvoided": 0
+    },
+    "enabled": false,
+    "playerAutopilot": false,
+    "hz": 2,
+    "activeSeconds": 5.26450000000596,
+    "activeTankSeconds": {
+      "enemy": 15.79350000001788,
+      "player": 5.26450000000596
+    },
+    "acceptedHzPerTank": 1.7095640611624678,
+    "acceptedHzByRole": {
+      "enemy": 1.7095640611624676,
+      "player": 1.7095640611624678
+    },
+    "latencySamplesMs": [
+      1496,
+      7.200000017881393,
+      3.2000000178813934,
+      4,
+      4.299999982118607,
+      3.5999999940395355,
+      4.200000017881393,
+      4.299999982118607,
+      4.4000000059604645
+    ],
+    "latencyP50Ms": 4.299999982118607,
+    "latencyP95Ms": 1496,
+    "appliedChoiceHistogram": {
+      "enemy:regroup:enemy-L2-2": {
+        "role": "enemy",
+        "id": "regroup:enemy-L2-2",
+        "category": "regroup",
+        "count": 2
+      },
+      "enemy:explore:2": {
+        "role": "enemy",
+        "id": "explore:2",
+        "category": "explore",
+        "count": 1
+      },
+      "enemy:regroup:enemy-L2-0": {
+        "role": "enemy",
+        "id": "regroup:enemy-L2-0",
+        "category": "regroup",
+        "count": 1
+      },
+      "player:explore:0": {
+        "role": "player",
+        "id": "explore:0",
+        "category": "explore",
+        "count": 4
+      },
+      "enemy:explore:1": {
+        "role": "enemy",
+        "id": "explore:1",
+        "category": "explore",
+        "count": 3
+      },
+      "enemy:scan": {
+        "role": "enemy",
+        "id": "scan",
+        "category": "scan",
+        "count": 6
+      },
+      "enemy:explore:0": {
+        "role": "enemy",
+        "id": "explore:0",
+        "category": "explore",
+        "count": 3
+      },
+      "enemy:revisit:0": {
+        "role": "enemy",
+        "id": "revisit:0",
+        "category": "revisit",
+        "count": 4
+      },
+      "enemy:patrol:flag-4:1": {
+        "role": "enemy",
+        "id": "patrol:flag-4:1",
+        "category": "patrol",
+        "count": 4
+      },
+      "player:flag:flag-2": {
+        "role": "player",
+        "id": "flag:flag-2",
+        "category": "flag",
+        "count": 4
+      }
+    },
+    "latestPlans": {},
+    "latestStrategies": {},
+    "lastSafetyEvents": [
+      {
+        "tick": 0,
+        "level": 2,
+        "event": {
+          "type": "TankContact",
+          "tankId": "enemy-L2-0",
+          "otherTankId": "enemy-L2-2",
+          "penetration": 1.1119478091597559
+        },
+        "tanks": [
+          {
+            "id": "enemy-L2-0",
+            "position": {
+              "x": -39.766823650710286,
+              "z": 94
+            },
+            "prevPosition": {
+              "x": -39.21084974613041,
+              "z": 94
+            },
+            "heading": 0.06283185307179587,
+            "speed": 0,
+            "alive": true,
+            "controlled": true,
+            "planId": null,
+            "modelAgeTicks": null,
+            "expired": true
+          },
+          {
+            "id": "enemy-L2-2",
+            "position": {
+              "x": -36.56682365071028,
+              "z": 94
+            },
+            "prevPosition": {
+              "x": -37.12279755529016,
+              "z": 94
+            },
+            "heading": 0.06283185307179587,
+            "speed": 0,
+            "alive": true,
+            "controlled": true,
+            "planId": null,
+            "modelAgeTicks": null,
+            "expired": true
+          }
+        ]
+      }
+    ],
+    "budgetExhausted": false,
+    "pending": false,
+    "status": "Disabled \u00b7 scripted AI",
+    "active": false
+  },
+  "realism": {
+    "enemy-L2-0": {
+      "seconds": 3.933333333333333,
+      "maxStationarySeconds": 0.8,
+      "turnReversals": 45,
+      "quickTurnFlips": 44,
+      "underFireTicks": 0,
+      "survivalStrategyTicks": 0,
+      "visibleOpponentTicks": 0,
+      "fireCommandTicks": 0,
+      "pursuitTicks": 0,
+      "damageEvents": 0
+    },
+    "enemy-L2-1": {
+      "seconds": 3.933333333333333,
+      "maxStationarySeconds": 0.5,
+      "turnReversals": 3,
+      "quickTurnFlips": 1,
+      "underFireTicks": 0,
+      "survivalStrategyTicks": 0,
+      "visibleOpponentTicks": 0,
+      "fireCommandTicks": 0,
+      "pursuitTicks": 0,
+      "damageEvents": 0
+    },
+    "enemy-L2-2": {
+      "seconds": 3.933333333333333,
+      "maxStationarySeconds": 0.5,
+      "turnReversals": 1,
+      "quickTurnFlips": 0,
+      "underFireTicks": 0,
+      "survivalStrategyTicks": 0,
+      "visibleOpponentTicks": 0,
+      "fireCommandTicks": 0,
+      "pursuitTicks": 0,
+      "damageEvents": 0
+    }
+  },
+  "errors": [],
+  "notes": [
+    "Model choices and exact per-tick executor commands recorded separately.",
+    "Stationary uses abs(speed)<0.5; turn reversals are diagnostics requiring visual review, not automatically defects.",
+    "Opponents are last request observations; exact own visibility at execution may differ; safe fire requires current cannon alignment."
+  ],
+  "sourceRevision": "a850b04857b5dd05cb28e0914945110251baa355"
+}

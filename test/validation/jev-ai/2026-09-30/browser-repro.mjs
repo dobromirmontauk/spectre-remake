@@ -1,0 +1,51 @@
+import {chromium} from 'playwright';
+import {writeFile,mkdir} from 'node:fs/promises';
+import assert from 'node:assert/strict';
+const out=new URL('./',import.meta.url).pathname;
+const browser=await chromium.launch({args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+const page=await browser.newPage({viewport:{width:1440,height:900}});
+let failureMode='';const errors=[];page.on('pageerror',e=>errors.push(e.message));
+await page.route('**/api/jev/**',async route=>{
+ if(route.request().url().endsWith('/decide')){if(failureMode){await route.fulfill({status:200,contentType:'application/json',body:failureMode});return;}const b=route.request().postDataJSON();await route.fulfill({json:{sequence:b.sequence,tick:b.tick,decisions:b.tanks.map(t=>({tankId:t.tankId,choice:(t.candidates.find(c=>c.id.startsWith('patrol:'))??t.candidates[0]).id,confidence:.85})),usage:{inputTokens:100},spentUsd:.001}});}else await route.fulfill({json:{records:[],total:0,nextOffset:null,recordId:'mock-audit',available:true,spentUsd:.001}});
+});
+try{
+ await page.goto('http://127.0.0.1:5183/');await page.waitForFunction(()=>window.__game);
+ const tiers=await page.evaluate(async()=>{
+  const {observeTank}=await import('/src/jev/observation.ts');
+  const {createInitialState}=await import('/src/sim/simulation.ts');
+  const {DEFAULT_LOADOUT}=await import('/src/config/constants.ts');
+  const s=createInitialState(1,[{loadout:DEFAULT_LOADOUT}],'solo');s.obstacles=[];s.enemies=s.enemies.slice(0,1);
+  const e=s.enemies[0];e.position={x:3,z:4};e.heading=0;e.alive=true;
+  s.players[0].position={x:3,z:24};s.players[0].heading=.4;
+  s.flags=[{id:'known',position:{x:3,z:12},collected:false},{id:'distant',position:{x:80,z:80},collected:false}];
+  s.pickups=[{id:'supply',position:{x:85,z:80},kind:'shield',amount:30,collected:false}];
+  const m={seen:{}};const first=observeTank(s,e.id,m);
+  s.players[0].position={x:-90,z:-90};s.players[0].heading=2.4;e.heading=Math.PI;s.tick=90;
+  const stale=observeTank(s,e.id,m);
+  s.level=3;const mapped=observeTank(s,e.id,{seen:{}});
+  s.level=5;const ally=structuredClone(e);ally.id='ally';ally.position={x:80,z:80};s.enemies.push(ally);
+  const hidden=observeTank(s,e.id,{seen:{}},{strategies:{ally:'patrol'}});
+  const shared=observeTank(s,e.id,{seen:{}},{sharedSightings:[{id:s.players[0].id,kind:'tank',team:'player',position:{x:10,z:20},heading:.7,seenTick:s.tick,source:'shared'}],strategies:{ally:'patrol'}});
+  return {first,stale,mapped,hidden,shared};
+ });
+ assert.equal(tiers.first.level,1);assert.notDeepEqual(tiers.first.own.position,{x:3,z:4});
+ assert.ok(!tiers.first.contacts.some(c=>c.id==='distant'));
+ const old=tiers.stale.memory.find(c=>c.kind==='tank'&&c.team==='player');assert.equal(old.heading,.4);assert.equal(old.seenTick,0);assert.equal(old.ageSeconds,3);
+ assert.deepEqual(tiers.mapped.own.position,{x:3,z:4});assert.ok(tiers.mapped.contacts.some(c=>c.id==='distant'));assert.ok(tiers.mapped.contacts.some(c=>c.id==='supply'&&c.pickupKind==='shield'));
+ assert.ok(tiers.hidden.contacts.some(c=>c.id==='ally'&&c.strategy==='patrol'));assert.ok(!tiers.hidden.contacts.some(c=>c.team==='player'));
+ assert.ok(tiers.shared.contacts.some(c=>c.team==='player'&&c.source==='shared'&&c.heading===.7&&c.ageSeconds===0));
+ await page.evaluate(()=>{window.__game.jev.configure({enabled:true,playerAutopilot:true,hz:2});window.__game.startGame();window.__game.setLevel(5);window.__game.jev.showDecisionLog(true);});
+ await page.waitForFunction(()=>window.__game.jev.getDecisionLog().some(r=>r.decisions.some(d=>d.applied)));
+ const rowId=await page.locator('.jev-log-row').first().getAttribute('data-audit-id');const details=page.locator(`[data-audit-id="${rowId}"] details`);assert.equal(await details.getAttribute('open'),null);
+ await page.screenshot({path:out+'log-collapsed.png'});
+ await details.locator('summary').click();assert.notEqual(await details.getAttribute('open'),null);
+ await page.waitForTimeout(700);
+ assert.notEqual(await page.locator(`[data-audit-id="${rowId}"] details`).getAttribute('open'),null);
+ await page.screenshot({path:out+'log-expanded.png'});
+ assert.ok((await page.locator(`[data-audit-id="${rowId}"] details pre`).first().textContent()).includes('observation'));
+ failureMode='null';await page.waitForFunction(()=>window.__game.jev.getDecisionLog().some(r=>r.outcome==='failed'&&r.error==='Invalid decision response'));failureMode='{invalid-json';await page.waitForFunction(()=>window.__game.jev.getDecisionLog().some(r=>r.responseText==='{invalid-json'&&r.outcome==='failed'));await page.screenshot({path:out+'log-malformed-response.png'});await page.evaluate(()=>{window.__game.jev.configure({enabled:false});window.__game.pause();});
+ const rows=await page.evaluate(()=>window.__game.jev.getDecisionLog());
+ assert.ok(rows.length>0);assert.ok(rows.every(r=>r.at&&r.request));assert.equal(errors.length,0);
+ await writeFile(out+'browser-report.json',JSON.stringify({mocked:true,tiers,rows,errors},null,2));
+ console.log('Live Chromium tier boundaries, dated tracks, collapsed/expanded stable decision log and applied records pass (mocked model).');
+}finally{await browser.close();}
