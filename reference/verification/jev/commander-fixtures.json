@@ -1,0 +1,564 @@
+{
+  "sourceRevision": "7f9a9e4",
+  "purpose": "Real paid isolated commander choices from generated partial observations; not gameplay or win-rate evidence",
+  "results": [
+    {
+      "fixture": "healthy-objective",
+      "observation": {
+        "visited": [
+          {
+            "x": 0,
+            "z": 0
+          }
+        ],
+        "own": {
+          "id": "player",
+          "team": "player",
+          "position": {
+            "x": 0,
+            "z": 0
+          },
+          "heading": 0,
+          "speed": 0,
+          "shieldFraction": 1,
+          "ammo": 80,
+          "maxAmmo": 80,
+          "shield": 100,
+          "maxShield": 100,
+          "fireReady": true,
+          "tick": 0
+        },
+        "contacts": [
+          {
+            "id": "enemy-L1-0",
+            "kind": "tank",
+            "position": {
+              "x": 0,
+              "z": 18
+            },
+            "seenTick": 0,
+            "team": "enemy"
+          },
+          {
+            "id": "enemy-L1-1",
+            "kind": "tank",
+            "position": {
+              "x": 9,
+              "z": 21
+            },
+            "seenTick": 0,
+            "team": "enemy"
+          },
+          {
+            "id": "visible-flag",
+            "kind": "flag",
+            "position": {
+              "x": 8,
+              "z": 22
+            },
+            "seenTick": 0
+          },
+          {
+            "id": "visible-shield",
+            "kind": "pickup",
+            "pickupKind": "shield",
+            "amount": 40,
+            "position": {
+              "x": -10,
+              "z": 10
+            },
+            "seenTick": 0
+          },
+          {
+            "id": "visible-ammo",
+            "kind": "pickup",
+            "pickupKind": "ammo",
+            "amount": 30,
+            "position": {
+              "x": -12,
+              "z": 8
+            },
+            "seenTick": 0
+          }
+        ],
+        "memory": [],
+        "geometry": [],
+        "bounds": 100
+      },
+      "candidates": [
+        {
+          "id": "flag:visible-flag",
+          "description": "Collect visible flag visible-flag; travel 23 units at 20 degrees relative heading; known obstacle route clear"
+        },
+        {
+          "id": "hold:enemy-L1-0",
+          "description": "Hold current vantage, aim and fire at visible target enemy-L1-0; travel 0 units at 0 degrees relative heading; known obstacle route clear; destination target range 18 units"
+        },
+        {
+          "id": "engage:enemy-L1-0",
+          "description": "Engage visible target enemy-L1-0 while maintaining separation; travel 6 units at 0 degrees relative heading; known obstacle route clear; destination target range 12 units"
+        },
+        {
+          "id": "flank:enemy-L1-0:-1",
+          "description": "Flank right of visible target enemy-L1-0; travel 14 units at -90 degrees relative heading; known obstacle route clear; destination target range 23 units"
+        },
+        {
+          "id": "flank:enemy-L1-0:1",
+          "description": "Flank left of visible target enemy-L1-0; travel 14 units at 90 degrees relative heading; known obstacle route clear; destination target range 23 units"
+        },
+        {
+          "id": "retreat:enemy-L1-0",
+          "description": "Create distance from visible target enemy-L1-0; travel 15 units at 180 degrees relative heading; known obstacle route clear; destination target range 33 units"
+        },
+        {
+          "id": "hold:enemy-L1-1",
+          "description": "Hold current vantage, aim and fire at visible target enemy-L1-1; travel 0 units at 0 degrees relative heading; known obstacle route clear; destination target range 23 units"
+        },
+        {
+          "id": "engage:enemy-L1-1",
+          "description": "Engage visible target enemy-L1-1 while maintaining separation; travel 11 units at 23 degrees relative heading; known obstacle route clear; destination target range 12 units"
+        },
+        {
+          "id": "flank:enemy-L1-1:-1",
+          "description": "Flank right of visible target enemy-L1-1; travel 15 units at -48 degrees relative heading; known obstacle route clear; destination target range 23 units"
+        },
+        {
+          "id": "flank:enemy-L1-1:1",
+          "description": "Flank left of visible target enemy-L1-1; travel 15 units at 94 degrees relative heading; known obstacle route clear; destination target range 23 units"
+        },
+        {
+          "id": "retreat:enemy-L1-1",
+          "description": "Create distance from visible target enemy-L1-1; travel 15 units at -157 degrees relative heading; known obstacle route clear; destination target range 38 units"
+        },
+        {
+          "id": "explore:0",
+          "description": "Search unvisited clear sector 0 for flags, supplies or opponents; travel 24 units at 0 degrees relative heading; known obstacle route clear"
+        },
+        {
+          "id": "explore:1",
+          "description": "Search unvisited clear sector 1 for flags, supplies or opponents; travel 24 units at 45 degrees relative heading; known obstacle route clear"
+        },
+        {
+          "id": "explore:2",
+          "description": "Search unvisited clear sector 2 for flags, supplies or opponents; travel 24 units at 90 degrees relative heading; known obstacle route clear"
+        },
+        {
+          "id": "explore:3",
+          "description": "Search unvisited clear sector 3 for flags, supplies or opponents; travel 24 units at 135 degrees relative heading; known obstacle route clear"
+        },
+        {
+          "id": "explore:4",
+          "description": "Search unvisited clear sector 4 for flags, supplies or opponents; travel 24 units at 180 degrees relative heading; known obstacle route clear"
+        }
+      ],
+      "status": 200,
+      "decision": {
+        "sequence": 1,
+        "tick": 0,
+        "decisions": [
+          {
+            "tankId": "player",
+            "choice": "engage:enemy-L1-0",
+            "confidence": 0.28,
+            "probabilities": {
+              "retreat:enemy-L1-0": 0.01,
+              "explore:1": 0.01,
+              "hold:enemy-L1-1": 0.01,
+              "flag:visible-flag": 0.3,
+              "flank:enemy-L1-1:1": 0.01,
+              "explore:3": 0.01,
+              "engage:enemy-L1-1": 0.06,
+              "engage:enemy-L1-0": 0.32,
+              "retreat:enemy-L1-1": 0,
+              "hold:enemy-L1-0": 0.17,
+              "explore:2": 0.01,
+              "flank:enemy-L1-0:1": 0.03,
+              "explore:4": 0.01,
+              "explore:0": 0.03,
+              "flank:enemy-L1-0:-1": 0.01,
+              "flank:enemy-L1-1:-1": 0.01
+            }
+          }
+        ],
+        "usage": {
+          "inputTokens": 1683,
+          "costUsd": 0.00007068600000000001
+        },
+        "costUsd": 0.00007068600000000001,
+        "spentUsd": 0.2812950000000001
+      }
+    },
+    {
+      "fixture": "critical-shield",
+      "observation": {
+        "visited": [
+          {
+            "x": 0,
+            "z": 0
+          }
+        ],
+        "own": {
+          "id": "player",
+          "team": "player",
+          "position": {
+            "x": 0,
+            "z": 0
+          },
+          "heading": 0,
+          "speed": 0,
+          "shieldFraction": 0.08,
+          "ammo": 80,
+          "maxAmmo": 80,
+          "shield": 8,
+          "maxShield": 100,
+          "fireReady": true,
+          "tick": 0
+        },
+        "contacts": [
+          {
+            "id": "enemy-L1-0",
+            "kind": "tank",
+            "position": {
+              "x": 0,
+              "z": 18
+            },
+            "seenTick": 0,
+            "team": "enemy"
+          },
+          {
+            "id": "enemy-L1-1",
+            "kind": "tank",
+            "position": {
+              "x": 9,
+              "z": 21
+            },
+            "seenTick": 0,
+            "team": "enemy"
+          },
+          {
+            "id": "visible-flag",
+            "kind": "flag",
+            "position": {
+              "x": 8,
+              "z": 22
+            },
+            "seenTick": 0
+          },
+          {
+            "id": "visible-shield",
+            "kind": "pickup",
+            "pickupKind": "shield",
+            "amount": 40,
+            "position": {
+              "x": -10,
+              "z": 10
+            },
+            "seenTick": 0
+          },
+          {
+            "id": "visible-ammo",
+            "kind": "pickup",
+            "pickupKind": "ammo",
+            "amount": 30,
+            "position": {
+              "x": -12,
+              "z": 8
+            },
+            "seenTick": 0
+          }
+        ],
+        "memory": [],
+        "geometry": [],
+        "bounds": 100
+      },
+      "candidates": [
+        {
+          "id": "flag:visible-flag",
+          "description": "Collect visible flag visible-flag; travel 23 units at 20 degrees relative heading; known obstacle route clear"
+        },
+        {
+          "id": "hold:enemy-L1-0",
+          "description": "Hold current vantage, aim and fire at visible target enemy-L1-0; travel 0 units at 0 degrees relative heading; known obstacle route clear; destination target range 18 units"
+        },
+        {
+          "id": "engage:enemy-L1-0",
+          "description": "Engage visible target enemy-L1-0 while maintaining separation; travel 6 units at 0 degrees relative heading; known obstacle route clear; destination target range 12 units"
+        },
+        {
+          "id": "flank:enemy-L1-0:-1",
+          "description": "Flank right of visible target enemy-L1-0; travel 14 units at -90 degrees relative heading; known obstacle route clear; destination target range 23 units"
+        },
+        {
+          "id": "flank:enemy-L1-0:1",
+          "description": "Flank left of visible target enemy-L1-0; travel 14 units at 90 degrees relative heading; known obstacle route clear; destination target range 23 units"
+        },
+        {
+          "id": "retreat:enemy-L1-0",
+          "description": "Create distance from visible target enemy-L1-0; travel 15 units at 180 degrees relative heading; known obstacle route clear; destination target range 33 units"
+        },
+        {
+          "id": "hold:enemy-L1-1",
+          "description": "Hold current vantage, aim and fire at visible target enemy-L1-1; travel 0 units at 0 degrees relative heading; known obstacle route clear; destination target range 23 units"
+        },
+        {
+          "id": "engage:enemy-L1-1",
+          "description": "Engage visible target enemy-L1-1 while maintaining separation; travel 11 units at 23 degrees relative heading; known obstacle route clear; destination target range 12 units"
+        },
+        {
+          "id": "flank:enemy-L1-1:-1",
+          "description": "Flank right of visible target enemy-L1-1; travel 15 units at -48 degrees relative heading; known obstacle route clear; destination target range 23 units"
+        },
+        {
+          "id": "flank:enemy-L1-1:1",
+          "description": "Flank left of visible target enemy-L1-1; travel 15 units at 94 degrees relative heading; known obstacle route clear; destination target range 23 units"
+        },
+        {
+          "id": "retreat:enemy-L1-1",
+          "description": "Create distance from visible target enemy-L1-1; travel 15 units at -157 degrees relative heading; known obstacle route clear; destination target range 38 units"
+        },
+        {
+          "id": "pickup:visible-shield",
+          "description": "Collect visible shield supply visible-shield; restore up to 40 shield of 92 missing; improve survival; travel 14 units at -45 degrees relative heading; known obstacle route clear"
+        },
+        {
+          "id": "explore:0",
+          "description": "Search unvisited clear sector 0 for flags, supplies or opponents; travel 24 units at 0 degrees relative heading; known obstacle route clear"
+        },
+        {
+          "id": "explore:1",
+          "description": "Search unvisited clear sector 1 for flags, supplies or opponents; travel 24 units at 45 degrees relative heading; known obstacle route clear"
+        },
+        {
+          "id": "explore:2",
+          "description": "Search unvisited clear sector 2 for flags, supplies or opponents; travel 24 units at 90 degrees relative heading; known obstacle route clear"
+        },
+        {
+          "id": "explore:3",
+          "description": "Search unvisited clear sector 3 for flags, supplies or opponents; travel 24 units at 135 degrees relative heading; known obstacle route clear"
+        }
+      ],
+      "status": 200,
+      "decision": {
+        "sequence": 2,
+        "tick": 0,
+        "decisions": [
+          {
+            "tankId": "player",
+            "choice": "pickup:visible-shield",
+            "confidence": 0.65,
+            "probabilities": {
+              "flank:enemy-L1-1:-1": 0,
+              "flag:visible-flag": 0.05,
+              "explore:1": 0,
+              "pickup:visible-shield": 0.68,
+              "engage:enemy-L1-1": 0.01,
+              "flank:enemy-L1-0:1": 0.01,
+              "explore:3": 0,
+              "hold:enemy-L1-1": 0.01,
+              "explore:0": 0.01,
+              "flank:enemy-L1-0:-1": 0.01,
+              "hold:enemy-L1-0": 0.06,
+              "retreat:enemy-L1-1": 0,
+              "explore:2": 0,
+              "retreat:enemy-L1-0": 0.04,
+              "flank:enemy-L1-1:1": 0,
+              "engage:enemy-L1-0": 0.12
+            }
+          }
+        ],
+        "usage": {
+          "inputTokens": 1694,
+          "costUsd": 0.000071148
+        },
+        "costUsd": 0.000071148,
+        "spentUsd": 0.2813661480000001
+      }
+    },
+    {
+      "fixture": "empty-ammo",
+      "observation": {
+        "visited": [
+          {
+            "x": 0,
+            "z": 0
+          }
+        ],
+        "own": {
+          "id": "player",
+          "team": "player",
+          "position": {
+            "x": 0,
+            "z": 0
+          },
+          "heading": 0,
+          "speed": 0,
+          "shieldFraction": 1,
+          "ammo": 0,
+          "maxAmmo": 80,
+          "shield": 100,
+          "maxShield": 100,
+          "fireReady": true,
+          "tick": 0
+        },
+        "contacts": [
+          {
+            "id": "enemy-L1-0",
+            "kind": "tank",
+            "position": {
+              "x": 0,
+              "z": 18
+            },
+            "seenTick": 0,
+            "team": "enemy"
+          },
+          {
+            "id": "enemy-L1-1",
+            "kind": "tank",
+            "position": {
+              "x": 9,
+              "z": 21
+            },
+            "seenTick": 0,
+            "team": "enemy"
+          },
+          {
+            "id": "visible-flag",
+            "kind": "flag",
+            "position": {
+              "x": 8,
+              "z": 22
+            },
+            "seenTick": 0
+          },
+          {
+            "id": "visible-shield",
+            "kind": "pickup",
+            "pickupKind": "shield",
+            "amount": 40,
+            "position": {
+              "x": -10,
+              "z": 10
+            },
+            "seenTick": 0
+          },
+          {
+            "id": "visible-ammo",
+            "kind": "pickup",
+            "pickupKind": "ammo",
+            "amount": 30,
+            "position": {
+              "x": -12,
+              "z": 8
+            },
+            "seenTick": 0
+          }
+        ],
+        "memory": [],
+        "geometry": [],
+        "bounds": 100
+      },
+      "candidates": [
+        {
+          "id": "flag:visible-flag",
+          "description": "Collect visible flag visible-flag; travel 23 units at 20 degrees relative heading; known obstacle route clear"
+        },
+        {
+          "id": "hold:enemy-L1-0",
+          "description": "Hold current vantage, aim and fire at visible target enemy-L1-0; travel 0 units at 0 degrees relative heading; known obstacle route clear; destination target range 18 units"
+        },
+        {
+          "id": "engage:enemy-L1-0",
+          "description": "Engage visible target enemy-L1-0 while maintaining separation; travel 6 units at 0 degrees relative heading; known obstacle route clear; destination target range 12 units"
+        },
+        {
+          "id": "flank:enemy-L1-0:-1",
+          "description": "Flank right of visible target enemy-L1-0; travel 14 units at -90 degrees relative heading; known obstacle route clear; destination target range 23 units"
+        },
+        {
+          "id": "flank:enemy-L1-0:1",
+          "description": "Flank left of visible target enemy-L1-0; travel 14 units at 90 degrees relative heading; known obstacle route clear; destination target range 23 units"
+        },
+        {
+          "id": "retreat:enemy-L1-0",
+          "description": "Create distance from visible target enemy-L1-0; travel 15 units at 180 degrees relative heading; known obstacle route clear; destination target range 33 units"
+        },
+        {
+          "id": "hold:enemy-L1-1",
+          "description": "Hold current vantage, aim and fire at visible target enemy-L1-1; travel 0 units at 0 degrees relative heading; known obstacle route clear; destination target range 23 units"
+        },
+        {
+          "id": "engage:enemy-L1-1",
+          "description": "Engage visible target enemy-L1-1 while maintaining separation; travel 11 units at 23 degrees relative heading; known obstacle route clear; destination target range 12 units"
+        },
+        {
+          "id": "flank:enemy-L1-1:-1",
+          "description": "Flank right of visible target enemy-L1-1; travel 15 units at -48 degrees relative heading; known obstacle route clear; destination target range 23 units"
+        },
+        {
+          "id": "flank:enemy-L1-1:1",
+          "description": "Flank left of visible target enemy-L1-1; travel 15 units at 94 degrees relative heading; known obstacle route clear; destination target range 23 units"
+        },
+        {
+          "id": "retreat:enemy-L1-1",
+          "description": "Create distance from visible target enemy-L1-1; travel 15 units at -157 degrees relative heading; known obstacle route clear; destination target range 38 units"
+        },
+        {
+          "id": "pickup:visible-ammo",
+          "description": "Collect visible ammo supply visible-ammo; restore up to 30 ammo of 80 missing; enable more cannon shots; travel 14 units at -56 degrees relative heading; known obstacle route clear"
+        },
+        {
+          "id": "explore:0",
+          "description": "Search unvisited clear sector 0 for flags, supplies or opponents; travel 24 units at 0 degrees relative heading; known obstacle route clear"
+        },
+        {
+          "id": "explore:1",
+          "description": "Search unvisited clear sector 1 for flags, supplies or opponents; travel 24 units at 45 degrees relative heading; known obstacle route clear"
+        },
+        {
+          "id": "explore:2",
+          "description": "Search unvisited clear sector 2 for flags, supplies or opponents; travel 24 units at 90 degrees relative heading; known obstacle route clear"
+        },
+        {
+          "id": "explore:3",
+          "description": "Search unvisited clear sector 3 for flags, supplies or opponents; travel 24 units at 135 degrees relative heading; known obstacle route clear"
+        }
+      ],
+      "status": 200,
+      "decision": {
+        "sequence": 3,
+        "tick": 0,
+        "decisions": [
+          {
+            "tankId": "player",
+            "choice": "pickup:visible-ammo",
+            "confidence": 0.25,
+            "probabilities": {
+              "explore:3": 0,
+              "hold:enemy-L1-0": 0.16,
+              "flank:enemy-L1-0:-1": 0.01,
+              "engage:enemy-L1-1": 0.02,
+              "retreat:enemy-L1-1": 0,
+              "pickup:visible-ammo": 0.3,
+              "hold:enemy-L1-1": 0.01,
+              "flank:enemy-L1-0:1": 0.02,
+              "flank:enemy-L1-1:1": 0.01,
+              "explore:0": 0.02,
+              "engage:enemy-L1-0": 0.25,
+              "retreat:enemy-L1-0": 0.01,
+              "explore:1": 0.01,
+              "explore:2": 0,
+              "flank:enemy-L1-1:-1": 0,
+              "flag:visible-flag": 0.18
+            }
+          }
+        ],
+        "usage": {
+          "inputTokens": 1694,
+          "costUsd": 0.000071148
+        },
+        "costUsd": 0.000071148,
+        "spentUsd": 0.2814372960000001
+      }
+    }
+  ]
+}
