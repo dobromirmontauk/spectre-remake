@@ -34,7 +34,7 @@ The audit file defaults to `JEV_LEDGER_FILE + '.calls.jsonl'`; set **absolute** 
 
 Loopback endpoints share the same localhost Origin/Host restrictions:
 
-- `GET /api/jev/history?offset=0&limit=50`: `{records,nextOffset,total}`, oldest first, maximum 200 records/page.
+- `GET /api/jev/history?offset=0&limit=50`: `{records,nextOffset,total}`, oldest first, maximum 200 records/page. Add `callId=<UUID>` to retrieve only that provider call’s request/result/error, with offset/total applying to the filtered records; missing IDs return an empty page.
 - `GET /api/jev/history/export`: complete JSONL download.
 - `POST /api/jev/audit/browser`: `{browserSessionId,sequence,tick,event:'attempt'|'response'|'outcome'|'applied',at:<ISO UTC>,details:{...}}`, at most 64 KiB. Persists a `type:'browser'` record with its own server UTC timestamp. This records browser stale/canceled/applied outcomes separately from provider outcomes, without inference or spending. Never include secrets in browser metadata.
 
