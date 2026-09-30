@@ -6,7 +6,7 @@ export interface TankMemory { seen: Record<string, Contact>; visited?: Vec2[]; s
 export interface RecentThreat { tick: number; seconds: number; ageSeconds: number; kind: 'damage' | 'projectile'; direction?: Vec2 }
 export interface ObservationContext { sharedSightings?: Contact[]; strategies?: Record<string, Strategy> }
 export interface TankObservation {
- level: number; nowSeconds: number; recentThreat?: RecentThreat;
+ remainingFlags: number; totalFlags: number; level: number; nowSeconds: number; recentThreat?: RecentThreat;
  own: { id: string; team: Team; position: Vec2; heading: number; speed: number; shieldFraction: number; ammo: number; maxAmmo: number; shield: number; maxShield: number; fireReady: boolean; tick: number; lastStrategy?: Strategy };
  visited: Vec2[]; contacts: Contact[]; memory: Contact[]; geometry: Obstacle[]; bounds: number;
 }
