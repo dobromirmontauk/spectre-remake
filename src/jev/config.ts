@@ -7,3 +7,7 @@ export const SAFETY_MARGIN = 0.8;
 export const LOOKAHEAD_SECONDS = 0.65;
 // Short clear local paths need incremental steering rather than a full acceleration/coast overrun.
 export const SHORT_PATH_PREDICTION_TICKS = 8;
+
+export const BODY_SPACING = 6.5;
+// Deadzone must exceed half one motor turn step to avoid overshoot alternation.
+export const TURN_DEADZONE_EPSILON = 0.005;
