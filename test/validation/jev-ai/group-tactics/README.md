@@ -1,4 +1,14 @@
-# Actual logged group combat replay
+# Group-tactics video
+
+[Watch the 48-second tactical replay](group-tactics.mp4) · [Original 120-second game capture](../2026-09-30/level5/gameplay.mp4) · [Interactive replay](replay.html)
+
+This is a readable observer replay of **real recorded AI gameplay**, not a newly simulated or scripted battle. All four commanders used Jev at configured 2 Hz. The camera, labels and captions were added afterward; no additional paid calls were made. It shows group engagement, retreat and an explicit regroup choice toward a retreating ally. It does **not** establish a coordinated flank or prove that the AI has mastered squad tactics.
+
+Useful moments: around 10 seconds Enemy 3 selects retreat; around 18 seconds Enemy 1 selects `regroup:enemy-L5-1` while Enemy 2 is retreating; later the defenders engage again. Exact executed actions and contact sources are visible beside the action. The source run completed with zero tank/obstacle contacts or friendly damage; those are whole-run measurements, not a claim that each maneuver was optimal.
+
+Reproduce the MP4: install Playwright without changing the package lock, serve the repository over HTTP on port 5185, then run `node test/validation/jev-ai/group-tactics/render-video.mjs` with `ffmpeg` on PATH. `REPLAY_URL` can override the local URL. Rendering is deterministic at 24 fps, 1440×900, 48 seconds. Decision descriptions are expandable in the interactive version; the recording keeps them collapsed so all four commanders fit.
+
+## Replay provenance
 
 Open `replay.html` through a local HTTP server rooted at the repository. No CDN, model calls or generated decisions. Browser `DecompressionStream` reads the existing gzip inputs by relative URL; archives are reused, not copied.
 

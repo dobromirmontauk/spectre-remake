@@ -2,7 +2,7 @@
 
 ## Current Objective
 
-Review `PROJECT-SUMMARY.md` and adapt it into a Spectre blog / LinkedIn post for user approval. Optional Jev intelligence and audit code is landed and locally verified; approved recordings, action traces and full call examples are archived under `test/validation/jev-ai/2026-09-30/`. Public Cloudflare remains the original static game. Preserve the cumulative $10 ledger and 2 Hz / three-enemy-plus-player limits for future local experiments.
+Adapt `PROJECT-SUMMARY.md` into a blog / LinkedIn post for user approval, using the recorded group-combat demo at `test/validation/jev-ai/group-tactics/group-tactics.mp4`. The video is a faithful observer replay of actual Jev decisions, with the original game capture alongside. Preserve the cumulative $10 ledger and 2 Hz / three-enemy-plus-player limits; public Cloudflare remains the original static game.
 
 ## Next Steps
 
@@ -13,6 +13,8 @@ Review `PROJECT-SUMMARY.md` and adapt it into a Spectre blog / LinkedIn post for
 - [ ] Revisit Luna Decisions when its official API contract and account access become available; benchmark against Jev and deterministic AI as a separate experiment.
 
 ## Last Progress
+
+- 2026-09-30 — Added a 48-second, 1440×900 group-combat MP4 with executed decision panels, contact sources and captions; interactive replay and reproducible renderer under `test/validation/jev-ai/group-tactics/`. Lead verified six timestamps, all four panels, and video output. Actual retreat/regroup choices are visible; coordinated flanking remains unproven. Reused archived footage, zero new paid calls.
 
 - 2026-09-30 — Wrote `PROJECT-SUMMARY.md`: publishable game/AI overview, measured final cadence and batch latency, safety/behavior results, token-derived operating costs, failure-driven design lessons and remaining playtest limits. All figures checked against archived run traces; no new paid calls or public post.
 

@@ -94,3 +94,6 @@ For future work, start with these records:
 - [Design and information boundaries](JEV-DESIGN.md), [backend operation](backend/README.md), and [current TODO](TODO.md).
 
 The final gameplay measurements correspond to source revision `84d64cc`. Evidence was archived in `0e9a025`; the design and handoff were recorded in `f4956d8`. All validation artifacts live under `test/validation/`, outside the game bundle. Normal simulation determinism remained intact, with 20 matching checkpoints across V8, JavaScriptCore and SpiderMonkey. Preserve the existing cumulative ledger before any new paid experiment.
+
+
+A [48-second group-combat video](test/validation/jev-ai/group-tactics/group-tactics.mp4) presents the real Level 5 trace as a readable tactical replay, including retreat and regroup choices. The [original capture](test/validation/jev-ai/2026-09-30/level5/gameplay.mp4) is available alongside it. This is evidence of those behaviors, rather than proof of coordinated flanking.
