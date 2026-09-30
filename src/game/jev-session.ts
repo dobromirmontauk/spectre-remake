@@ -3,11 +3,35 @@ import type { SimEvent } from '../sim/events.ts';
 import type { Command } from '../sim/commands.ts';
 import { observeTank } from '../jev/observation.ts';
 import { buildCandidates, commandForPlan } from '../jev/controller.ts';
-import type { TankMemory, TankObservation, TacticalPlan } from '../jev/types.ts';
+import { DecisionAuditStore, type DecisionAudit } from './jev-audit.ts';
+import type { TankMemory, TankObservation, TacticalPlan, Strategy } from '../jev/types.ts';
 
 const REQUEST_TIMEOUT_MS = 1500;
 const PLAN_MAX_AGE_TICKS = 30;
 export class JevSession {
+  private auditStore = new DecisionAuditStore();
+  private auditRevision = 0;
+  private auditRecords: DecisionAudit[] = [];
+  private auditBySequence: Record<number, DecisionAudit> = {};
+  private pendingAudit: DecisionAudit | null = null;
+  private acceptedStrategies: Record<string, Strategy> = {};
+  getAuditRevision(): number { return this.auditRevision; }
+  getDecisionLog(): DecisionAudit[] { return structuredClone(this.auditRecords); }
+  exportDecisionLog(): Promise<DecisionAudit[]> { return this.auditStore.exportAll(); }
+  private saveAudit(record: DecisionAudit, event: 'attempt' | 'response' | 'outcome' | 'applied'): void {
+    this.auditRevision++; this.auditStore.save(record);
+    // Durable backend metadata complements browser exact input storage and upstream history.
+    // This optional endpoint never invokes the model, and failure leaves the game unaffected.
+    if (typeof window !== 'undefined') void globalThis.fetch('/api/jev/audit/browser', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ browserSessionId: record.browserSessionId, sequence: record.sequence, tick: record.tick, event, at: new Date().toISOString(), details: { outcome: record.outcome, error: record.error, decisions: record.decisions, latencyMs: record.latencyMs, ...(event === 'attempt' ? { request: record.request } : {}), ...(event === 'response' ? { response: record.response } : {}) } }),
+    }).catch(() => {});
+  }
+  private finishUnapplied(tankId: string, reason: 'superseded' | 'expired' | 'session reset' | 'life ended' | 'budget exhausted'): void {
+    const audit = this.auditBySequence[this.selectionSerial[tankId]!];
+    const decision = audit?.decisions.find(d => d.tankId === tankId && d.accepted && !d.applied && !d.notAppliedReason);
+    if (audit && decision) { decision.notAppliedReason = reason; this.saveAudit(audit, 'outcome'); }
+  }
   private budgetExhausted = false;
   private lastSafetyEvents: { tick: number; level: number; event: SimEvent; tanks: { id: string; position: { x: number; z: number }; prevPosition: { x: number; z: number }; heading: number; speed: number; alive: boolean; controlled: boolean; planId: string | null; modelAgeTicks: number | null; expired: boolean }[] }[] = [];
   private modelTicks: Record<string, number> = {};
@@ -59,14 +83,17 @@ export class JevSession {
       acceptedHzPerTank: totalTankSeconds ? this.counters.modelDecisions / totalTankSeconds : 0,
       acceptedHzByRole: { enemy: tankSeconds.enemy ? this.acceptedByRole.enemy / tankSeconds.enemy : 0, player: tankSeconds.player ? this.acceptedByRole.player / tankSeconds.player : 0 },
       latencySamplesMs: [...this.latencySamplesMs], latencyP50Ms: percentile(.5), latencyP95Ms: percentile(.95),
-      appliedChoiceHistogram: structuredClone(this.appliedChoiceHistogram), latestPlans: structuredClone(this.plans),
+      appliedChoiceHistogram: structuredClone(this.appliedChoiceHistogram), latestPlans: structuredClone(this.plans), latestStrategies: { ...this.acceptedStrategies },
       lastSafetyEvents: structuredClone(this.lastSafetyEvents), budgetExhausted: this.budgetExhausted,
       pending: !!this.pending, status: this.status, active: this.active,
     };
   }
   getObservation(id: string) { return this.observations[id] ? structuredClone(this.observations[id]) : null; }
   private invalidate(): void {
-    this.generation++; this.pending?.abort(); this.pending = null;
+    for (const tankId of Object.keys(this.plans)) this.finishUnapplied(tankId, 'session reset');
+    this.generation++;
+    if (this.pendingAudit?.outcome === 'pending') { this.pendingAudit.outcome = 'canceled'; this.pendingAudit.error = 'Session suspended, reset or reconfigured'; this.saveAudit(this.pendingAudit, 'outcome'); }
+    this.pending?.abort(); this.pending = null; this.pendingAudit = null; this.acceptedStrategies = {};
     this.modelTicks = {}; this.plans = {}; this.memories = {}; this.observations = {}; this.nextAt = 0;
   }
   enforceRoster(state: GameState, local = true): void {
@@ -94,9 +121,15 @@ export class JevSession {
     this.nextAt = now + 1000 / this.settings.hz;
     const tanks = [...state.enemies.filter(t => t.alive), ...(this.settings.playerAutopilot && player?.alive ? [player] : [])];
     const candidates: Record<string, TacticalPlan[]> = {};
+    // Only reports actually observed by an ally can enter squad context.
+    // First pass uses each commander's own perception; final pass adds permitted reports.
+    const sharedSightings = tanks.filter(t => state.enemies.some(e => e.id === t.id)).flatMap(tank => {
+      const memory = this.memories[tank.id] ??= { seen: {} };
+      return observeTank(state, tank.id, memory).contacts.filter(c => c.kind === 'tank' && c.team === 'player' && c.seenTick === state.tick && c.source === 'own');
+    });
     const payload = tanks.map(tank => {
       const memory = this.memories[tank.id] ??= { seen: {} };
-      const observation = observeTank(state, tank.id, memory);
+      const observation = observeTank(state, tank.id, memory, { sharedSightings: state.enemies.some(e => e.id === tank.id) ? sharedSightings : [], strategies: state.enemies.some(e => e.id === tank.id) ? this.acceptedStrategies : this.acceptedStrategies[tank.id] ? { [tank.id]: this.acceptedStrategies[tank.id]! } : {} });
       this.observations[tank.id] = observation;
       const choices = buildCandidates(observation); candidates[tank.id] = choices;
       return { tankId: tank.id, role: tank.id === player?.id ? 'player' : 'enemy', observation, candidates: choices.map(c => ({ id: c.id, description: c.description })) };
@@ -105,49 +138,68 @@ export class JevSession {
     this.counters.maxRequestedTanks = Math.max(this.counters.maxRequestedTanks, payload.length);
     const sequence = ++this.sequence, generation = this.generation, tick = state.tick;
     const lives = { ...this.lifeSerial }, level = state.level;
+    const request = { version: 1, sequence, tick, tanks: payload };
+    const audit: DecisionAudit = { id: `${this.auditStore.sessionId}:${sequence}`, browserSessionId: this.auditStore.sessionId, sequence, tick, level, at: new Date().toISOString(), request: JSON.parse(JSON.stringify(request)), outcome: 'pending', decisions: [] };
+    this.auditRecords.push(audit); this.auditBySequence[sequence] = audit;
+    if (this.auditRecords.length > 100) { const old = this.auditRecords.shift()!; delete this.auditBySequence[old.sequence]; }
+    this.pendingAudit = audit; this.saveAudit(audit, 'attempt');
     const abort = new AbortController(); this.pending = abort;
     const timeout = setTimeout(() => abort.abort(), REQUEST_TIMEOUT_MS);
     const started = performance.now(); this.counters.requests++;
-    void this.fetcher('/api/jev/decide', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: abort.signal, body: JSON.stringify({ version: 1, sequence, tick, tanks: payload }) })
+    void this.fetcher('/api/jev/decide', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: abort.signal, body: JSON.stringify(request) })
       .then(async response => {
+        const body: unknown = await response.json().catch(() => null);
+        audit.response = structuredClone(body); audit.latencyMs = performance.now() - started;
+        this.saveAudit(audit, 'response');
         if (response.status === 402) {
           this.budgetExhausted = true;
+          for (const tankId of Object.keys(this.plans)) this.finishUnapplied(tankId, 'budget exhausted');
           this.plans = {};
-          const details: unknown = await response.json().catch(() => null);
+          const details: unknown = body; audit.outcome = 'budget';
           if (details && typeof details === 'object' && 'spentUsd' in details && typeof details.spentUsd === 'number' && Number.isFinite(details.spentUsd) && details.spentUsd >= 0) this.counters.spentUsd = details.spentUsd;
           this.status = 'Budget exhausted · offline guards · no paid requests';
           throw new Error('Budget exhausted');
         }
-        if (!response.ok) throw new Error(`Backend ${response.status}`); return await response.json() as { sequence: number; tick: number; decisions: { tankId: string; choice: string }[]; usage?: { inputTokens?: number }; spentUsd?: number }; })
+        if (!response.ok) throw new Error(`Backend ${response.status}`); return body as { sequence: number; tick: number; decisions: { tankId: string; choice: string; confidence?: number; callId?: string }[]; usage?: { inputTokens?: number }; spentUsd?: number }; })
       .then(response => {
         this.counters.inputTokens += response.usage?.inputTokens ?? 0;
         this.counters.spentUsd = response.spentUsd ?? this.counters.spentUsd;
         this.counters.latencyMs = performance.now() - started;
         this.latencySamplesMs.push(this.counters.latencyMs);
         if (this.latencySamplesMs.length > 1000) this.latencySamplesMs.shift();
-        if (generation !== this.generation || !this.active || response.sequence !== sequence || response.tick !== tick || state.level !== level || state.tick - tick > PLAN_MAX_AGE_TICKS || state.tick < tick) { this.counters.staleResponses++; return; }
+        if (!response || !Array.isArray(response.decisions)) throw new Error('Invalid decision response');
+        audit.decisions = response.decisions.map(decision => {
+          const plan = candidates[decision.tankId]?.find(c => c.id === decision.choice);
+          return { tankId: decision.tankId, role: state.players.some(p => p.id === decision.tankId) ? 'player' : 'enemy', choice: decision.choice, description: plan?.description ?? 'Unknown candidate; discarded', strategy: plan?.strategy, confidence: decision.confidence, callId: decision.callId, accepted: false, applied: false };
+        });
+        if (generation !== this.generation || !this.active || response.sequence !== sequence || response.tick !== tick || state.level !== level || state.tick - tick > PLAN_MAX_AGE_TICKS || state.tick < tick) { this.counters.staleResponses++; if (audit.outcome !== 'canceled') audit.outcome = 'stale'; this.saveAudit(audit, 'outcome'); return; }
         let accepted = 0;
         for (const decision of response.decisions) {
           const plan = candidates[decision.tankId]?.find(c => c.id === decision.choice);
           const tank = [...state.enemies, ...state.players].find(t => t.id === decision.tankId);
-          if (plan && tank?.alive && plan.expiresTick >= state.tick && (lives[tank.id] ?? 0) === (this.lifeSerial[tank.id] ?? 0)) { this.plans[decision.tankId] = plan; this.selectionSerial[decision.tankId] = sequence; this.modelTicks[decision.tankId] = tick;
+          const logged = audit.decisions.find(d => d.tankId === decision.tankId && d.choice === decision.choice)!;
+          if (plan && tank?.alive && plan.expiresTick >= state.tick && (lives[tank.id] ?? 0) === (this.lifeSerial[tank.id] ?? 0)) { this.finishUnapplied(decision.tankId, 'superseded'); logged.accepted = true; if (plan.strategy) this.acceptedStrategies[decision.tankId] = plan.strategy; this.plans[decision.tankId] = plan; this.selectionSerial[decision.tankId] = sequence; this.modelTicks[decision.tankId] = tick;
             this.acceptedByRole[state.players.some(p => p.id === tank.id) ? 'player' : 'enemy']++; accepted++; }
         }
+        audit.outcome = accepted ? 'accepted' : 'stale'; this.saveAudit(audit, 'outcome');
         this.counters.modelDecisions += accepted;
         if (this.counters.latencyMs > 200 && this.settings.hz === 5) this.settings.hz = 2;
         this.status = accepted ? `Jev live · ${this.settings.hz} Hz · ${Math.round(this.counters.latencyMs)} ms` : 'Offline fallback · no valid Jev decisions';
-      }).catch(error => { if (generation === this.generation) { this.counters.failures++; this.status = this.budgetExhausted ? 'Budget exhausted · offline guards · no paid requests' : `Offline fallback · ${error instanceof Error ? error.message : 'backend unavailable'}`; } })
-      .finally(() => { clearTimeout(timeout); if (this.pending === abort) this.pending = null; });
+      }).catch(error => { audit.latencyMs = performance.now() - started; if (audit.outcome !== 'canceled' && audit.outcome !== 'budget') audit.outcome = 'failed'; audit.error = error instanceof Error ? error.message : 'Request failed'; this.saveAudit(audit, 'outcome'); if (generation === this.generation) { this.counters.failures++; this.status = this.budgetExhausted ? 'Budget exhausted · offline guards · no paid requests' : `Offline fallback · ${error instanceof Error ? error.message : 'backend unavailable'}`; } })
+      .finally(() => { clearTimeout(timeout); if (this.pending === abort) { this.pending = null; this.pendingAudit = null; } });
   }
   command(state: GameState, tank: TankState): Command {
     const plan = this.plans[tank.id];
-    if (!plan || plan.expiresTick < state.tick) { this.counters.fallbackTicks++; return commandForPlan(state, tank.id, null, this.interventions); }
+    if (!plan || plan.expiresTick < state.tick) { if (plan) this.finishUnapplied(tank.id, 'expired'); this.counters.fallbackTicks++; return commandForPlan(state, tank.id, null, this.interventions); }
     if (this.appliedSerial[tank.id] !== this.selectionSerial[tank.id]) {
       this.appliedSerial[tank.id] = this.selectionSerial[tank.id]!;
       const role = state.players.some(p => p.id === tank.id) ? 'player' : 'enemy';
       const key = `${role}:${plan.id}`;
       const entry = this.appliedChoiceHistogram[key] ??= { role, id: plan.id, category: plan.id.split(':')[0]!, count: 0 };
       entry.count++;
+      const audit = this.auditBySequence[this.selectionSerial[tank.id]!];
+      const decision = audit?.decisions.find(d => d.tankId === tank.id && d.accepted);
+      if (audit && decision) { decision.applied = true; decision.appliedTick = state.tick; this.saveAudit(audit, 'applied'); }
     }
     this.counters.modelCommandTicks++;
     return commandForPlan(state, tank.id, plan, this.interventions);
@@ -178,8 +230,9 @@ export class JevSession {
       }
       if (event.type === 'EnemyRespawned' || event.type === 'EnemyDestroyed' || event.type === 'PlayerRespawned' || event.type === 'PlayerDestroyed') {
         const id = event.type === 'EnemyRespawned' || event.type === 'EnemyDestroyed' ? event.enemyId : event.tankId;
+        this.finishUnapplied(id, 'life ended');
         this.lifeSerial[id] = (this.lifeSerial[id] ?? 0) + 1;
-        delete this.memories[id]; delete this.observations[id]; delete this.plans[id];
+        delete this.memories[id]; delete this.observations[id]; delete this.plans[id]; delete this.acceptedStrategies[id];
       }
       if (event.type === 'ObstacleContact') this.counters.obstacleContacts++;
       if (event.type === 'TankContact') this.counters.tankContacts++;

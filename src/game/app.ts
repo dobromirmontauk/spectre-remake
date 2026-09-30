@@ -28,6 +28,7 @@ import { Screens } from './screens.ts';
 import { NetScreens, type MatchStartInfo } from './netscreens.ts';
 import { installDebugApi } from './debug.ts';
 import { isMuted, resumeAudio, setMuted, toggleMuted, updateEngine, updateSfx } from '../audio/sfx.ts';
+import { JevDecisionLog } from './jev-log.ts';
 import { JevSession } from './jev-session.ts';
 import { LocalSession, NetSession, type PlaySession } from '../net/session.ts';
 
@@ -83,12 +84,14 @@ function showPlayerLeftToast(text: string): void {
 
 const flow = new GameFlow();
 const jev = new JevSession();
+const jevLog = new JevDecisionLog(stage, jev);
 const jevPanel = document.createElement('div');
 jevPanel.className = 'jev-panel';
-jevPanel.innerHTML = '<label><input id="jev-enabled" type="checkbox"> Jev AI</label><label><input id="jev-player" type="checkbox"> Player autopilot</label><span id="jev-status"></span>';
+jevPanel.innerHTML = '<label><input id="jev-enabled" type="checkbox"> Jev AI</label><label><input id="jev-player" type="checkbox"> Player autopilot</label><span id="jev-status"></span><button id="jev-log-toggle">Decisions</button>';
 stage.appendChild(jevPanel);
 const jevEnabled = jevPanel.querySelector<HTMLInputElement>('#jev-enabled')!;
 const jevPlayer = jevPanel.querySelector<HTMLInputElement>('#jev-player')!;
+jevPanel.querySelector<HTMLButtonElement>('#jev-log-toggle')!.onclick = () => jevLog.toggle();
 const jevStatus = jevPanel.querySelector<HTMLSpanElement>('#jev-status')!;
 jevEnabled.addEventListener('change', () => jev.configure({ enabled: jevEnabled.checked }));
 jevPlayer.addEventListener('change', () => jev.configure({ playerAutopilot: jevPlayer.checked }));
@@ -201,6 +204,9 @@ function asNetSession(): NetSession | null {
 installDebugApi({
   jev: {
     configure: (opts) => { jev.configure({ ...opts, playerAutopilot: opts.autopilot ?? opts.playerAutopilot }); jev.enforceRoster(state, session.kind === 'local'); },
+    getDecisionLog: () => jev.getDecisionLog(),
+    exportDecisionLog: () => jev.exportDecisionLog(),
+    showDecisionLog: (show) => jevLog.toggle(show),
     getStats: () => jev.getStats(),
     getMetrics: () => jev.getStats(),
     getObservation: (id) => jev.getObservation(id),
@@ -442,6 +448,7 @@ function frame(now: number): void {
   const simActive = flow.isGameplayActive && !flow.paused;
   jev.update(state, now, simActive, session.kind === 'local', document.visibilityState === 'visible');
   const jevStats = jev.getStats();
+  jevLog.update(jev);
   jevEnabled.checked = jevStats.enabled;
   jevPlayer.checked = jevStats.playerAutopilot;
   jevPlayer.disabled = !jevStats.enabled;

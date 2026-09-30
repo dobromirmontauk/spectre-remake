@@ -1273,3 +1273,13 @@ body {
 .jev-panel label { cursor:pointer; white-space:nowrap; }
 .jev-panel input { vertical-align:middle; }
 .jev-panel[data-live="true"] #jev-status { color:#6eea90; }
+
+.jev-panel button { background:#171717; color:#f2cb60; border:1px solid #777; font:inherit; cursor:pointer; }
+.jev-log { position:absolute; right:8px; top:180px; bottom:48px; width:min(620px,calc(100% - 16px)); z-index:55; background:rgba(9,12,15,.97); border:1px solid #7293a1; color:#e0e7ea; font:12px/1.45 monospace; padding:12px; overflow:auto; }
+.jev-log[hidden] { display:none; }
+.jev-log-header { display:flex; flex-wrap:wrap; gap:8px; align-items:center; position:sticky; top:-12px; background:#090c0f; padding:8px 0; }
+.jev-log button,.jev-log a { color:#98d4eb; background:#18242a; border:1px solid #66828c; font:inherit; padding:3px 6px; cursor:pointer; }
+.jev-log-row { border-top:1px solid #384750; padding:10px 0; white-space:pre-wrap; }
+.jev-log details { margin-top:5px; color:#a3cad9; }
+.jev-log summary { cursor:pointer; }
+.jev-log pre { max-height:260px; overflow:auto; white-space:pre-wrap; word-break:break-word; color:#d3d9dc; background:#030609; padding:8px; }

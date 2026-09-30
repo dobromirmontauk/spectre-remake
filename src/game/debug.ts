@@ -34,6 +34,9 @@ export interface NetDebugHooks {
 export interface DebugHooks {
   jev: {
     configure(opts: Partial<{ enabled: boolean; playerAutopilot: boolean; autopilot: boolean; hz: number }>): void;
+    getDecisionLog(): import('./jev-audit.ts').DecisionAudit[];
+    exportDecisionLog(): Promise<import('./jev-audit.ts').DecisionAudit[]>;
+    showDecisionLog(show: boolean): void;
     getStats(): ReturnType<import('./jev-session.ts').JevSession['getStats']>;
     getMetrics(): ReturnType<import('./jev-session.ts').JevSession['getStats']>;
     getObservation(id: string): unknown;
