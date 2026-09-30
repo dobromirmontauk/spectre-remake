@@ -45,3 +45,11 @@ test('bounded four-tank transport above32KiB is accepted, above64KiB and oversiz
  });
 });
 test('personality prompts alter enemy risk preference only within fear and safety constraints',()=>{for(const profile of ['aggressive','neutral','cowardly']){const t=tank('e');t.observation={own:{personality:profile}};const prompt=providerRequest(body([t])).questions.tank_0.instructions;assert.match(prompt,new RegExp('personality: '+profile));assert.match(prompt,/Never override/);assert.match(prompt,/collision or friendly-fire constraints/);assert.match(prompt,/STOP the opposing tank/);if(profile==='aggressive')assert.match(prompt,/moderate exposure when healthy/);if(profile==='cowardly')assert.match(prompt,/withdraw sooner/);}const p=tank('p','player');p.observation={own:{personality:'aggressive'}};assert.doesNotMatch(providerRequest(body([p])).questions.tank_0.instructions,/Commander personality/);});
+import {Audit} from './audit.mjs';
+test('full original upstream JSON envelope survives exact history and restart without invented legacy fields',async()=>{
+ const original={model:'jev-1.13.0',answers:{tank_0:{type:'choice',choice:'hold',confidence:1,probabilities:{hold:1},provider_detail:{version:2}}},usage:{input_tokens:100,output_tokens:17},request_id:'provider-original-id',metadata:{region:'west',nested:['extra',{returned:true}]}};
+ await fixture({fetchImpl:async()=>new Response(JSON.stringify(original))},async(url,budget,audit)=>{
+  const reply=await(await post(url)).json(),callId=reply.decisions[0].callId;const page=await(await fetch(url+`/api/jev/history?callId=${callId}`)).json();assert.deepEqual(page.records.find(r=>r.type==='result').upstreamResponse,original);assert.ok(!JSON.stringify(page).includes('FAKE'));
+  audit.append({type:'result',callId:'legacy',choice:'hold'});const file=audit.file;audit.close();const restored=new Audit(file);try{assert.deepEqual(restored.page(0,10,callId).records.find(r=>r.type==='result').upstreamResponse,original);assert.equal(restored.page(0,10,'legacy').records[0].upstreamResponse,undefined);}finally{restored.close();}
+ });
+});
