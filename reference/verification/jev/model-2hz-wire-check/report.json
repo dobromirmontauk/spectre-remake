@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "config": {
     "url": "http://localhost:5173/",
-    "duration": 30,
+    "duration": 15,
     "enabled": true,
     "offline": false,
     "autopilot": true,
@@ -13,32 +13,32 @@
     "seedNote": "Requested seed recorded; game start uses built-in deterministic seed",
     "maxEnemies": 3,
     "god": false,
-    "video": true
+    "video": false
   },
-  "elapsedSeconds": 30.211,
+  "elapsedSeconds": 15.24,
   "stoppedReason": "duration",
-  "inferenceEvidence": "no-model-decisions-observed",
+  "inferenceEvidence": "model-decisions-observed",
   "network": {
-    "requested": 61,
-    "responses": 61,
-    "httpFailures": 61,
-    "transportFailures": 0,
+    "requested": 32,
+    "responses": 31,
+    "httpFailures": 0,
+    "transportFailures": 1,
     "statuses": {
-      "400": 61
+      "200": 31
     }
   },
   "errors": [],
   "metrics": {
-    "requests": 61,
+    "requests": 31,
     "maxRequestedTanks": 3,
-    "modelDecisions": 0,
-    "modelCommandTicks": 0,
-    "fallbackTicks": 2721,
+    "modelDecisions": 93,
+    "modelCommandTicks": 1356,
+    "fallbackTicks": 21,
     "staleResponses": 0,
-    "failures": 61,
-    "inputTokens": 0,
-    "spentUsd": 0,
-    "latencyMs": 0,
+    "failures": 0,
+    "inputTokens": 188352,
+    "spentUsd": 0.007910784000000006,
+    "latencyMs": 254.89999997615814,
     "wallHits": 0,
     "obstacleContacts": 0,
     "tankContacts": 0,
@@ -48,28 +48,28 @@
     "playerDeaths": 0,
     "enemyDeaths": 0,
     "shots": 0,
-    "flags": 0,
+    "flags": 3,
     "closeCallTicks": 0,
     "tankContactTicks": 0,
     "stationaryTicks": 0,
-    "observedTicks": 907,
+    "observedTicks": 459,
     "interventions": {
-      "wallAvoided": 0,
+      "wallAvoided": 55,
       "tankAvoided": 0,
       "allyShotAvoided": 0
     },
     "enabled": true,
     "playerAutopilot": true,
     "hz": 2,
-    "acceptedHzPerTank": 0,
+    "acceptedHzPerTank": 1.8836396779597422,
     "pending": false,
-    "status": "Offline fallback · Backend 400",
+    "status": "Jev live · 2 Hz · 255 ms",
     "active": true
   },
   "outcome": {
     "level": 1,
-    "score": 0,
-    "flagsCollected": 0,
+    "score": 300,
+    "flagsCollected": 3,
     "gameOver": false,
     "players": [
       {
@@ -82,7 +82,7 @@
     ],
     "enemyCount": 2
   },
-  "effectiveDecisionsPerSecond": 0,
+  "effectiveDecisionsPerSecond": 6.102362204724409,
   "unavailableKPIs": [
     "human fun rating",
     "lowShieldRecoveries",
@@ -91,8 +91,32 @@
   "observedTankCount": 3,
   "maxActualEnemies": 2,
   "maxRequestedTanks": 3,
-  "effectiveAcceptedHzPerTank": null,
-  "modelDrivenTickFraction": null,
+  "effectiveAcceptedHzPerTank": 1.8836396779597422,
+  "modelDrivenTickFraction": 0.9847494553376906,
+  "appliedChoiceHistogram": null,
+  "sampled": {
+    "provenance": "sample-derived; 200ms snapshots; motion/events between samples can be missed",
+    "tanks": {
+      "player": {
+        "distance": 196.47503173949778,
+        "stationarySeconds": 0.8190000000000014,
+        "lowShieldEpisodes": 0,
+        "lowShieldRecoveries": 0
+      },
+      "enemy-L1-0": {
+        "distance": 155.50326731920376,
+        "stationarySeconds": 4.909999999999998,
+        "lowShieldEpisodes": 0,
+        "lowShieldRecoveries": 0
+      },
+      "enemy-L1-1": {
+        "distance": 149.13734450628905,
+        "stationarySeconds": 4.295999999999999,
+        "lowShieldEpisodes": 0,
+        "lowShieldRecoveries": 0
+      }
+    }
+  },
   "contextSample": {
     "visited": [
       {
@@ -107,23 +131,14 @@
         "x": 0,
         "z": 0
       },
-      "heading": 0.09424777960769379,
+      "heading": 0.6597344572538566,
       "speed": 0,
       "shieldFraction": 1,
       "ammo": 80,
       "fireReady": true,
-      "tick": 1
+      "tick": 7
     },
     "contacts": [
-      {
-        "id": "flag-3",
-        "kind": "flag",
-        "position": {
-          "x": -42.11120047606528,
-          "z": -13.517702771350741
-        },
-        "seenTick": 1
-      },
       {
         "id": "flag-5",
         "kind": "flag",
@@ -131,7 +146,7 @@
           "x": -29.29670492000878,
           "z": 52.31205037981272
         },
-        "seenTick": 1
+        "seenTick": 7
       },
       {
         "id": "flag-7",
@@ -140,7 +155,16 @@
           "x": 37.468720845878124,
           "z": -20.691883768886328
         },
-        "seenTick": 1
+        "seenTick": 7
+      },
+      {
+        "id": "pickup-1",
+        "kind": "pickup",
+        "position": {
+          "x": 31.302622905001044,
+          "z": -40.38987062498927
+        },
+        "seenTick": 7
       },
       {
         "id": "pickup-2",
@@ -149,7 +173,7 @@
           "x": -42.04406579770148,
           "z": 26.142198223620653
         },
-        "seenTick": 1
+        "seenTick": 7
       },
       {
         "id": "pickup-6",
@@ -158,7 +182,7 @@
           "x": 57.40091338194907,
           "z": -1.4772933553904295
         },
-        "seenTick": 1
+        "seenTick": 7
       },
       {
         "id": "pickup-7",
@@ -167,35 +191,21 @@
           "x": -9.642250053584576,
           "z": 56.22497889213264
         },
-        "seenTick": 1
+        "seenTick": 7
       }
     ],
-    "memory": [],
+    "memory": [
+      {
+        "id": "flag-3",
+        "kind": "flag",
+        "position": {
+          "x": -42.11120047606528,
+          "z": -13.517702771350741
+        },
+        "seenTick": 0
+      }
+    ],
     "geometry": [
-      {
-        "id": "wall-0",
-        "kind": "wall",
-        "min": {
-          "x": -65.86220878479071,
-          "z": -3.6332196998409927
-        },
-        "max": {
-          "x": -56.206942113814875,
-          "z": 5.639089017640799
-        }
-      },
-      {
-        "id": "wall-3",
-        "kind": "wall",
-        "min": {
-          "x": -49.50704122078605,
-          "z": -52.53977097268216
-        },
-        "max": {
-          "x": -45.06566422688775,
-          "z": -45.91629651119001
-        }
-      },
       {
         "id": "wall-4",
         "kind": "wall",
@@ -207,18 +217,6 @@
           "x": 15.96362096304074,
           "z": 55.93599735992029
         }
-      },
-      {
-        "id": "windmill-1",
-        "kind": "windmill",
-        "position": {
-          "x": -15.004783501848578,
-          "z": -44.05462353117764
-        },
-        "pylonRadius": 1.2,
-        "bladeLength": 6,
-        "bladeAngle": 0.19012716821189904,
-        "prevBladeAngle": 0.13776729065206916
       }
     ],
     "bounds": 100
