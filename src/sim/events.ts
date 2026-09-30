@@ -4,6 +4,7 @@
 import type { PickupKind, Vec2 } from './types.ts';
 
 export type SimEvent =
+  | { type: 'TankDamaged'; tankId: string; shooterId: string; amount: number; source: 'projectile' }
   | { type: 'TankContact'; tankId: string; otherTankId: string; penetration: number }
   | { type: 'ObstacleContact'; tankId: string; obstacleId: string; penetration: number }
   | { type: 'FriendlyFireHit'; shooterId: string; tankId: string; damage: number }
