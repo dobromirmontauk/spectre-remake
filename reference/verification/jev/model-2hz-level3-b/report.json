@@ -1,0 +1,220 @@
+{
+  "schemaVersion": 1,
+  "config": {
+    "url": "http://localhost:5173/",
+    "duration": 90,
+    "enabled": true,
+    "offline": false,
+    "autopilot": true,
+    "level": 3,
+    "seed": 1991,
+    "hz": 2,
+    "seedApplied": false,
+    "seedNote": "Requested seed recorded; game start uses built-in deterministic seed",
+    "maxEnemies": 3,
+    "god": false,
+    "video": true
+  },
+  "elapsedSeconds": 90.238,
+  "stoppedReason": "duration",
+  "inferenceEvidence": "model-decisions-observed",
+  "network": {
+    "requested": 183,
+    "responses": 179,
+    "httpFailures": 0,
+    "transportFailures": 4,
+    "statuses": {
+      "200": 179
+    }
+  },
+  "errors": [],
+  "metrics": {
+    "requests": 182,
+    "maxRequestedTanks": 4,
+    "modelDecisions": 651,
+    "modelCommandTicks": 9516,
+    "fallbackTicks": 367,
+    "staleResponses": 0,
+    "failures": 0,
+    "inputTokens": 1201444,
+    "spentUsd": 0.09371825400000043,
+    "latencyMs": 203.09999999403954,
+    "wallHits": 0,
+    "obstacleContacts": 0,
+    "tankContacts": 31,
+    "friendlyFireHits": 0,
+    "friendlyFireDamage": 0,
+    "playerDamage": 0,
+    "playerDeaths": 1,
+    "enemyDeaths": 9,
+    "shots": 52,
+    "flags": 14,
+    "closeCallTicks": 98,
+    "tankContactTicks": 0,
+    "stationaryTicks": 0,
+    "observedTicks": 2708,
+    "interventions": {
+      "wallAvoided": 1760,
+      "tankAvoided": 139,
+      "allyShotAvoided": 144
+    },
+    "enabled": true,
+    "playerAutopilot": true,
+    "hz": 2,
+    "acceptedHzPerTank": 1.7779210067782631,
+    "pending": false,
+    "status": "Jev live · 2 Hz · 203 ms",
+    "active": true
+  },
+  "outcome": {
+    "level": 4,
+    "score": 3421,
+    "flagsCollected": 4,
+    "gameOver": false,
+    "players": [
+      {
+        "id": "player",
+        "shield": 64,
+        "lives": 2,
+        "kills": 0,
+        "alive": true
+      }
+    ],
+    "enemyCount": 3
+  },
+  "effectiveDecisionsPerSecond": 7.214255635098295,
+  "unavailableKPIs": [
+    "human fun rating",
+    "lowShieldRecoveries",
+    "chaseLoops"
+  ],
+  "observedTankCount": 4,
+  "maxActualEnemies": 3,
+  "maxRequestedTanks": 4,
+  "effectiveAcceptedHzPerTank": 1.7779210067782631,
+  "modelDrivenTickFraction": 0.9628655266619448,
+  "appliedChoiceHistogram": null,
+  "sampled": {
+    "provenance": "sample-derived; 200ms snapshots; motion/events between samples can be missed",
+    "tanks": {
+      "player": {
+        "distance": 1081.463420379733,
+        "stationarySeconds": 7.800999999999977,
+        "lowShieldEpisodes": 1,
+        "lowShieldRecoveries": 0
+      },
+      "enemy-L3-0": {
+        "distance": 346.6166455227902,
+        "stationarySeconds": 28.887000000000008,
+        "lowShieldEpisodes": 0,
+        "lowShieldRecoveries": 0
+      },
+      "enemy-L3-1": {
+        "distance": 537.6994647920505,
+        "stationarySeconds": 27.558000000000014,
+        "lowShieldEpisodes": 0,
+        "lowShieldRecoveries": 0
+      },
+      "enemy-L3-2": {
+        "distance": 646.4538916735637,
+        "stationarySeconds": 8.486000000000008,
+        "lowShieldEpisodes": 0,
+        "lowShieldRecoveries": 0
+      },
+      "enemy-L4-0": {
+        "distance": 164.36955563045677,
+        "stationarySeconds": 1.8430000000000177,
+        "lowShieldEpisodes": 0,
+        "lowShieldRecoveries": 0
+      },
+      "enemy-L4-1": {
+        "distance": 65.93096948184473,
+        "stationarySeconds": 6.358000000000004,
+        "lowShieldEpisodes": 0,
+        "lowShieldRecoveries": 0
+      },
+      "enemy-L4-2": {
+        "distance": 170.21837175439748,
+        "stationarySeconds": 3.754000000000019,
+        "lowShieldEpisodes": 0,
+        "lowShieldRecoveries": 0
+      }
+    }
+  },
+  "contextSample": {
+    "visited": [
+      {
+        "x": 0,
+        "z": 0
+      }
+    ],
+    "own": {
+      "id": "player",
+      "team": "player",
+      "position": {
+        "x": 0,
+        "z": 0
+      },
+      "heading": 0.7539822368615504,
+      "speed": 0,
+      "shieldFraction": 1,
+      "ammo": 80,
+      "fireReady": true,
+      "tick": 8
+    },
+    "contacts": [
+      {
+        "id": "flag-2",
+        "kind": "flag",
+        "position": {
+          "x": 39.60821772180498,
+          "z": 24.31704222969711
+        },
+        "seenTick": 8
+      },
+      {
+        "id": "flag-6",
+        "kind": "flag",
+        "position": {
+          "x": -27.608189651742578,
+          "z": 33.49044111929834
+        },
+        "seenTick": 8
+      },
+      {
+        "id": "flag-9",
+        "kind": "flag",
+        "position": {
+          "x": 42.18513999320567,
+          "z": -25.281080449
+        },
+        "seenTick": 8
+      },
+      {
+        "id": "pickup-5",
+        "kind": "pickup",
+        "position": {
+          "x": 17.239724239334464,
+          "z": 46.73210511729121
+        },
+        "seenTick": 8
+      }
+    ],
+    "memory": [],
+    "geometry": [
+      {
+        "id": "windmill-0",
+        "kind": "windmill",
+        "position": {
+          "x": -51.585966028273106,
+          "z": 23.058774331584573
+        },
+        "pylonRadius": 1.2,
+        "bladeLength": 6,
+        "bladeAngle": 1.6636756469346279,
+        "prevBladeAngle": 1.611315769374798
+      }
+    ],
+    "bounds": 100
+  }
+}
