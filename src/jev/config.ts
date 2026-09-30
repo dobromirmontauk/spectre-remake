@@ -14,3 +14,6 @@ export const TURN_DEADZONE_EPSILON = 0.005;
 
 export const EXPIRED_AIM_GRACE_TICKS = 6;
 export const HOLD_ALLY_FRESH_TICKS = 15;
+
+export const SPACING_RELEASE_DISTANCE = 9;
+export const SPACING_RECOVERY_MAX_TICKS = 120;
