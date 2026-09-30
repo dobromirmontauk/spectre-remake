@@ -4,4 +4,4 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {pathToFileURL} from 'node:url';
 const dir=await mkdtemp(join(tmpdir(),'spectre-controller-'));
-try {const outfile=join(dir,'test.mjs');await build({entryPoints:['scripts/tests/jev-controller.ts'],bundle:true,platform:'node',format:'esm',outfile});await import(pathToFileURL(outfile).href);}finally{await rm(dir,{recursive:true,force:true});}
+try {for(const [i,entry]of ['scripts/tests/jev-controller.ts','scripts/tests/jev-tactics-v2.ts'].entries()){const outfile=join(dir,'test'+i+'.mjs');await build({entryPoints:[entry],bundle:true,platform:'node',format:'esm',outfile});await import(pathToFileURL(outfile).href);}}finally{await rm(dir,{recursive:true,force:true});}
