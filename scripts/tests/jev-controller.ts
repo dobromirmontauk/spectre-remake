@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import {createInitialState} from '../../src/sim/simulation.ts';
 import {observeTank} from '../../src/jev/observation.ts';
 import {buildCandidates,commandForPlan} from '../../src/jev/controller.ts';
+import {movementParamsForEnemy} from '../../src/sim/ai.ts';
+import {levelConfig} from '../../src/config/levels.ts';
 import {applyMovement} from '../../src/sim/movement.ts';
 const s=createInitialState(1,[{loadout:{speed:10,shields:100,ammo:100}}]);
 s.obstacles=[];s.flags=[];s.pickups=[];s.players[0]!.position={x:0,z:0};s.players[0]!.heading=0;
@@ -43,3 +45,17 @@ assert.equal(observeTank(s,'player',{seen:{}}).geometry.length,1,'immediate tact
 s.obstacles=[];e.position={x:4,z:60};s.enemies=[e];
 assert.equal(commandForPlan(s,'player',plan).fire,false,'aim cone alone cannot fire a ray that misses target');
 console.log('Additional geometry, bounded descriptions, braking and actual cannon-ray regressions passed');
+// Exact observed deadlock: both tanks outside physical diameter but inside safety margin.
+s.obstacles=[];s.enemies=[e];player.position={x:45,z:-29};e.position={x:42,z:-31};player.heading=0;e.heading=0;player.speed=0;e.speed=0;e.alive=true;
+for(let tick=0;tick<600;tick++){
+ s.tick=tick;const pc=commandForPlan(s,'player',{...plan,waypoint:{x:42,z:-31},expiresTick:tick+30});
+ const ec=commandForPlan(s,e.id,{...plan,targetId:'player',waypoint:{x:45,z:-29},expiresTick:tick+30});
+ applyMovement(player,pc,player.movement);applyMovement(e,ec,movementParamsForEnemy(e.kind,levelConfig(s.level)));
+ assert(Math.hypot(player.position.x-e.position.x,player.position.z-e.position.z)>=3.2,'escape never overlaps physical hulls');
+}
+const escapedGap=Math.hypot(player.position.x-e.position.x,player.position.z-e.position.z);
+assert(escapedGap>=6,'margin-overlap pair separates within20seconds');
+console.log('Exact clearance deadlock: final gap '+escapedGap.toFixed(2)+' after600ticks, no hull overlaps');
+const benchmarkStart=performance.now();
+for(let i=0;i<1200;i++)commandForPlan(s,'player',{...plan,expiresTick:s.tick+30});
+console.log('Controller1200 calls: '+(performance.now()-benchmarkStart).toFixed(1)+'ms');

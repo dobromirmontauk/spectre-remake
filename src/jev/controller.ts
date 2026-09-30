@@ -32,7 +32,23 @@ export function commandForPlan(state:GameState,tankId:string,plan:TacticalPlan|n
  let turn:Command['turn']=Math.abs(delta)<.045?0:delta>0?1:-1;
  let thrust:Command['thrust']=d>3&&Math.abs(delta)<.7?1:0;
  const all=[...state.players,...state.enemies];
- const safe=(cmd:Command)=>{const ghost={...tank,position:{...tank.position},prevPosition:{...tank.prevPosition}};const horizon=Math.ceil(LOOKAHEAD_SECONDS*30);for(let i=0;i<horizon+300;i++){if(i>=horizon&&Math.abs(ghost.speed)<.001)break;const before={...ghost.position};applyMovement(ghost,i<horizon?cmd:{...cmd,thrust:0},params);if(Math.abs(ghost.position.x)>ARENA_HALF_SIZE-TANK_RADIUS-SAFETY_MARGIN||Math.abs(ghost.position.z)>ARENA_HALF_SIZE-TANK_RADIUS-SAFETY_MARGIN||blocked(before,ghost.position,state.obstacles,TANK_RADIUS+SAFETY_MARGIN)||all.some(t=>t.id!==tankId&&t.alive&&segmentVsCircle(before,ghost.position,t.position,TANK_RADIUS*2+SAFETY_MARGIN).hit))return false;}return true;};
+ // Tactile spacing reflex: move away from close hulls instead of accepting mutual idle.
+ const nearby=all.filter(t=>t.id!==tankId&&t.alive&&distance(tank.position,t.position)<6.5);
+ if(nearby.length){
+  let awayX=0,awayZ=0;for(const other of nearby){const gap=Math.max(.1,distance(tank.position,other.position));awayX+=(tank.position.x-other.position.x)/(gap*gap);awayZ+=(tank.position.z-other.position.z)/(gap*gap);}
+  const away=datan2(awayX,awayZ);const forwardDelta=angleDelta(away,tank.heading);const reverseDelta=angleDelta(away+Math.PI,tank.heading);
+  const reversing=Math.abs(reverseDelta)<Math.abs(forwardDelta);const steering=reversing?reverseDelta:forwardDelta;
+  turn=Math.abs(steering)<.045?0:steering>0?1:-1;thrust=Math.abs(steering)<.7?(reversing?-1:1):0;
+ }
+ const safe=(cmd:Command)=>{const ghost={...tank,position:{...tank.position},prevPosition:{...tank.prevPosition}};const horizon=Math.ceil(LOOKAHEAD_SECONDS*30);for(let i=0;i<horizon+300;i++){if(i>=horizon&&Math.abs(ghost.speed)<.001)break;const before={...ghost.position};applyMovement(ghost,i<horizon?cmd:{...cmd,thrust:0},params);if(Math.abs(ghost.position.x)>ARENA_HALF_SIZE-TANK_RADIUS-SAFETY_MARGIN||Math.abs(ghost.position.z)>ARENA_HALF_SIZE-TANK_RADIUS-SAFETY_MARGIN||blocked(before,ghost.position,state.obstacles,TANK_RADIUS+SAFETY_MARGIN)||all.some(t=>{
+ if(t.id===tankId||!t.alive)return false;
+ const physical=TANK_RADIUS*2;const clearance=physical+SAFETY_MARGIN;
+ if(distance(before,t.position)<clearance){
+  // An existing clearance overlap may only stay still or increase distance; hull intersection is always forbidden.
+  return distance(ghost.position,t.position)+1e-8<distance(before,t.position)||segmentVsCircle(before,ghost.position,t.position,physical).hit;
+ }
+ return segmentVsCircle(before,ghost.position,t.position,clearance).hit;
+}))return false;}return true;};
  if(!safe({turn,thrust,fire:false,grenade:false})){if(diagnostics){const end={x:tank.position.x+dsin(tank.heading)*Math.max(4,Math.abs(tank.speed)*LOOKAHEAD_SECONDS),z:tank.position.z+dcos(tank.heading)*Math.max(4,Math.abs(tank.speed)*LOOKAHEAD_SECONDS)};if(all.some(t=>t.id!==tankId&&t.alive&&segmentVsCircle(tank.position,end,t.position,TANK_RADIUS*2+SAFETY_MARGIN).hit))diagnostics.tankAvoided++;else diagnostics.wallAvoided++;}thrust=tank.speed<0?1:-1;if(!safe({turn,thrust,fire:false,grenade:false})){// If already too close to stop, maximize braking rather than unsafe coasting.
  turn=turn||1;
  if(Math.abs(tank.speed)<.1)thrust=0;
