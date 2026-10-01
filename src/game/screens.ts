@@ -25,6 +25,7 @@ import {
 } from '../config/constants.ts';
 
 export interface ScreensCallbacks {
+  getAiMode?(): boolean;
   getFilled(): boolean;
   toggleFilled(): boolean;
   getMuted(): boolean;
@@ -434,7 +435,7 @@ export class Screens {
   }
 
   private startGame(): void {
-    const opts = this.selectedMode === 'solo' ? undefined : { mode: this.selectedMode, loadout2: this.loadout2() };
+    const opts = this.selectedMode === 'solo' ? { aiMode: this.callbacks.getAiMode?.() ?? false } : { mode: this.selectedMode, loadout2: this.loadout2() };
     resetGameWithLoadout(this.state, this.currentLoadout(), 1, opts);
     this.flow.beginRun();
   }

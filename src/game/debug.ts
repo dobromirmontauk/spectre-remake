@@ -33,7 +33,7 @@ export interface NetDebugHooks {
 // window.__game hooks used for deterministic Playwright verification.
 export interface DebugHooks {
   jev: {
-    configure(opts: Partial<{ enabled: boolean; playerAutopilot: boolean; autopilot: boolean; hz: number }>): void;
+    configure(opts: Partial<{ enabled: boolean; aiMode: boolean; playerAutopilot: boolean; autopilot: boolean; hz: number }>): void;
     getDecisionLog(): import('./jev-audit.ts').DecisionAudit[];
     exportDecisionLog(): Promise<import('./jev-audit.ts').DecisionAudit[]>;
     showDecisionLog(show: boolean): void;
@@ -59,7 +59,7 @@ export interface DebugHooks {
   gotoMenu(): void;
   // `opts.mode` defaults to 'solo' (identical to the original 1P-only
   // behavior); pass 'coop'/'duel' + opts.loadout2 to start a 2P match.
-  startGame(loadout?: Loadout, opts?: { mode?: GameMode; loadout2?: Loadout }): void;
+  startGame(loadout?: Loadout, opts?: { mode?: GameMode; loadout2?: Loadout; aiMode?: boolean }): void;
   setFilled(on: boolean): void;
   setMuted(on: boolean): void;
   // Deterministic state checksum (sim/hash.ts) — the desync-detection

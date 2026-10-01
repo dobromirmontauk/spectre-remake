@@ -87,14 +87,22 @@ const jev = new JevSession();
 const jevLog = new JevDecisionLog(stage, jev);
 const jevPanel = document.createElement('div');
 jevPanel.className = 'jev-panel';
-jevPanel.innerHTML = '<label><input id="jev-enabled" type="checkbox"> Jev AI</label><label><input id="jev-player" type="checkbox"> Player autopilot</label><span id="jev-status"></span><button id="jev-log-toggle">Decisions</button>';
+jevPanel.innerHTML = '<label><input id="ai-mode" type="checkbox"> AI mode</label><span class="ai-mode-help">Solo · 1 life · ≤3 enemies · flags or squad clear · optional local backend</span><details class="jev-diagnostics"><summary>Diagnostics</summary><label><input id="jev-enabled" type="checkbox"> Jev only (legacy)</label></details><label><input id="jev-player" type="checkbox"> Player autopilot</label><span id="jev-status"></span><button id="jev-log-toggle">Decisions</button>';
 stage.appendChild(jevPanel);
+const aiModeCheckbox = jevPanel.querySelector<HTMLInputElement>('#ai-mode')!;
 const jevEnabled = jevPanel.querySelector<HTMLInputElement>('#jev-enabled')!;
 const jevPlayer = jevPanel.querySelector<HTMLInputElement>('#jev-player')!;
 jevPanel.querySelector<HTMLButtonElement>('#jev-log-toggle')!.onclick = () => jevLog.toggle();
 const jevStatus = jevPanel.querySelector<HTMLSpanElement>('#jev-status')!;
-jevEnabled.addEventListener('change', () => jev.configure({ enabled: jevEnabled.checked }));
-jevPlayer.addEventListener('change', () => jev.configure({ playerAutopilot: jevPlayer.checked }));
+function configureJev(opts: Parameters<JevSession['configure']>[0]): void {
+  if (opts.aiMode !== undefined && opts.aiMode !== jev.getStats().aiMode && flow.isGameplayActive) throw new Error('Return to the menu before changing AI mode; it applies to a new match');
+  if (opts.enabled === false && state.aiMode && flow.isGameplayActive) throw new Error('AI mode remains enabled until this match ends');
+  if (opts.aiMode === true && session.kind !== 'local') throw new Error('AI mode is only available in local solo matches');
+  jev.configure(opts);
+}
+aiModeCheckbox.addEventListener('change', () => configureJev({ aiMode: aiModeCheckbox.checked }));
+jevEnabled.addEventListener('change', () => configureJev({ enabled: jevEnabled.checked }));
+jevPlayer.addEventListener('change', () => configureJev({ playerAutopilot: jevPlayer.checked }));
 
 const threeRenderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 const scene = new THREE.Scene();
@@ -111,6 +119,7 @@ const gameRenderer = new Renderer(scene, state);
 const effects = new EffectsManager(scene);
 
 const screens = new Screens(screensRoot, flow, state, {
+  getAiMode: () => jev.getStats().aiMode,
   getFilled: () => isFilledMode(),
   toggleFilled: () => {
     const next = !isFilledMode();
@@ -203,7 +212,7 @@ function asNetSession(): NetSession | null {
 
 installDebugApi({
   jev: {
-    configure: (opts) => { jev.configure({ ...opts, playerAutopilot: opts.autopilot ?? opts.playerAutopilot }); jev.enforceRoster(state, session.kind === 'local'); },
+    configure: (opts) => { configureJev({ ...opts, playerAutopilot: opts.autopilot ?? opts.playerAutopilot }); jev.enforceRoster(state, session.kind === 'local'); },
     getDecisionLog: () => jev.getDecisionLog(),
     exportDecisionLog: () => jev.exportDecisionLog(),
     showDecisionLog: (show) => jevLog.toggle(show),
@@ -266,6 +275,7 @@ installDebugApi({
   },
   setLives: (n: number) => {
     assertLocal('setLives');
+    if (state.aiMode) throw new Error('Finite AI mode has one life; start a new match to restart');
     const p0 = state.players[0];
     if (!p0) return;
     p0.lives = n;
@@ -283,15 +293,19 @@ installDebugApi({
   },
   restart: () => {
     assertLocal('restart');
+    const aiMode = state.mode === 'solo' && jev.getStats().aiMode;
+    if (state.aiMode !== aiMode) resetGameWithRoster(state, state.players.map(p => ({ loadout: p.loadout, name: p.name })), 1, state.mode, { aiMode });
     flow.restart(state);
   },
   gotoMenu: () => {
     flow.goToMenu();
   },
-  startGame: (loadout: Loadout = DEFAULT_LOADOUT, opts?: { mode?: GameMode; loadout2?: Loadout }) => {
+  startGame: (loadout: Loadout = DEFAULT_LOADOUT, opts?: { mode?: GameMode; loadout2?: Loadout; aiMode?: boolean }) => {
     assertLocal('startGame');
     resumeAudio();
-    resetGameWithLoadout(state, loadout, 1, opts);
+    const aiMode = opts?.aiMode ?? ((opts?.mode ?? 'solo') === 'solo' && jev.getStats().aiMode);
+    if (opts?.aiMode !== undefined) jev.configure({ aiMode: opts.aiMode });
+    resetGameWithLoadout(state, loadout, 1, { ...opts, aiMode });
     jev.enforceRoster(state);
     flow.beginRun();
   },
@@ -449,9 +463,13 @@ function frame(now: number): void {
   jev.update(state, now, simActive, session.kind === 'local', document.visibilityState === 'visible');
   const jevStats = jev.getStats();
   jevLog.update(jev);
+  aiModeCheckbox.checked = flow.isGameplayActive ? state.aiMode : jevStats.aiMode;
+  aiModeCheckbox.disabled = flow.isGameplayActive || session.kind !== 'local';
+  aiModeCheckbox.title = flow.isGameplayActive ? 'Return to the menu to change AI mode for a new match' : 'Finite solo match; Jev at 2 Hz with safe offline fallback when the local backend is unavailable';
+  jevEnabled.disabled = session.kind !== 'local' || (flow.isGameplayActive && (state.aiMode || state.mode !== 'solo'));
   jevEnabled.checked = jevStats.enabled;
   jevPlayer.checked = jevStats.playerAutopilot;
-  jevPlayer.disabled = !jevStats.enabled;
+  jevPlayer.disabled = !jevStats.enabled || session.kind !== 'local' || (flow.isGameplayActive && state.mode !== 'solo');
   jevStatus.textContent = jevStats.status;
   jevPanel.dataset.live = jevStats.status.startsWith('Jev live') ? 'true' : 'false';
   let stalled = false;

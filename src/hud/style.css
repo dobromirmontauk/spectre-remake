@@ -1283,3 +1283,7 @@ body {
 .jev-log details { margin-top:5px; color:#a3cad9; }
 .jev-log summary { cursor:pointer; }
 .jev-log pre { max-height:260px; overflow:auto; white-space:pre-wrap; word-break:break-word; color:#d3d9dc; background:#030609; padding:8px; }
+.ai-mode-help { color:#9dacaf; font-size:11px; }
+.jev-diagnostics summary { cursor:pointer; color:#9dacaf; }
+.jev-diagnostics[open] { background:#101010; border:1px solid #555; padding:3px 5px; }
+#ai-mode:disabled { opacity:.6; }

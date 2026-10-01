@@ -78,6 +78,7 @@ export function hashState(state: GameState): number {
   h = mixInt(h, state.tick);
   h = mixInt(h, state.rng.state);
   h = mixString(h, state.mode);
+  if (state.aiMode) h = mixString(h, 'finite-ai-mode-v1'); // Preserve ordinary/network hash bytes.
   h = mixInt(h, state.level);
   h = mixInt(h, state.flagsCollected);
   h = mixInt(h, state.score);
