@@ -17,3 +17,10 @@ export const HOLD_ALLY_FRESH_TICKS = 15;
 
 export const SPACING_RELEASE_DISTANCE = 9;
 export const SPACING_RECOVERY_MAX_TICKS = 120;
+
+export const SQUAD_REVIEW_TICKS = 120;
+export const SQUAD_CONTACT_HYSTERESIS_TICKS = 45;
+export const SQUAD_HUNT_MAX_TICKS = 450;
+export const MISSION_STEP_DISTANCE = 18;
+export const MOTION_WINDOW_TICKS = 60;
+export const MOTION_STALL_TICKS = 30;

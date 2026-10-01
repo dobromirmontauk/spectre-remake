@@ -8,14 +8,17 @@ import { applyMovement } from '../sim/movement.ts';
 import { movementParamsForEnemy } from '../sim/ai.ts';
 import { levelConfig } from '../config/levels.ts';
 import { findTank,distance,angleDelta,blocked } from './observation.ts';
+import {buildMissionCandidates} from './tactics.ts';
+import {clearFriendlyRoute} from './routes.ts';
 import { clearNavigationSegment } from './navigation.ts';
 import { PLAN_TICKS, SAFETY_MARGIN, LOOKAHEAD_SECONDS, SHORT_PATH_PREDICTION_TICKS, BODY_SPACING, TURN_DEADZONE_EPSILON, EXPIRED_AIM_GRACE_TICKS, HOLD_ALLY_FRESH_TICKS, SPACING_RELEASE_DISTANCE, SPACING_RECOVERY_MAX_TICKS } from './config.ts';
 import type { TankObservation,TacticalPlan,Strategy } from './types.ts';
 export function buildCandidates(o:TankObservation,motorOrigin?:Vec2):TacticalPlan[] {
+ if(o.mission)return buildMissionCandidates(o,motorOrigin??o.own.position);
  const plans:TacticalPlan[]=[]; const origin=motorOrigin??o.own.position;
  const survival=!!o.recentThreat||o.own.shieldFraction<.35;
  const strategyFor=(id:string):Strategy=>id.startsWith('retreat:')?'retreat':id.startsWith('regroup:')?'regroup':id.startsWith('patrol:')?'patrol':id.startsWith('guard:')||id.startsWith('hold:')?'protect':id.startsWith('engage:')||id.startsWith('flank:')||id.startsWith('intercept:')?'pursue':'explore';
- const add=(id:string,description:string,waypoint:Vec2,fire=false,targetId?:string)=>{if(/^(engage|flank|intercept):/.test(id)&&o.contacts.some(c=>c.kind==='tank'&&c.team===o.own.team&&c.id!==o.own.id&&distance(c.position,waypoint)<BODY_SPACING))return;if(Math.abs(waypoint.x)<o.bounds-4&&Math.abs(waypoint.z)<o.bounds-4&&clearNavigationSegment(origin,waypoint,o.geometry,TANK_RADIUS+SAFETY_MARGIN))plans.push({id,strategy:strategyFor(id),description:'Strategy '+strategyFor(id)+': '+description+'; travel '+Math.round(distance(origin,waypoint))+' units at '+Math.round(angleDelta(datan2(waypoint.x-origin.x,waypoint.z-origin.z),o.own.heading)*180/Math.PI)+' degrees relative heading; known obstacle route clear'+(targetId?'; destination target range '+Math.round(distance(waypoint,o.contacts.find(c=>c.id===targetId)!.position))+' units':''),waypoint,fire,targetId,expiresTick:o.own.tick+PLAN_TICKS});};
+ const add=(id:string,description:string,waypoint:Vec2,fire=false,targetId?:string)=>{if(distance(origin,waypoint)>3&&!clearFriendlyRoute(o,origin,waypoint))return;if(Math.abs(waypoint.x)<o.bounds-4&&Math.abs(waypoint.z)<o.bounds-4&&clearNavigationSegment(origin,waypoint,o.geometry,TANK_RADIUS+SAFETY_MARGIN))plans.push({id,strategy:strategyFor(id),description:'Strategy '+strategyFor(id)+': '+description+'; travel '+Math.round(distance(origin,waypoint))+' units at '+Math.round(angleDelta(datan2(waypoint.x-origin.x,waypoint.z-origin.z),o.own.heading)*180/Math.PI)+' degrees relative heading; known obstacle route clear'+(targetId?'; destination target range '+Math.round(distance(waypoint,o.contacts.find(c=>c.id===targetId)!.position))+' units':''),waypoint,fire,targetId,expiresTick:o.own.tick+PLAN_TICKS});};
  const supply=(c:TankObservation['contacts'][number],remembered=false)=>{
   if(o.own.team!=='player'||!c.pickupKind||!c.amount)return;
   const missing=c.pickupKind==='shield'?o.own.maxShield-o.own.shield:o.own.maxAmmo-o.own.ammo;
@@ -92,7 +95,7 @@ export function buildCandidates(o:TankObservation,motorOrigin?:Vec2):TacticalPla
  const allowed=survival&&recovery.length?recovery:survival?plans.filter(p=>p.strategy!=='pursue'&&p.strategy!=='protect'):plans;
  return (allowed.length?allowed:plans).slice(0,16);
 }
-export interface SafetyDiagnostics { wallAvoided:number; tankAvoided:number; allyShotAvoided:number }
+export interface SafetyDiagnostics { wallAvoided:number; tankAvoided:number; allyShotAvoided:number; lastBlock?:'wall'|'tank' }
 interface SpacingRecovery { tick:number; startTick:number; level:number; backing:boolean; away:number; subjects:string[]; position:Vec2 }
 // Motor history belongs to this live in-place simulation identity, not model context
 // or serialized sim state. Replacement/reset/lifecycle gaps cannot inherit it.
@@ -230,7 +233,7 @@ export function commandForPlan(state:GameState,tankId:string,plan:TacticalPlan|n
   }
   return true;
  };
- if(!safe({turn,thrust,fire:false,grenade:false})||!stoppingRoom({turn,thrust,fire:false,grenade:false})){if(diagnostics){const end={x:tank.position.x+dsin(tank.heading)*Math.max(4,Math.abs(tank.speed)*LOOKAHEAD_SECONDS),z:tank.position.z+dcos(tank.heading)*Math.max(4,Math.abs(tank.speed)*LOOKAHEAD_SECONDS)};if(all.some(t=>t.id!==tankId&&t.alive&&segmentVsCircle(tank.position,end,t.position,TANK_RADIUS*2+SAFETY_MARGIN).hit))diagnostics.tankAvoided++;else diagnostics.wallAvoided++;}thrust=Math.abs(tank.speed)<=(tank.speed<0?params.thrustAccel:params.reverseAccel)/30?0:tank.speed<0?1:-1;
+ if(!safe({turn,thrust,fire:false,grenade:false})||!stoppingRoom({turn,thrust,fire:false,grenade:false})){if(diagnostics){const bodyBlocked=!bodySafe({turn,thrust,fire:false,grenade:false});diagnostics.lastBlock=bodyBlocked?'tank':'wall';if(bodyBlocked)diagnostics.tankAvoided++;else diagnostics.wallAvoided++;}thrust=Math.abs(tank.speed)<=(tank.speed<0?params.thrustAccel:params.reverseAccel)/30?0:tank.speed<0?1:-1;
  const turns:Command['turn'][]=[Math.abs(tank.speed)<params.coastFriction/30?turn:0,turn,turn===1?-1:1];
  let feasible=false;
  for(const emergencyTurn of turns){const braking:Command={turn:emergencyTurn,thrust,fire:false,grenade:false};if(stoppingRoom(braking)&&safe(braking,true)){turn=emergencyTurn;feasible=true;break;}}

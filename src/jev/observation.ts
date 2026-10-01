@@ -29,6 +29,8 @@ export function observeTank(state: GameState, tankId:string, memory:TankMemory, 
  if(state.level>=5){
   for(const ally of state.enemies)if(ally.id!==tankId&&ally.alive&&!contacts.some(c=>c.id===ally.id))contacts.push({id:ally.id,kind:'tank',team:'enemy',position:{...ally.position},heading:ally.heading,seenTick:state.tick,source:'shared',strategy:context.strategies?.[ally.id]});
   for(const c of contacts)if(c.team==='enemy'){c.strategy=context.strategies?.[c.id];if(c.source==='own')memory.seen[c.id]={...c,position:{...c.position}};}
+ }
+ if(state.level>=5||(context.radio&&team==='enemy')){
   for(const report of team==='enemy'?context.sharedSightings??[]:[]){
    if(report.kind!=='tank'||report.team!=='player'||report.id===tankId||report.seenTick>state.tick||state.tick-report.seenTick>MEMORY_TICKS||contacts.some(c=>c.id===report.id))continue;
    const shared={...report,source:'shared' as const,position:{...report.position}};
@@ -37,7 +39,11 @@ export function observeTank(state: GameState, tankId:string, memory:TankMemory, 
    const old=memory.seen[shared.id];if(!old||old.seenTick<shared.seenTick)memory.seen[shared.id]=shared;
   }
  }
- for(const [id,c]of Object.entries(memory.seen))if(c.kind==='tank'&&state.tick-c.seenTick>MEMORY_TICKS)delete memory.seen[id];
+ if(context.radio&&team==='enemy')for(const report of context.sharedObjectives??[]){
+  if(report.kind==='tank'||report.seenTick>state.tick||contacts.some(c=>c.id===report.id))continue;
+  const shared={...report,source:'shared' as const,position:{...report.position}};contacts.push(shared);
+ }
+ for(const [id,c]of Object.entries(memory.seen))if(c.kind==='tank' &&state.tick-c.seenTick>MEMORY_TICKS)delete memory.seen[id];
  if(memory.lastShield!==undefined&&tank.shield<memory.lastShield)memory.recentThreat={kind:'damage',tick:state.tick,seconds:state.tick/30,ageSeconds:0};
  memory.lastShield=tank.shield;
  for(const shot of state.projectiles)if(shot.ownerId!==tankId&&visible(shot.position)&&distance(tank.position,shot.position)<25){

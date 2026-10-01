@@ -4,13 +4,18 @@ import type { Command } from '../sim/commands.ts';
 import { PersonalityAssignments } from '../jev/personality.ts';
 import { observeTank } from '../jev/observation.ts';
 import { separateJevSpawns } from '../jev/placement.ts';
+import {SquadPlanner} from '../jev/squad.ts';
+import {MOTION_WINDOW_TICKS} from '../jev/config.ts';
+import {distance} from '../jev/observation.ts';
 import { buildCandidates, commandForPlan } from '../jev/controller.ts';
 import { DecisionAuditStore, type DecisionAudit } from './jev-audit.ts';
-import type { TankMemory, TankObservation, TacticalPlan, Strategy } from '../jev/types.ts';
+import type { TankMemory, TankObservation, TacticalPlan, Strategy, MotionFeedback } from '../jev/types.ts';
 
 const REQUEST_TIMEOUT_MS = 1500;
 const PLAN_MAX_AGE_TICKS = 30;
 export class JevSession {
+  private squad = new SquadPlanner();
+  private motion:Record<string,{lastShotTick?:number;tick:number;level:number;samples:{tick:number;position:{x:number;z:number}}[];feedback:MotionFeedback}>={};
   private personalities: PersonalityAssignments;
   private auditStore = new DecisionAuditStore();
   private auditRevision = 0;
@@ -38,7 +43,7 @@ export class JevSession {
   private budgetExhausted = false;
   private lastSafetyEvents: { tick: number; level: number; event: SimEvent; tanks: { id: string; position: { x: number; z: number }; prevPosition: { x: number; z: number }; heading: number; speed: number; alive: boolean; controlled: boolean; planId: string | null; modelAgeTicks: number | null; expired: boolean }[] }[] = [];
   private modelTicks: Record<string, number> = {};
-  private settings = { enabled: false, playerAutopilot: false, hz: 2 };
+  private settings = { aiMode:false, enabled: false, playerAutopilot: false, hz: 2 };
   private placementLevel = -1;
   private placementTick = -1;
   private placementAlive: Record<string,boolean> = {};
@@ -67,9 +72,10 @@ export class JevSession {
   private counters = { requests: 0, maxRequestedTanks: 0, modelDecisions: 0, modelCommandTicks: 0, fallbackTicks: 0, staleResponses: 0, failures: 0, inputTokens: 0, spentUsd: 0, latencyMs: 0, wallHits: 0, obstacleContacts: 0, tankContacts: 0, friendlyFireHits: 0, friendlyFireDamage: 0, playerDamage: 0, enemyProjectileDamage: 0, playerDeaths: 0, enemyDeaths: 0, shots: 0, flags: 0, closeCallTicks: 0, tankContactTicks: 0, stationaryTicks: 0, observedTicks: 0 };
   private fetcher: typeof fetch;
   constructor(fetcher: typeof fetch = (input, init) => globalThis.fetch(input, init), random: () => number = Math.random) { this.fetcher = fetcher; this.personalities = new PersonalityAssignments(random); }
-  configure(opts: Partial<{ enabled: boolean; playerAutopilot: boolean; hz: number }>): void {
+  configure(opts: Partial<{ aiMode:boolean; enabled: boolean; playerAutopilot: boolean; hz: number }>): void {
     if (opts.hz !== undefined && opts.hz !== 2 && opts.hz !== 5) throw new Error('Jev cadence must be 2 or 5 Hz');
     this.settings = { ...this.settings, ...Object.fromEntries(Object.entries(opts).filter(([, value]) => value !== undefined)) };
+    if(opts.aiMode!==undefined){this.settings.enabled=opts.aiMode;if(opts.aiMode)this.settings.hz=2;}
     this.invalidate();
     this.status = this.settings.enabled ? (this.budgetExhausted ? 'Budget exhausted · offline guards · no paid requests' : 'Ready · offline fallback until Jev responds') : 'Disabled · scripted AI';
   }
@@ -83,6 +89,7 @@ export class JevSession {
     const samples = [...this.latencySamplesMs].sort((a, b) => a - b);
     const percentile = (p: number) => samples.length ? samples[Math.min(samples.length - 1, Math.ceil(samples.length * p) - 1)]! : 0;
     return {
+      missions:this.squad.getMissions(), squadPlanRevision:this.squad.getRevision(), motionFeedback:Object.fromEntries(Object.entries(this.motion).map(([id,m])=>[id,structuredClone(m.feedback)])),
       ...this.counters, interventions: { ...this.interventions }, ...this.settings,
       activeSeconds: (this.activeMs + extra) / 1000,
       activeTankSeconds: tankSeconds,
@@ -100,6 +107,7 @@ export class JevSession {
     this.generation++;
     if (this.pendingAudit?.outcome === 'pending') { this.pendingAudit.outcome = 'canceled'; this.pendingAudit.error = 'Session suspended, reset or reconfigured'; this.saveAudit(this.pendingAudit, 'outcome'); }
     this.pending?.abort(); this.pending = null; this.pendingAudit = null; this.acceptedStrategies = {};
+    this.squad.reset();this.motion={};
     this.modelTicks = {}; this.plans = {}; this.memories = {}; this.observations = {}; this.nextAt = 0;
   }
   enforceRoster(state: GameState, local = true): void {
@@ -137,17 +145,24 @@ export class JevSession {
     const candidates: Record<string, TacticalPlan[]> = {};
     // Only reports actually observed by an ally can enter squad context.
     // First pass uses each commander's own perception; final pass adds permitted reports.
-    const sharedSightings = tanks.filter(t => state.enemies.some(e => e.id === t.id)).flatMap(tank => {
-      const memory = this.memories[tank.id] ??= { seen: {} };
-      return observeTank(state, tank.id, memory).contacts.filter(c => c.kind === 'tank' && c.team === 'player' && c.seenTick === state.tick && c.source === 'own');
+    const enemyIds=state.enemies.map(e=>e.id);
+    const ownObservations=tanks.map(tank=>observeTank(state,tank.id,this.memories[tank.id]??={seen:{}}));
+    const enemyObservations=ownObservations.filter(o=>enemyIds.includes(o.own.id));
+    const sharedSightings=enemyObservations.flatMap(o=>o.contacts.filter(c=>c.kind==='tank'&&c.team==='player'&&c.seenTick===state.tick&&c.source==='own'));
+    const sharedObjectives=enemyObservations.flatMap(o=>[...o.contacts,...o.memory].filter(c=>c.kind!=='tank'));
+    const observations=tanks.map(tank=>{
+      const isEnemy=enemyIds.includes(tank.id);
+      const observation=observeTank(state,tank.id,this.memories[tank.id]??={seen:{}},{sharedSightings:isEnemy?sharedSightings:[],strategies:this.acceptedStrategies,radio:this.settings.aiMode&&isEnemy,sharedObjectives:this.settings.aiMode&&isEnemy?sharedObjectives:[]});
+      observation.own.personality=this.personalities.get(tank.id,tank.id===player?.id);
+      if(this.settings.aiMode){observation.own.livesRemaining=isEnemy?1:player?.lives;observation.own.motionFeedback=this.motion[tank.id]?structuredClone(this.motion[tank.id]!.feedback):{windowTicks:0,distanceMoved:0,stalledTicks:0,blockedTicks:0,progress:false};}
+      return observation;
     });
-    const payload = tanks.map(tank => {
-      const memory = this.memories[tank.id] ??= { seen: {} };
-      const observation = observeTank(state, tank.id, memory, { sharedSightings: state.enemies.some(e => e.id === tank.id) ? sharedSightings : [], strategies: this.acceptedStrategies });
-      observation.own.personality = this.personalities.get(tank.id, tank.id === player?.id);
-      this.observations[tank.id] = observation;
-      const choices = buildCandidates(observation, tank.position); candidates[tank.id] = choices;
-      return { tankId: tank.id, role: tank.id === player?.id ? 'player' : 'enemy', observation, candidates: choices.map(c => ({ id: c.id, description: c.description })) };
+    const missions=this.settings.aiMode?this.squad.update(observations):{};
+    const payload=tanks.map((tank,index)=>{
+      const observation=observations[index]!;if(missions[tank.id])observation.mission=missions[tank.id];
+      this.observations[tank.id]=observation;
+      const choices=buildCandidates(observation,tank.position);candidates[tank.id]=choices;
+      return {tankId:tank.id,role:tank.id===player?.id?'player':'enemy',observation,candidates:choices.map(c=>({id:c.id,description:c.description}))};
     });
     if (!payload.length) return;
     this.counters.maxRequestedTanks = Math.max(this.counters.maxRequestedTanks, payload.length);
@@ -195,7 +210,7 @@ export class JevSession {
           const plan = candidates[decision.tankId]?.find(c => c.id === decision.choice);
           const tank = [...state.enemies, ...state.players].find(t => t.id === decision.tankId);
           const logged = audit.decisions.find(d => d.tankId === decision.tankId && d.choice === decision.choice)!;
-          if (plan && tank?.alive && plan.expiresTick >= state.tick && (lives[tank.id] ?? 0) === (this.lifeSerial[tank.id] ?? 0)) { this.finishUnapplied(decision.tankId, 'superseded'); logged.accepted = true; if (plan.strategy) this.acceptedStrategies[decision.tankId] = plan.strategy; this.plans[decision.tankId] = plan; this.selectionSerial[decision.tankId] = sequence; this.modelTicks[decision.tankId] = tick;
+          if (plan && (!this.settings.aiMode||plan.missionId===this.squad.getMissions()[decision.tankId]?.id) && tank?.alive && plan.expiresTick >= state.tick && (lives[tank.id] ?? 0) === (this.lifeSerial[tank.id] ?? 0)) { this.finishUnapplied(decision.tankId, 'superseded'); logged.accepted = true; if (plan.strategy) this.acceptedStrategies[decision.tankId] = plan.strategy; this.plans[decision.tankId] = plan; this.selectionSerial[decision.tankId] = sequence; this.modelTicks[decision.tankId] = tick;
             this.acceptedByRole[state.players.some(p => p.id === tank.id) ? 'player' : 'enemy']++; accepted++; }
         }
         audit.outcome = accepted ? 'accepted' : 'stale'; this.saveAudit(audit, 'outcome');
@@ -205,9 +220,29 @@ export class JevSession {
       }).catch(error => { audit.latencyMs = performance.now() - started; if (audit.outcome !== 'canceled' && audit.outcome !== 'budget') audit.outcome = 'failed'; audit.error = error instanceof Error ? error.message : 'Request failed'; this.saveAudit(audit, 'outcome'); if (generation === this.generation) { this.counters.failures++; this.status = this.budgetExhausted ? 'Budget exhausted · offline guards · no paid requests' : `Offline fallback · ${error instanceof Error ? error.message : 'backend unavailable'}`; } })
       .finally(() => { clearTimeout(timeout); if (this.pending === abort) { this.pending = null; this.pendingAudit = null; } });
   }
+  private recordMotion(state:GameState,tank:TankState):void{
+    if(!this.settings.aiMode)return;
+    let m=this.motion[tank.id];
+    if(!m||m.level!==state.level||state.tick<m.tick||state.tick-m.tick>1)m=this.motion[tank.id]={tick:state.tick,level:state.level,samples:[],feedback:{windowTicks:0,distanceMoved:0,stalledTicks:0,blockedTicks:0,progress:false}};
+    if(m.samples.some(sample=>sample.tick===state.tick))return;
+    const previous=m.samples.at(-1);const moved=previous?distance(previous.position,tank.position):0;
+    m.samples.push({tick:state.tick,position:{...tank.position}});while(m.samples.length&&state.tick-m.samples[0]!.tick>=MOTION_WINDOW_TICKS)m.samples.shift();
+    const first=m.samples[0]!;let travel=0;for(let i=1;i<m.samples.length;i++)travel+=distance(m.samples[i-1]!.position,m.samples[i]!.position);
+    m.feedback.windowTicks=state.tick-first.tick;m.feedback.distanceMoved=Math.round(travel*100)/100;m.feedback.firedRecently=m.lastShotTick!==undefined&&state.tick-m.lastShotTick<=MOTION_WINDOW_TICKS;m.feedback.progress=travel>=1||m.feedback.firedRecently;
+    m.feedback.stalledTicks=!m.feedback.firedRecently&&moved<.02&&Math.abs(tank.speed)<.5?m.feedback.stalledTicks+1:0;m.tick=state.tick;
+  }
+  private execute(state:GameState,tank:TankState,plan:TacticalPlan|null):Command{
+    const wall=this.interventions.wallAvoided,body=this.interventions.tankAvoided;
+    const command=commandForPlan(state,tank.id,plan,this.interventions);
+    const m=this.motion[tank.id];if(m){const rejected=wall!==this.interventions.wallAvoided||body!==this.interventions.tankAvoided;m.feedback.blockedTicks=rejected?m.feedback.blockedTicks+1:0;
+    if(rejected){m.feedback.lastIntervention=body!==this.interventions.tankAvoided?'tank':'wall';if(plan)m.feedback.failedWaypoint={...plan.waypoint};}}
+    return command;
+  }
   command(state: GameState, tank: TankState): Command {
-    const plan = this.plans[tank.id];
-    if (!plan || plan.expiresTick < state.tick) { if (plan) this.finishUnapplied(tank.id, 'expired'); this.counters.fallbackTicks++; return commandForPlan(state, tank.id, plan ?? null, this.interventions); }
+    this.recordMotion(state,tank);
+    let plan = this.plans[tank.id];
+    if(this.settings.aiMode&&plan?.missionId!==this.squad.getMissions()[tank.id]?.id)plan=undefined;
+    if (!plan || plan.expiresTick < state.tick) { if (plan) this.finishUnapplied(tank.id, 'expired'); this.counters.fallbackTicks++; return this.execute(state,tank,plan??null); }
     if (this.appliedSerial[tank.id] !== this.selectionSerial[tank.id]) {
       this.appliedSerial[tank.id] = this.selectionSerial[tank.id]!;
       const role = state.players.some(p => p.id === tank.id) ? 'player' : 'enemy';
@@ -219,7 +254,7 @@ export class JevSession {
       if (audit && decision) { decision.applied = true; decision.appliedTick = state.tick; this.saveAudit(audit, 'applied'); }
     }
     this.counters.modelCommandTicks++;
-    return commandForPlan(state, tank.id, plan, this.interventions);
+    return this.execute(state,tank,plan);
   }
   commands(state: GameState, local: boolean): { enemies: Record<string, { command: Command; fireHeading: number }>; player: Command | null } | null {
     if (!this.settings.enabled || !local || state.mode !== 'solo' || state.players.length !== 1) return null;
@@ -250,7 +285,7 @@ export class JevSession {
         this.personalities.forget(id);
         this.finishUnapplied(id, 'life ended');
         this.lifeSerial[id] = (this.lifeSerial[id] ?? 0) + 1;
-        delete this.memories[id]; delete this.observations[id]; delete this.plans[id]; delete this.acceptedStrategies[id];
+        delete this.motion[id];delete this.memories[id]; delete this.observations[id]; delete this.plans[id]; delete this.acceptedStrategies[id];
       }
       if (event.type === 'ObstacleContact') this.counters.obstacleContacts++;
       if (event.type === 'TankContact') this.counters.tankContacts++;
@@ -260,7 +295,7 @@ export class JevSession {
       if (event.type === 'PlayerDamaged') this.counters.playerDamage += event.amount;
       if (event.type === 'PlayerDestroyed') this.counters.playerDeaths++;
       if (event.type === 'EnemyDestroyed') this.counters.enemyDeaths++;
-      if (event.type === 'ShotFired') this.counters.shots++;
+      if (event.type === 'ShotFired') {this.counters.shots++;const motion=this.motion[event.ownerId];if(motion){motion.lastShotTick=state.tick;motion.feedback.firedRecently=true;motion.feedback.stalledTicks=0;motion.feedback.progress=true;}}
       if (event.type === 'FlagCollected') this.counters.flags++;
     }
     const living = [...state.enemies, ...state.players].filter(t => t.alive);
