@@ -113,13 +113,13 @@ export function commandForPlan(state:GameState,tankId:string,plan:TacticalPlan|n
  const target=plan.targetId?findTank(state,plan.targetId):undefined;
  // Firing is recomputed from local sight; never follow an unseen target's new position.
  const visibleTarget=target?.alive&&distance(tank.position,target.position)<65&&!blocked(tank.position,target.position,state.obstacles)&&Math.abs(angleDelta(datan2(target.position.x-tank.position.x,target.position.z-tank.position.z),tank.heading))<Math.PI*.65?target:undefined;
- const waypoint=plan.waypoint;const d=distance(tank.position,waypoint);const aim=datan2(waypoint.x-tank.position.x,waypoint.z-tank.position.z);let delta=angleDelta(aim,tank.heading);
- if(d<3&&visibleTarget)delta=angleDelta(datan2(visibleTarget.position.x-tank.position.x,visibleTarget.position.z-tank.position.z),tank.heading);
+ const waypoint=plan.waypoint;const d=distance(tank.position,waypoint);const aim=datan2(waypoint.x-tank.position.x,waypoint.z-tank.position.z);let delta=angleDelta(aim+(plan.backing?Math.PI:0),tank.heading);
+ if((d<3||plan.backing)&&visibleTarget)delta=angleDelta(datan2(visibleTarget.position.x-tank.position.x,visibleTarget.position.z-tank.position.z),tank.heading);
  else if(d<3&&plan.strategy==='patrol')delta=.2;
  else if(d<3&&plan.lookAt)delta=angleDelta(datan2(plan.lookAt.x-tank.position.x,plan.lookAt.z-tank.position.z),tank.heading);
  const turnTolerance=Math.max(.045,params.turnRate/60+TURN_DEADZONE_EPSILON);
  let turn:Command['turn']=Math.abs(delta)<turnTolerance?0:delta>0?1:-1;
- let thrust:Command['thrust']=d>3&&Math.abs(delta)<.7?1:0;
+ let thrust:Command['thrust']=d>3&&Math.abs(delta)<.7?(plan.backing?-1:1):0;
  if(missingPlan||plan.id==='scan'){turn=briefExpiry?0:Math.abs(tank.speed)<.1?1:0;thrust=0;}
  const all=[...state.players,...state.enemies];
  // Tactile spacing reflex: move away from close hulls instead of accepting mutual idle.

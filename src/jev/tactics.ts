@@ -13,17 +13,24 @@ export function buildMissionCandidates(o:TankObservation,origin:Vec2):TacticalPl
  const ownTarget=threat&&(threat.source==='own'||threat.source===undefined)?threat:undefined;
  const afraid=!!o.recentThreat||o.own.shieldFraction<.35||m.kind==='recover';
  const stalled=!o.own.motionFeedback?.firedRecently&&((o.own.motionFeedback?.stalledTicks??0)>=MOTION_STALL_TICKS||(o.own.motionFeedback?.blockedTicks??0)>=15);
- const add=(tactic:NonNullable<TacticalPlan['tactic']>,suffix:string,destination:Vec2,fire=false)=>{
+ const add=(tactic:NonNullable<TacticalPlan['tactic']>,suffix:string,destination:Vec2,fire=false,backing=false)=>{
   if(Math.abs(destination.x)>o.bounds-4||Math.abs(destination.z)>o.bounds-4||!clearNavigationSegment(origin,destination,o.geometry,TANK_RADIUS+SAFETY_MARGIN)||!clearFriendlyRoute(o,origin,destination))return;
   if(stalled&&tactic==='advance'&&o.own.motionFeedback?.failedWaypoint&&distance(destination,o.own.motionFeedback.failedWaypoint)<4)return;
   const strategy=tactic==='evade'||tactic==='cover'?'retreat':tactic==='fire'?'protect':m.kind==='attack'||m.kind==='intercept'?'pursue':'explore';
-  plans.push({id:tactic+':'+suffix,missionId:m.id,tactic,strategy,description:'Action '+tactic+': execute '+m.kind+' mission '+m.id+' as '+m.role+'; '+(tactic==='evade'||tactic==='cover'?'temporary survival maneuver, then resume mission; ':'')+'travel '+Math.round(distance(origin,destination))+' units at '+Math.round(angleDelta(datan2(destination.x-origin.x,destination.z-origin.z),o.own.heading)*180/Math.PI)+' degrees; known route and friendly clearance checked'+(stalled?'; recent motion stalled, change lane':'')+(fire?'; fire only at own visible target when locally safe':''),waypoint:destination,targetId:ownTarget?.id??m.targetId,fire:fire&&!!ownTarget,lookAt:ownTarget?{...ownTarget.position}:m.track?{...m.track.position}:undefined,expiresTick:o.own.tick+PLAN_TICKS});
+  plans.push({id:tactic+':'+suffix,missionId:m.id,tactic,strategy,description:'Action '+tactic+': execute '+m.kind+' mission '+m.id+' as '+m.role+'; '+(tactic==='evade'||tactic==='cover'?'temporary survival maneuver, then resume mission; ':'')+'travel '+Math.round(distance(origin,destination))+' units at '+Math.round(angleDelta(datan2(destination.x-origin.x,destination.z-origin.z),o.own.heading)*180/Math.PI)+' degrees; known route and friendly clearance checked'+(stalled?'; recent motion stalled, change lane':'')+(fire?'; fire only at own visible target when locally safe':''),waypoint:destination,targetId:ownTarget?.id??m.targetId,fire:fire&&!!ownTarget,backing:backing||undefined,lookAt:ownTarget?{...ownTarget.position}:m.track?{...m.track.position}:undefined,expiresTick:o.own.tick+PLAN_TICKS});
  };
  let goal=m.waypoint;
  if(ownTarget&&m.kind==='attack'){const gap=Math.max(1,distance(origin,ownTarget.position)),dx=(origin.x-ownTarget.position.x)/gap,dz=(origin.z-ownTarget.position.z)/gap,side=m.role==='flanker'?14:0;goal={x:ownTarget.position.x+dx*14-dz*side,z:ownTarget.position.z+dz*14+dx*side};}
  const bearing=datan2(goal.x-origin.x,goal.z-origin.z),range=distance(origin,goal),step=Math.min(MISSION_STEP_DISTANCE,range);
  const arrival={x:origin.x+dsin(bearing)*step,z:origin.z+dcos(bearing)*step};
  if(!afraid)add('advance','mission',arrival,!!ownTarget);
+ if(afraid&&ownTarget&&Math.abs(angleDelta(datan2(ownTarget.position.x-origin.x,ownTarget.position.z-origin.z),o.own.heading))<.7){
+  const away=datan2(origin.x-ownTarget.position.x,origin.z-ownTarget.position.z);
+  add('evade','reverse-fire',{x:origin.x+dsin(away)*14,z:origin.z+dcos(away)*14},true,true);
+  const reverse=plans.find(p=>p.id==='evade:reverse-fire');
+  if(reverse)reverse.description='Action evade: reverse away for the next500ms while keeping gun aimed at personally visible target; increase separation and fire only through safe lane; execute '+m.kind+' mission '+m.id+' as '+m.role+'; preserve life and resume mission after threat';
+ }
+
  if(ownTarget&&!afraid&&(m.kind==='attack'||m.kind==='intercept')){
   const laneBlocked=o.contacts.some(c=>c.kind==='tank'&&c.team===o.own.team&&c.id!==o.own.id&&segmentVsCircle(origin,ownTarget.position,c.position,TANK_RADIUS+PROJECTILE_RADIUS+SAFETY_MARGIN).hit);
   if(!laneBlocked&&!blocked(origin,ownTarget.position,o.geometry)&&!stalled)add('fire','visible',origin,true);

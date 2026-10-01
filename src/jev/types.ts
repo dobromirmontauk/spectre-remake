@@ -14,4 +14,4 @@ export interface TankObservation {
  own: { livesRemaining?:number; motionFeedback?:MotionFeedback; personality?: Personality; id: string; team: Team; position: Vec2; heading: number; speed: number; shieldFraction: number; ammo: number; maxAmmo: number; shield: number; maxShield: number; fireReady: boolean; tick: number; lastStrategy?: Strategy };
  visited: Vec2[]; contacts: Contact[]; memory: Contact[]; geometry: Obstacle[]; bounds: number;
 }
-export interface TacticalPlan { missionId?:string; tactic?:'advance'|'peek'|'fire'|'reposition'|'evade'|'cover'; id: string; description: string; waypoint: Vec2; lookAt?: Vec2; targetId?: string; fire: boolean; expiresTick: number; strategy?: Strategy }
+export interface TacticalPlan { backing?:boolean; missionId?:string; tactic?:'advance'|'peek'|'fire'|'reposition'|'evade'|'cover'; id: string; description: string; waypoint: Vec2; lookAt?: Vec2; targetId?: string; fire: boolean; expiresTick: number; strategy?: Strategy }
