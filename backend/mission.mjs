@@ -1,0 +1,16 @@
+const object=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
+const finite=x=>typeof x==='number'&&Number.isFinite(x);
+const nonnegative=x=>finite(x)&&x>=0;
+const tick=x=>Number.isSafeInteger(x)&&x>=0;
+const text=(x,max=64)=>typeof x==='string'&&x.length>0&&x.length<=max;
+const point=x=>object(x)&&finite(x.x)&&finite(x.z);
+export function validMission(m){
+ if(!object(m)||!text(m.id)||!['search','hunt','intercept','attack','recover'].includes(m.kind)||!text(m.role)||!tick(m.assignedTick)||!tick(m.reviewTick)||m.reviewTick<m.assignedTick||!point(m.waypoint)||!text(m.reason,512))return false;
+ if(m.targetId!==undefined&&!text(m.targetId))return false;
+ if(m.track!==undefined){const t=m.track;if(!object(t)||!point(t.position)||!tick(t.seenTick)||!nonnegative(t.ageSeconds)||!nonnegative(t.uncertainty)||(t.heading!==undefined&&!finite(t.heading)))return false;}
+ return true;
+}
+export function missionInstruction(tank){
+ if(tank.role!=='enemy'||!object(tank.observation.mission))return '';
+ return 'Assigned squad mission: you must execute the assigned mission in your own observation.mission. Do not choose a different strategy, role or objective. Its kind, role, waypoint and targetId are authoritative; keep this mission until the squad commander changes it. Select only the next 500 milliseconds of tactical action from the supplied Choice options. These orders override generic strategic suggestions: personality affects risk and approach within the assignment, never strategic reselection. Mission track and radio reports are dated estimates with age and uncertainty, not hidden current positions or personal line of sight. Enemies in this mission mode have one finite life (own.livesRemaining): fear and survival urgency increase as own.shieldFraction falls, becoming critical near destruction or under recentThreat. Use offered cover, braking, retreat or regrouping as a local emergency without arbitrary mission abandonment; then resume the assigned objective when safe. When a visible opponent is legally hittable and the local firing safety checks permit it, fire promptly rather than wait for perfect alignment or strategy reselection. Use own.motionFeedback: blockedTicks, stalledTicks and lack of progress mean the current route is ineffective. Prefer an offered feasible alternate toward the same assigned target or a safe local escape; never stubbornly chase the nearest flag or repeat a blocked maneuver. No option can override collision, teammate fire safety, or authorized perception. If no offered forward option is safe, choose a bounded emergency alternative rather than invent a new mission.';
+}
