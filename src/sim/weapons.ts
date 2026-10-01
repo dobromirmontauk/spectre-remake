@@ -72,8 +72,9 @@ export function fireProjectile(state: GameState, owner: TankState, heading: numb
   // target; the owner itself is excluded by id in updateProjectiles, and the
   // muzzle flash still reads from the nose via the ShotFired event below.
   const position = { x: owner.position.x, z: owner.position.z };
+  const projectileId = nextId(state, 'shot');
   state.projectiles.push({
-    id: nextId(state, 'shot'),
+    id: projectileId,
     ownerId: owner.id,
     position,
     prevPosition: { ...position },
@@ -81,7 +82,7 @@ export function fireProjectile(state: GameState, owner: TankState, heading: numb
     speed: PROJECTILE_SPEED,
     ticksRemaining: PROJECTILE_MAX_TICKS,
   });
-  events.push({ type: 'ShotFired', ownerId: owner.id, position: noseOf(owner, TANK_RADIUS + 0.5), heading });
+  events.push({ type: 'ShotFired', ownerId: owner.id, projectileId, position: noseOf(owner, TANK_RADIUS + 0.5), heading });
 }
 
 export function fireGrenade(state: GameState, owner: TankState, heading: number, events: SimEvent[]): void {
@@ -153,7 +154,7 @@ export function updateProjectiles(state: GameState, events: SimEvent[]): void {
         if (isPlayerTarget) events.push({ type: 'PlayerDamaged', amount: damage });
       }
       if (!isPlayerTarget && !isPlayerOwner && target.shield < shieldBefore) events.push({ type: 'FriendlyFireHit', shooterId: shot.ownerId, tankId: target.id, damage: shieldBefore - target.shield });
-      events.push({ type: 'ShotHit', position: hit.point, targetKind: isPlayerTarget ? 'player' : 'enemy' });
+      events.push({ type: 'ShotHit', projectileId: shot.id, ownerId: shot.ownerId, targetId: target.id, position: hit.point, targetKind: isPlayerTarget ? 'player' : 'enemy' });
       consumed = true;
       break;
     }
@@ -165,14 +166,14 @@ export function updateProjectiles(state: GameState, events: SimEvent[]): void {
             ? segmentVsAABB(shot.prevPosition, shot.position, obstacle.min, obstacle.max)
             : segmentVsCircle(shot.prevPosition, shot.position, obstacle.position, obstacle.pylonRadius);
         if (!hit.hit) continue;
-        events.push({ type: 'ShotHit', position: hit.point, targetKind: 'obstacle' });
+        events.push({ type: 'ShotHit', projectileId: shot.id, ownerId: shot.ownerId, targetId: obstacle.id, position: hit.point, targetKind: 'obstacle' });
         consumed = true;
         break;
       }
     }
 
     if (!consumed && outOfBounds(shot.position)) {
-      events.push({ type: 'ShotHit', position: shot.position, targetKind: 'bounds' });
+      events.push({ type: 'ShotHit', projectileId: shot.id, ownerId: shot.ownerId, targetId: 'arena-bounds', position: shot.position, targetKind: 'bounds' });
       consumed = true;
     }
 

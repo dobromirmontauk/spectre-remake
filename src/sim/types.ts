@@ -152,11 +152,14 @@ export interface Pickup {
 // each other, no AI/flags, first to a kill target wins (see DUEL_KILL_TARGET).
 export type GameMode = 'solo' | 'coop' | 'duel';
 
+export interface MatchOptions { aiMode?: boolean }
+
 export interface GameState {
   tick: number;
   level: number;
   rng: RngState;
   mode: GameMode;
+  aiMode: boolean; // Solo-only finite squad and one player life; default false.
   players: PlayerState[]; // slot order == array order; solo has exactly one (slot 0)
   obstacles: Obstacle[];
   flags: Flag[];

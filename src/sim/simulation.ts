@@ -1,4 +1,4 @@
-import type { EnemyState, GameMode, GameState, Loadout, PlayerSpec, PlayerState, TankState, Vec2 } from './types.ts';
+import type { EnemyState, GameMode, GameState, Loadout, MatchOptions, PlayerSpec, PlayerState, TankState, Vec2 } from './types.ts';
 import type { Command } from './commands.ts';
 import { NEUTRAL_COMMAND } from './commands.ts';
 import type { SimEvent } from './events.ts';
@@ -127,10 +127,12 @@ function enemySeedFor(level: number): number {
 // comment for why (reconstructibility from (state, commands) alone, and
 // cross-peer hash agreement). They stay unique across levels (needed
 // because the renderer caches meshes by id and never re-checks `kind`).
-function buildEnemies(level: number, mode: GameMode): EnemyState[] {
+function buildEnemies(level: number, mode: GameMode, aiMode = false): EnemyState[] {
   if (mode === 'duel') return [];
   const cfg = levelConfig(level);
-  return buildEnemyRoster(enemySeedFor(level), cfg).map((spec, i) => createEnemy(spec.position, spec.kind, cfg, `enemy-L${level}-${i}`));
+  const roster = buildEnemyRoster(enemySeedFor(level), cfg);
+  if (aiMode) roster.splice(3);
+  return roster.map((spec, i) => createEnemy(spec.position, spec.kind, cfg, `enemy-L${level}-${i}`));
 }
 
 // Duel has no flags (kill-count decides the match, not a level clear) —
@@ -143,12 +145,15 @@ function layoutForMode(level: number, mode: GameMode): LevelLayout {
 
 // Builds a brand-new GameState for `specs.length` players (array index =
 // slot). Solo is just `[{ loadout }]`, mode defaulted to 'solo'.
-export function createInitialState(level: number, specs: PlayerSpec[], mode: GameMode = 'solo'): GameState {
+export function createInitialState(level: number, specs: PlayerSpec[], mode: GameMode = 'solo', options: MatchOptions = {}): GameState {
+  const aiMode = options.aiMode === true;
+  if (aiMode && (mode !== 'solo' || specs.length !== 1)) throw new Error('AI mode requires one solo player');
   const layout = layoutForMode(level, mode);
 
   const players: PlayerState[] = specs.map((spec, slot) => {
     const player = createPlayerState(slot, spec.loadout, spec.name ?? defaultPlayerName(slot));
     applySpawn(player, spawnForSlot(slot, mode));
+    if (aiMode) player.lives = 1;
     return player;
   });
 
@@ -157,12 +162,13 @@ export function createInitialState(level: number, specs: PlayerSpec[], mode: Gam
     level,
     rng: createRng(LEVELGEN_SEED_BASE ^ level),
     mode,
+    aiMode,
     players,
     obstacles: layout.obstacles,
     flags: layout.flags,
     pickups: layout.pickups,
     flagsCollected: 0,
-    enemies: buildEnemies(level, mode),
+    enemies: buildEnemies(level, mode, aiMode),
     projectiles: [],
     grenades: [],
     score: 0,
@@ -205,7 +211,7 @@ export function rebuildLevel(state: GameState, level: number): void {
   state.flags = layout.flags;
   state.pickups = layout.pickups;
   state.flagsCollected = 0;
-  state.enemies = buildEnemies(level, state.mode);
+  state.enemies = buildEnemies(level, state.mode, state.aiMode);
   state.projectiles = [];
   state.grenades = [];
   state.bonusRemaining = BONUS_START;
@@ -214,7 +220,7 @@ export function rebuildLevel(state: GameState, level: number): void {
   // to life just because the level cleared — resetPlayerForLevel would
   // otherwise silently revive them, undoing removePlayer().
   for (const player of state.players) {
-    if (player.removed) continue;
+    if (player.removed || (state.aiMode && player.lives <= 0)) continue;
     resetPlayerForLevel(state, player);
   }
 }
@@ -225,6 +231,7 @@ export function rebuildLevel(state: GameState, level: number): void {
 // every player and clears lives/kills/score/winner; use resetGameWithRoster
 // (or the resetGameWithLoadout wrapper) to change the roster/mode itself.
 export function resetGame(state: GameState): void {
+  if (state.aiMode) state.god = false;
   state.tick = 0;
   state.score = 0;
   state.winner = null;
@@ -232,7 +239,7 @@ export function resetGame(state: GameState): void {
   state.nextEntityId = 0;
   state.rng = createRng(LEVELGEN_SEED_BASE ^ 1); // "fresh game" means reproducible from level alone, like createInitialState
   for (const player of state.players) {
-    player.lives = PLAYER_LIVES_START;
+    player.lives = state.aiMode ? 1 : PLAYER_LIVES_START;
     player.kills = 0;
   }
   rebuildLevel(state, 1);
@@ -242,9 +249,13 @@ export function resetGame(state: GameState): void {
 // tank-setup screen's "Start" button and the debug `startGame` hook. Array
 // index of `specs` becomes the player's slot (0-7); slots 0/1 keep the
 // 'player'/'player2' ids so existing events/kill-credit/tests keep working.
-export function resetGameWithRoster(state: GameState, specs: PlayerSpec[], level = 1, mode: GameMode = 'solo'): void {
+export function resetGameWithRoster(state: GameState, specs: PlayerSpec[], level = 1, mode: GameMode = 'solo', options: MatchOptions = {}): void {
+  const aiMode = options.aiMode === true;
+  if (aiMode && (mode !== 'solo' || specs.length !== 1)) throw new Error('AI mode requires one solo player');
+  state.aiMode = aiMode;
   state.mode = mode;
   state.players = specs.map((spec, slot) => createPlayerState(slot, spec.loadout, spec.name ?? defaultPlayerName(slot)));
+  if (aiMode) { state.players[0]!.lives = 1; state.god = false; }
   state.tick = 0;
   state.score = 0;
   state.winner = null;
@@ -280,11 +291,11 @@ export function resetGameWithLoadout(
   state: GameState,
   loadout: Loadout,
   level = 1,
-  opts: { mode?: GameMode; loadout2?: Loadout } = {},
+  opts: { mode?: GameMode; loadout2?: Loadout; aiMode?: boolean } = {},
 ): void {
   const mode = opts.mode ?? 'solo';
   const specs: PlayerSpec[] = mode === 'solo' ? [{ loadout }] : [{ loadout }, { loadout: opts.loadout2 ?? DEFAULT_LOADOUT }];
-  resetGameWithRoster(state, specs, level, mode);
+  resetGameWithRoster(state, specs, level, mode, opts);
 }
 
 function resolveObstacleCollisionsFor(tank: TankState, state: GameState, radius: number, events: SimEvent[], emitWallHit: boolean): void {
@@ -481,6 +492,7 @@ function handleEnemyLifecycle(state: GameState, levelCfg: LevelConfig, events: S
       if (enemy.shield <= 0) destroyEnemy(state, enemy, respawnTicks, events);
       continue;
     }
+    if (state.aiMode) continue;
     if (enemy.respawnTicksRemaining > 0) {
       enemy.respawnTicksRemaining--;
       if (enemy.respawnTicksRemaining <= 0) respawnEnemy(state, enemy, levelCfg, events);
@@ -610,6 +622,7 @@ export function removePlayer(state: GameState, slot: number, events: SimEvent[])
 // --- Debug-only helpers (used by game/debug.ts) ---
 
 export function spawnEnemyAt(state: GameState, x: number, z: number, kind: 'drone' | 'hunter'): void {
+  if (state.aiMode && state.enemies.length >= 3) return;
   const cfg = levelConfig(state.level);
   state.enemies.push(createEnemy({ x, z }, kind, cfg, nextId(state, 'enemy')));
 }
@@ -617,7 +630,7 @@ export function spawnEnemyAt(state: GameState, x: number, z: number, kind: 'dron
 export function killAllEnemies(state: GameState): void {
   const events: SimEvent[] = [...state.events];
   for (const enemy of state.enemies) {
-    if (enemy.alive) markEnemyDestroyed(enemy, ENEMY_RESPAWN_TICKS, events); // no score — debug-only kill
+    if (enemy.alive) markEnemyDestroyed(enemy, state.aiMode ? 0 : ENEMY_RESPAWN_TICKS, events); // no score — debug-only kill
   }
   state.events = events;
 }
@@ -689,9 +702,13 @@ export function step(state: GameState, commands: Record<string, Command>, drops:
   resolveTankVsTankCollisions(state, events);
   resolveFinalStaticPass(state);
   advanceWindmills(state);
-  handleEnemyLifecycle(state, levelCfg, events, ENEMY_RESPAWN_TICKS);
+  handleEnemyLifecycle(state, levelCfg, events, state.aiMode ? 0 : ENEMY_RESPAWN_TICKS);
   handlePlayerLifecycle(state, events);
-  resolveFlags(state, events);
+  if (!state.aiMode || !state.gameOver) resolveFlags(state, events);
+  if (state.aiMode && !state.gameOver && state.enemies.length > 0 && state.enemies.every(e => !e.alive) && !events.some(e => e.type === 'LevelComplete')) {
+    state.score += state.bonusRemaining;
+    events.push({ type: 'LevelComplete', level: state.level });
+  }
   resolvePickups(state, events);
 
   if (state.tick % BONUS_DECAY_INTERVAL_TICKS === 0) {
