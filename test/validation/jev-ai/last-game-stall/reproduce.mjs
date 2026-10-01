@@ -1,0 +1,8 @@
+import {readFileSync} from 'node:fs';
+import {createInitialState} from '../../../../src/sim/simulation.ts';
+import {DEFAULT_LOADOUT} from '../../../../src/config/constants.ts';
+import {buildCandidates,commandForPlan} from '../../../../src/jev/controller.ts';
+const f=JSON.parse(readFileSync(new URL('./evidence.json',import.meta.url)));const ts=f.lastRequest.details.request.tanks;
+const state=createInitialState(1,[{loadout:DEFAULT_LOADOUT}]);state.tick=f.lastRequest.tick;state.enemies.splice(2);state.players[0].position={x:80,z:-80};
+for(const t of ts){const tank=state.enemies.find(x=>x.id===t.tankId),other=ts.find(x=>x.tankId!==t.tankId);Object.assign(tank,{position:other.observation.contacts.find(c=>c.id===t.tankId).position,heading:t.observation.own.heading,speed:t.observation.own.speed,alive:true});tank.prevPosition={...tank.position};}
+for(const t of ts){const tank=state.enemies.find(x=>x.id===t.tankId);const choice=f.lastResults.find(r=>r.callId===f.lastResults.find(x=>x.choice.endsWith(t.tankId.endsWith('0')?':-1':':1'))?.callId)?.choice;const plan=buildCandidates(t.observation,tank.position).find(p=>p.id===choice);if(!plan)throw Error('Missing recorded choice');const diagnostics={wallAvoided:0,tankAvoided:0,allyShotAvoided:0};const command=commandForPlan(state,t.tankId,plan,diagnostics);console.log(JSON.stringify({id:t.tankId,choice,waypoint:plan.waypoint,command,diagnostics}));const isolated={...state,enemies:state.enemies.filter(e=>e.id===t.tankId)};const unblocked=commandForPlan(isolated,t.tankId,plan);console.log('Without ally:',unblocked);if(command.thrust!==0||command.turn!==0||unblocked.thrust!==1)throw Error('Recorded ally-blocked deadlock did not reproduce');}
