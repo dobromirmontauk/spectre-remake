@@ -1,2 +1,6 @@
 test/validation/jev-ai/group-tactics/*.mp4 filter=lfs diff=lfs merge=lfs -text
 test/validation/jev-ai/group-tactics/*.png filter=lfs diff=lfs merge=lfs -text
+test/validation/ai-mode/**/*.mp4 filter=lfs diff=lfs merge=lfs -text
+test/validation/ai-mode/**/*.webm filter=lfs diff=lfs merge=lfs -text
+test/validation/ai-mode/**/*.png filter=lfs diff=lfs merge=lfs -text
+test/validation/ai-mode/**/*.json.gz filter=lfs diff=lfs merge=lfs -text

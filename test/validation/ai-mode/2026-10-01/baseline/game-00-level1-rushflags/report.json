@@ -1,0 +1,437 @@
+{
+  "sourceSha": "f23b7031b5743fd7ca56ee2195a5bbee67414f37",
+  "loadedSourceHashes": {
+    "/src/hud/style.css": "b29f7f3c5051d4a9a25c44306c1e804120dace61de3ab73ed6c84687d0d9801e",
+    "/src/game/app.ts": "fdc42e94a638dc257b0df7a2ac125c0631f1906df75fc0087ac2c30733edb8b1",
+    "/src/config/constants.ts": "edbdc8833a9823cdc3086080deea565148326c203863364d33b7a9c1f6d32250",
+    "/src/sim/simulation.ts": "08af80d62e469314fa772c33baa04a5b41c833453e86373ade5e704d7f1c8ba3",
+    "/src/render/effects.ts": "0bfd49321b039e2a7bdf181f1836505e3cd104d097615f88d369bcdb30755389",
+    "/src/input/keyboard.ts": "643f2617e7fba67ed666a1bc5f0cd29f40726f5255a422b17c138bc36703330a",
+    "/src/render/retro.ts": "72e8b5053499f86523212c7f9a11f1c2ea38791669d966b2127358b59c66fb22",
+    "/src/sim/hash.ts": "788f503ee857400ac11c72c2416abee4a404e1590ce789ed2072bf386819aa3b",
+    "/src/render/renderer.ts": "48430850f5be222e9af8d4ad26aa4a8bd4f5c390621b407867867f3e4de6dd5f",
+    "/src/render/cameras.ts": "7675d7da356efef481eb1c402e76ff3213f1c68d3f4c08cd2d4c850715458255",
+    "/src/hud/hud.ts": "dffcba0e0927c1a41ba34cfedfba2c7678d833d5155e7594d5443037abcdaaba",
+    "/src/render/meshes.ts": "30e84233938478bfc1ffbf9bb88f3b9c364da6e8ac005ae1815f722c42e980af",
+    "/src/hud/hudmp.ts": "74d805fe9dc86e1398d102c4ab923a4c23a16b74ad150f4a3e1bc799813a9b7d",
+    "/src/hud/radar.ts": "c58289fdb28a5e1f87f3262edc6a16a3205c33f87bd4d687d78cf998a4aeff22",
+    "/src/game/netscreens.ts": "e066b6c17522e274400b53455caeea792c4077299c14065e4b3f08c17274d0b0",
+    "/src/game/debug.ts": "3b5d36bb899c7298e248e571a9ed302424962511b318ae00c560ac6bd282abdc",
+    "/src/game/flow.ts": "b70db7741019409a2f3a99bb1cf42c1c6cb4de46b7dcc91354068011b453d49e",
+    "/src/game/screens.ts": "1c888550c06545745fdc5f0d1741e00a396bc6f7110343a4283ca8479906b5f1",
+    "/src/net/session.ts": "cf684cbaa0d6db4c04b404ba57a9475a855a0b2557f1b021978cf1d3092bdc19",
+    "/src/sim/commands.ts": "d9e38c1e72ed8aa31e18327fd3099debbeb6607ba2976e9aaac5dc2690e0eb8a",
+    "/src/sim/movement.ts": "5dd0e54acb54a7677541c52b051eed898e082ac48cd25cc3d1c0c67c329b0e90",
+    "/src/audio/sfx.ts": "fca8de348ff739998716c56dc4f5c9869b7a735697712de9965ee2df052c53a8",
+    "/src/game/jev-log.ts": "4d0908b8e33843dcfe2e2e89a9a2164d48f2db68ef766993f626a5b29f46ade6",
+    "/src/sim/collision.ts": "041b0234b69ddc497b721eb6d462652ea0b97f37c02b58e40bac2f61cb801275",
+    "/src/sim/levelgen.ts": "c2eee4079cf95b799665e12831d8d1ec541dfe827c4ae1bb83e5e27ca57738fb",
+    "/src/sim/rng.ts": "3007879ffa1fc67a39f43905ad14c94f7c06cd7a4d70d431979bd90aafcff692",
+    "/src/sim/ai.ts": "5b647e1400d2c24bf476688aea206842002aa45a9cdd8f027b49f4752d0ece42",
+    "/src/sim/weapons.ts": "38b36f176f534ab1fff0fbb9837f14589d233554e5a6728d86ba0a5bb84d8e5d",
+    "/src/render/arena.ts": "63fffe58155acfdf1549a8f6383eda264f85146474f67ebc77ec9b44f62a9cf7",
+    "/src/config/palette.ts": "20ae2d426dc7b527888dbeb4d548338e0c37acd5aa0b2a61fbd9d9e6332ad6f0",
+    "/src/config/levels.ts": "a3b2db9489f77e1bc41a8c9438fe857645925c6639dfa7de6ce85a011bad9cc7",
+    "/src/net/roomcode.ts": "7a4735c04fbbb6ecb191f2f31900f1fff8f314a09b1d4bba6c3a270e5ad4f63f",
+    "/src/net/createTransport.ts": "f552084f58ad1a97302778491bd412dc838dea8a23cd0c814ae26427f10553a1",
+    "/src/net/lobby.ts": "54c25fcee265471df7fbfa9adcd6e94e2ad332a96f8b76ef4ef0587788ac58f1",
+    "/src/game/highscores.ts": "832867cdd75da7792ea1cfb75b5281d194deaa2c5d4b82634b624e3308dd150a",
+    "/src/net/lockstep.ts": "1063b9cd3eebe1432ad3aef010bb0b47ca532b9733e2589c5ddbb4a610387ad5",
+    "/src/game/jev-session.ts": "cc5afe13159b77628b9769ef1aa6c6bae708bbb16c24c091980d3f16ed87dfcd",
+    "/src/sim/fire-safety.ts": "2a387d99339d211f55678e918f03e9f33bf1dea97f5fa25ddfe7cb155b88c4d4",
+    "/src/sim/dmath.ts": "ef03c18c12ba8e78232466be44c54226fc26a0a564e259ea2751216dd67981bf",
+    "/src/net/broadcast.ts": "6afb1c84721330baa878b7ca51714f5ae64785c59aac817b3dfc2e7cdf6a20f1",
+    "/src/net/trystero.ts": "3cc473c077574579b0bf81229e6faa51db726f3870ef305b18b6ec23f98a4769",
+    "/src/net/protocol.ts": "1750b7b5426ae2655356e14116283ae62bf0220fb05fd35ee43e36a9768b6bb1",
+    "/src/jev/personality.ts": "d5eb4125682801ceb555e207aefcd1eb6cf1c4fab7716ae6fefbb17ffc31888f",
+    "/src/jev/observation.ts": "0f8e8288e1d33ef07672017ab6f3a38675057f46c61815ce13cc8fe6e2bf45e9",
+    "/src/jev/placement.ts": "355a9d461504fe56d504f2a375876decb12d46b5fae07805dd9b8cb5835ad04e",
+    "/src/jev/squad.ts": "aaf46e7f2d94900a0d227420f0da552983aab8a061ba74deb059375ee0a9e8e2",
+    "/src/jev/config.ts": "3933c67b4a6b02bcbb146f77817e0ba26d76ed470331e45ae879a3753c19b9a1",
+    "/src/game/jev-audit.ts": "d0621e1145779f1df892bed2d512c15f87a4b8e856f055544f3fc5796bdaec44",
+    "/src/jev/controller.ts": "050833fdc12069176f4ee2e1813739a633f57b9e0ae8dd3aaceb6580f6699284",
+    "/src/jev/tactics.ts": "5ae91d6491aae7f2d234cd98e1c99da89e7bed193b8dc1632a0e73adf2c0327f",
+    "/src/jev/routes.ts": "02987bfe153bdeabe0cc26784ae4f5fa3576c2d93933c6cf8c2a3df0838c2f8a",
+    "/src/jev/navigation.ts": "068a97b9bbfec7a1e68e64fee8d1c3c529777baf226790afc70dedf84febd5c1"
+  },
+  "scenario": {
+    "index": 0,
+    "level": 1,
+    "behavior": "rushflags",
+    "seed": "built-in deterministic level seed; no seed override",
+    "profile": "scripted"
+  },
+  "mocked": false,
+  "stopReason": "player-death",
+  "errors": [],
+  "healthBefore": {
+    "available": true,
+    "spentUsd": 1.6839023879999777,
+    "limitUsd": 9.5,
+    "model": "jev-1.13.0",
+    "attemptedCalls": 16463,
+    "pendingReservations": 0,
+    "auditAvailable": true,
+    "auditRecords": 26135
+  },
+  "healthAfter": {
+    "available": true,
+    "spentUsd": 1.708705613999977,
+    "limitUsd": 9.5,
+    "model": "jev-1.13.0",
+    "attemptedCalls": 16627,
+    "pendingReservations": 0,
+    "auditAvailable": true,
+    "auditRecords": 26871
+  },
+  "sessionStats": {
+    "missions": {},
+    "squadPlanRevision": 11,
+    "motionFeedback": {},
+    "requests": 82,
+    "maxRequestedTanks": 2,
+    "modelDecisions": 162,
+    "modelCommandTicks": 2346,
+    "fallbackTicks": 150,
+    "staleResponses": 0,
+    "failures": 0,
+    "inputTokens": 582475,
+    "spentUsd": 1.708366337999977,
+    "latencyMs": 153,
+    "wallHits": 0,
+    "obstacleContacts": 0,
+    "tankContacts": 0,
+    "friendlyFireHits": 0,
+    "friendlyFireDamage": 0,
+    "playerDamage": 108,
+    "enemyProjectileDamage": 0,
+    "playerDeaths": 1,
+    "enemyDeaths": 0,
+    "shots": 14,
+    "flags": 3,
+    "closeCallTicks": 182,
+    "tankContactTicks": 0,
+    "stationaryTicks": 0,
+    "observedTicks": 1248,
+    "interventions": {
+      "wallAvoided": 106,
+      "tankAvoided": 97,
+      "allyShotAvoided": 113,
+      "lastBlock": "tank"
+    },
+    "aiMode": true,
+    "enabled": true,
+    "playerAutopilot": false,
+    "hz": 2,
+    "activeSeconds": 41.47519999999404,
+    "activeTankSeconds": {
+      "enemy": 82.95039999998808,
+      "player": 0
+    },
+    "acceptedHzPerTank": 1.9529743075382793,
+    "acceptedHzByRole": {
+      "enemy": 1.9529743075382793,
+      "player": 0
+    },
+    "latencySamplesMs": [
+      318.09999999403954,
+      152.80000001192093,
+      142.2999999821186,
+      176.89999997615814,
+      145.80000001192093,
+      160.59999999403954,
+      156.59999999403954,
+      154,
+      175.5,
+      139.2000000178814,
+      146,
+      170.7999999821186,
+      188.2000000178814,
+      202.2000000178814,
+      142.10000002384186,
+      161.80000001192093,
+      206.5,
+      158.60000002384186,
+      237.69999998807907,
+      174.5,
+      205.09999999403954,
+      168.40000000596046,
+      148.59999999403954,
+      147.40000000596046,
+      142.69999998807907,
+      141.10000002384186,
+      146.5,
+      129.2000000178814,
+      185.59999999403954,
+      160.10000002384186,
+      158,
+      165.80000001192093,
+      161.09999999403954,
+      143.09999999403954,
+      160.7000000178814,
+      176.40000000596046,
+      193.69999998807907,
+      138.40000000596046,
+      195.7999999821186,
+      161.2000000178814,
+      139.30000001192093,
+      194.90000000596046,
+      164.2000000178814,
+      143.10000002384186,
+      162.80000001192093,
+      173.40000000596046,
+      135.80000001192093,
+      193.80000001192093,
+      162.19999998807907,
+      168.69999998807907,
+      131.2000000178814,
+      152.90000000596046,
+      161.60000002384186,
+      201.2000000178814,
+      186.90000000596046,
+      146.40000000596046,
+      153.40000000596046,
+      192.19999998807907,
+      177.10000002384186,
+      158.7999999821186,
+      169.7999999821186,
+      190.09999999403954,
+      220.80000001192093,
+      157.90000000596046,
+      134,
+      183.19999998807907,
+      215.69999998807907,
+      210.5,
+      160.09999999403954,
+      247.40000000596046,
+      163.90000000596046,
+      172.2999999821186,
+      156,
+      185.39999997615814,
+      148.69999998807907,
+      219,
+      197.59999999403954,
+      159.69999998807907,
+      152.5,
+      219.40000000596046,
+      153
+    ],
+    "latencyP50Ms": 161.80000001192093,
+    "latencyP95Ms": 219.40000000596046,
+    "appliedChoiceHistogram": {
+      "enemy:advance:mission": {
+        "role": "enemy",
+        "id": "advance:mission",
+        "category": "advance",
+        "count": 69
+      },
+      "enemy:reposition:lane-1": {
+        "role": "enemy",
+        "id": "reposition:lane-1",
+        "category": "reposition",
+        "count": 7
+      },
+      "enemy:reposition:lane-0": {
+        "role": "enemy",
+        "id": "reposition:lane-0",
+        "category": "reposition",
+        "count": 19
+      },
+      "enemy:reposition:lane-2": {
+        "role": "enemy",
+        "id": "reposition:lane-2",
+        "category": "reposition",
+        "count": 7
+      },
+      "enemy:fire:visible": {
+        "role": "enemy",
+        "id": "fire:visible",
+        "category": "fire",
+        "count": 60
+      }
+    },
+    "latestPlans": {},
+    "latestStrategies": {},
+    "lastSafetyEvents": [],
+    "budgetExhausted": false,
+    "pending": false,
+    "status": "Suspended \u00b7 single-player, visible, unpaused gameplay only",
+    "active": false
+  },
+  "tenMetrics": {
+    "contactReacquisition": {
+      "seconds": [
+        1.0333333333333334,
+        0.1,
+        0.16666666666666666,
+        0.3333333333333333,
+        1.3
+      ],
+      "median": 0.3333333333333333,
+      "p95": 1.3,
+      "rightCensoredLostContacts": 0,
+      "definition": "Squad union own FOV/LOS loss to rediscovery by any living squad member",
+      "perTankSecondsDiagnostic": [
+        1.0333333333333334,
+        1.1666666666666667,
+        0.6666666666666666,
+        1.0333333333333334,
+        7.233333333333333,
+        1.3,
+        2.7666666666666666,
+        0.5,
+        0.4,
+        0.4666666666666667,
+        0.16666666666666666
+      ]
+    },
+    "firstAimedShot": {
+      "medianSeconds": 1.2666666666666666,
+      "p95Seconds": 4.466666666666667,
+      "episodesWithShot": 7,
+      "unfiredContacts": [
+        {
+          "id": "enemy-L1-1|player",
+          "contactSeconds": 3.033333333333333,
+          "censored": false
+        },
+        {
+          "id": "enemy-L1-0|player",
+          "contactSeconds": 0.5333333333333333,
+          "censored": false
+        },
+        {
+          "id": "enemy-L1-0|player",
+          "contactSeconds": 0.3333333333333333,
+          "censored": false
+        },
+        {
+          "id": "enemy-L1-1|player",
+          "contactSeconds": 1.7,
+          "censored": false
+        },
+        {
+          "id": "enemy-L1-1|player",
+          "contactSeconds": 4.133333333333334,
+          "censored": false
+        },
+        {
+          "id": "enemy-L1-1|player",
+          "contactSeconds": 1.3,
+          "censored": true
+        }
+      ]
+    },
+    "shootingOpportunity": {
+      "shotsPerContactSecond": 0.24504084014002334,
+      "fireReadySafeOpportunityFraction": 0.4,
+      "safeOpportunityTicks": 35
+    },
+    "hitAccuracy": {
+      "resolvedHitPercent": 64.28571428571429,
+      "resolvedShots": 14,
+      "pendingCensoredShots": 0,
+      "enemyShots": 14,
+      "unlinkedHitEvents": 0,
+      "limitation": null
+    },
+    "pressure": {
+      "playerDamagePerContactSecond": 1.8903150525087515,
+      "playerDamage": 108,
+      "enemyTankContactSeconds": 57.13333333333333
+    },
+    "crossfire": {
+      "usefulFraction": 0,
+      "ticks": 0,
+      "definition": "Two own-visible enemy firing lanes to same target, safe paths, bearing separation >=45 degrees"
+    },
+    "search": {
+      "uniqueTenUnitCellsByTank": {
+        "enemy-L1-0": 2,
+        "enemy-L1-1": 3
+      },
+      "globalUniqueCells": 5,
+      "uniqueCellsPerSearchTankMinute": 90,
+      "duplicateEntryWaste": 0,
+      "perTankDuplicateEntryDiagnostic": 0,
+      "searchTankSeconds": 3.3333333333333335
+    },
+    "movement": {
+      "assignedStallFraction": 0.1276440554339898,
+      "longestStallSeconds": 2.2333333333333334,
+      "movementTicks": 1371,
+      "definition": "Assigned non-hold waypoint at least3 units away, including zero-thrust guard stalls; speed <0.5 units/s; useful aligned firing ticks excluded"
+    },
+    "flagDefense": {
+      "episodes": [
+        {
+          "flagId": "flag-3",
+          "startTick": 62,
+          "endTick": 87,
+          "seconds": 0.8333333333333334,
+          "outcome": "captured"
+        },
+        {
+          "flagId": "flag-2",
+          "startTick": 245,
+          "endTick": 269,
+          "seconds": 0.8,
+          "outcome": "captured"
+        },
+        {
+          "flagId": "flag-5",
+          "startTick": 397,
+          "endTick": 453,
+          "seconds": 1.8666666666666667,
+          "outcome": "exited-without-capture"
+        },
+        {
+          "flagId": "flag-4",
+          "startTick": 479,
+          "endTick": 503,
+          "seconds": 0.8,
+          "outcome": "captured"
+        }
+      ],
+      "uniqueApproachedFlags": 4,
+      "approachInterruptions": 1,
+      "captures": 3,
+      "resolvedCaptureDenialFraction": 0.25,
+      "rightCensoredEpisodes": 0,
+      "approachSeconds": 4.3,
+      "timeBoughtSecondsProxy": 41.56666666666667,
+      "limitation": "Approach exits/attacker deaths without capture are denial proxies; no causal extra time against a counterfactual"
+    },
+    "survival": {
+      "damageDealt": 108,
+      "damageReceived": 0,
+      "exchangeRatio": null,
+      "rawDamageUnitsNotComparableAcrossShieldSizes": true,
+      "shieldFractionDamageDealt": 1.08,
+      "shieldFractionDamageReceived": 0,
+      "normalizedExchangeRatio": null,
+      "permanentlyLostSquad": 0,
+      "retreatEpisodes": 0,
+      "retreatSuccesses": 0,
+      "definition": "Retreat success: survives >=5s with shield fraction no lower than entry; one episode per tank, end censoring explicit",
+      "retreatFailures": 0,
+      "censoredRetreats": 0
+    }
+  },
+  "diagnostics": {
+    "bodyContacts": 0,
+    "friendlyFireDamage": 0,
+    "stopReason": "player-death",
+    "seconds": 41.56666666666667
+  },
+  "limitations": [
+    "Observer metrics use full scene solely for evaluation, never as model input.",
+    "Crossfire opportunity uses safe target-directed ray, not guaranteed target prediction.",
+    "Search cell revisit waste can include tactically useful revisits.",
+    "Reacquisition episodes and first-shot contacts use current own FOV/LOS."
+  ],
+  "observerCorrection": {
+    "gameplayUnchanged": true,
+    "description": "Recomputed from original immutable frames/actions: pre-command cooldown<=1 and actual legal shots count as opportunities; no resolved shots means null accuracy; nearest-rank quantiles; evaluate through first terminal tick, excluding automatic next-level roster. Actual shot heading/origin after steering determines aim; observer death ends unfired contacts and classifies failed recovery."
+  }
+}

@@ -1,0 +1,593 @@
+{
+  "sourceSha": "f23b7031b5743fd7ca56ee2195a5bbee67414f37",
+  "mocked": false,
+  "profile": "scripted",
+  "scenarios": [
+    {
+      "scenario": {
+        "index": 0,
+        "level": 1,
+        "behavior": "rushflags",
+        "seed": "built-in deterministic level seed; no seed override",
+        "profile": "scripted"
+      },
+      "stopReason": "player-death",
+      "errors": [],
+      "tenMetrics": {
+        "contactReacquisition": {
+          "seconds": [
+            1.0333333333333334,
+            0.1,
+            0.16666666666666666,
+            0.3333333333333333,
+            1.3
+          ],
+          "median": 0.3333333333333333,
+          "p95": 1.3,
+          "rightCensoredLostContacts": 0,
+          "definition": "Squad union own FOV/LOS loss to rediscovery by any living squad member",
+          "perTankSecondsDiagnostic": [
+            1.0333333333333334,
+            1.1666666666666667,
+            0.6666666666666666,
+            1.0333333333333334,
+            7.233333333333333,
+            1.3,
+            2.7666666666666666,
+            0.5,
+            0.4,
+            0.4666666666666667,
+            0.16666666666666666
+          ]
+        },
+        "firstAimedShot": {
+          "medianSeconds": 1.2666666666666666,
+          "p95Seconds": 4.466666666666667,
+          "episodesWithShot": 7,
+          "unfiredContacts": [
+            {
+              "id": "enemy-L1-1|player",
+              "contactSeconds": 3.033333333333333,
+              "censored": false
+            },
+            {
+              "id": "enemy-L1-0|player",
+              "contactSeconds": 0.5333333333333333,
+              "censored": false
+            },
+            {
+              "id": "enemy-L1-0|player",
+              "contactSeconds": 0.3333333333333333,
+              "censored": false
+            },
+            {
+              "id": "enemy-L1-1|player",
+              "contactSeconds": 1.7,
+              "censored": false
+            },
+            {
+              "id": "enemy-L1-1|player",
+              "contactSeconds": 4.133333333333334,
+              "censored": false
+            },
+            {
+              "id": "enemy-L1-1|player",
+              "contactSeconds": 1.3,
+              "censored": true
+            }
+          ]
+        },
+        "shootingOpportunity": {
+          "shotsPerContactSecond": 0.24504084014002334,
+          "fireReadySafeOpportunityFraction": 0.4,
+          "safeOpportunityTicks": 35
+        },
+        "hitAccuracy": {
+          "resolvedHitPercent": 64.28571428571429,
+          "resolvedShots": 14,
+          "pendingCensoredShots": 0,
+          "enemyShots": 14,
+          "unlinkedHitEvents": 0,
+          "limitation": null
+        },
+        "pressure": {
+          "playerDamagePerContactSecond": 1.8903150525087515,
+          "playerDamage": 108,
+          "enemyTankContactSeconds": 57.13333333333333
+        },
+        "crossfire": {
+          "usefulFraction": 0,
+          "ticks": 0,
+          "definition": "Two own-visible enemy firing lanes to same target, safe paths, bearing separation >=45 degrees"
+        },
+        "search": {
+          "uniqueTenUnitCellsByTank": {
+            "enemy-L1-0": 2,
+            "enemy-L1-1": 3
+          },
+          "globalUniqueCells": 5,
+          "uniqueCellsPerSearchTankMinute": 90,
+          "duplicateEntryWaste": 0,
+          "perTankDuplicateEntryDiagnostic": 0,
+          "searchTankSeconds": 3.3333333333333335
+        },
+        "movement": {
+          "assignedStallFraction": 0.1276440554339898,
+          "longestStallSeconds": 2.2333333333333334,
+          "movementTicks": 1371,
+          "definition": "Assigned non-hold waypoint at least3 units away, including zero-thrust guard stalls; speed <0.5 units/s; useful aligned firing ticks excluded"
+        },
+        "flagDefense": {
+          "episodes": [
+            {
+              "flagId": "flag-3",
+              "startTick": 62,
+              "endTick": 87,
+              "seconds": 0.8333333333333334,
+              "outcome": "captured"
+            },
+            {
+              "flagId": "flag-2",
+              "startTick": 245,
+              "endTick": 269,
+              "seconds": 0.8,
+              "outcome": "captured"
+            },
+            {
+              "flagId": "flag-5",
+              "startTick": 397,
+              "endTick": 453,
+              "seconds": 1.8666666666666667,
+              "outcome": "exited-without-capture"
+            },
+            {
+              "flagId": "flag-4",
+              "startTick": 479,
+              "endTick": 503,
+              "seconds": 0.8,
+              "outcome": "captured"
+            }
+          ],
+          "uniqueApproachedFlags": 4,
+          "approachInterruptions": 1,
+          "captures": 3,
+          "resolvedCaptureDenialFraction": 0.25,
+          "rightCensoredEpisodes": 0,
+          "approachSeconds": 4.3,
+          "timeBoughtSecondsProxy": 41.56666666666667,
+          "limitation": "Approach exits/attacker deaths without capture are denial proxies; no causal extra time against a counterfactual"
+        },
+        "survival": {
+          "damageDealt": 108,
+          "damageReceived": 0,
+          "exchangeRatio": null,
+          "rawDamageUnitsNotComparableAcrossShieldSizes": true,
+          "shieldFractionDamageDealt": 1.08,
+          "shieldFractionDamageReceived": 0,
+          "normalizedExchangeRatio": null,
+          "permanentlyLostSquad": 0,
+          "retreatEpisodes": 0,
+          "retreatSuccesses": 0,
+          "definition": "Retreat success: survives >=5s with shield fraction no lower than entry; one episode per tank, end censoring explicit",
+          "retreatFailures": 0,
+          "censoredRetreats": 0
+        }
+      },
+      "diagnostics": {
+        "bodyContacts": 0,
+        "friendlyFireDamage": 0,
+        "stopReason": "player-death",
+        "seconds": 41.56666666666667
+      }
+    },
+    {
+      "scenario": {
+        "index": 1,
+        "level": 3,
+        "behavior": "rushflags",
+        "seed": "built-in deterministic level seed; no seed override",
+        "profile": "scripted"
+      },
+      "stopReason": "player-death",
+      "errors": [],
+      "tenMetrics": {
+        "contactReacquisition": {
+          "seconds": [],
+          "median": null,
+          "p95": null,
+          "rightCensoredLostContacts": 0,
+          "definition": "Squad union own FOV/LOS loss to rediscovery by any living squad member",
+          "perTankSecondsDiagnostic": [
+            1.9666666666666666,
+            1.9,
+            0.6,
+            0.1,
+            0.03333333333333333,
+            0.43333333333333335,
+            4.766666666666667,
+            1.9666666666666666,
+            1.3333333333333333,
+            1.2,
+            0.03333333333333333,
+            1.1333333333333333
+          ]
+        },
+        "firstAimedShot": {
+          "medianSeconds": 1.5666666666666667,
+          "p95Seconds": 5.066666666666666,
+          "episodesWithShot": 7,
+          "unfiredContacts": [
+            {
+              "id": "enemy-L3-1|player",
+              "contactSeconds": 1.4333333333333333,
+              "censored": false
+            },
+            {
+              "id": "enemy-L3-0|player",
+              "contactSeconds": 0.3,
+              "censored": false
+            },
+            {
+              "id": "enemy-L3-2|player",
+              "contactSeconds": 4.6,
+              "censored": false
+            },
+            {
+              "id": "enemy-L3-2|player",
+              "contactSeconds": 0.03333333333333333,
+              "censored": false
+            },
+            {
+              "id": "enemy-L3-2|player",
+              "contactSeconds": 1.9,
+              "censored": false
+            },
+            {
+              "id": "enemy-L3-2|player",
+              "contactSeconds": 2.2,
+              "censored": false
+            },
+            {
+              "id": "enemy-L3-2|player",
+              "contactSeconds": 3.2666666666666666,
+              "censored": false
+            },
+            {
+              "id": "enemy-L3-2|player",
+              "contactSeconds": 2.066666666666667,
+              "censored": true
+            }
+          ]
+        },
+        "shootingOpportunity": {
+          "shotsPerContactSecond": 0.2395644283121597,
+          "fireReadySafeOpportunityFraction": 0.2391304347826087,
+          "safeOpportunityTicks": 92
+        },
+        "hitAccuracy": {
+          "resolvedHitPercent": 68.18181818181817,
+          "resolvedShots": 22,
+          "pendingCensoredShots": 0,
+          "enemyShots": 22,
+          "unlinkedHitEvents": 0,
+          "limitation": null
+        },
+        "pressure": {
+          "playerDamagePerContactSecond": 1.9600725952813067,
+          "playerDamage": 180,
+          "enemyTankContactSeconds": 91.83333333333333
+        },
+        "crossfire": {
+          "usefulFraction": 0.033363390441839495,
+          "ticks": 37,
+          "definition": "Two own-visible enemy firing lanes to same target, safe paths, bearing separation >=45 degrees"
+        },
+        "search": {
+          "uniqueTenUnitCellsByTank": {
+            "enemy-L3-0": 2,
+            "enemy-L3-1": 7,
+            "enemy-L3-2": 4
+          },
+          "globalUniqueCells": 13,
+          "uniqueCellsPerSearchTankMinute": 99.15254237288137,
+          "duplicateEntryWaste": 0,
+          "perTankDuplicateEntryDiagnostic": 0,
+          "searchTankSeconds": 7.866666666666666
+        },
+        "movement": {
+          "assignedStallFraction": 0.1900600764609503,
+          "longestStallSeconds": 1.1,
+          "movementTicks": 1831,
+          "definition": "Assigned non-hold waypoint at least3 units away, including zero-thrust guard stalls; speed <0.5 units/s; useful aligned firing ticks excluded"
+        },
+        "flagDefense": {
+          "episodes": [
+            {
+              "flagId": "flag-2",
+              "startTick": 60,
+              "endTick": 111,
+              "seconds": 1.7,
+              "outcome": "exited-without-capture"
+            },
+            {
+              "flagId": "flag-1",
+              "startTick": 149,
+              "endTick": 192,
+              "seconds": 1.4333333333333333,
+              "outcome": "exited-without-capture"
+            },
+            {
+              "flagId": "flag-1",
+              "startTick": 289,
+              "endTick": 334,
+              "seconds": 1.5,
+              "outcome": "exited-without-capture"
+            },
+            {
+              "flagId": "flag-1",
+              "startTick": 381,
+              "endTick": 412,
+              "seconds": 1.0333333333333334,
+              "outcome": "exited-without-capture"
+            },
+            {
+              "flagId": "flag-9",
+              "startTick": 641,
+              "endTick": 686,
+              "seconds": 1.5,
+              "outcome": "exited-without-capture"
+            },
+            {
+              "flagId": "flag-2",
+              "startTick": 712,
+              "endTick": 760,
+              "seconds": 1.6,
+              "outcome": "exited-without-capture"
+            },
+            {
+              "flagId": "flag-1",
+              "startTick": 761,
+              "endTick": 814,
+              "seconds": 1.7666666666666666,
+              "outcome": "exited-without-capture"
+            },
+            {
+              "flagId": "flag-0",
+              "startTick": 830,
+              "endTick": 853,
+              "seconds": 0.7666666666666667,
+              "outcome": "captured"
+            }
+          ],
+          "uniqueApproachedFlags": 4,
+          "approachInterruptions": 7,
+          "captures": 1,
+          "resolvedCaptureDenialFraction": 0.875,
+          "rightCensoredEpisodes": 0,
+          "approachSeconds": 11.3,
+          "timeBoughtSecondsProxy": 39.46666666666667,
+          "limitation": "Approach exits/attacker deaths without capture are denial proxies; no causal extra time against a counterfactual"
+        },
+        "survival": {
+          "damageDealt": 180,
+          "damageReceived": 0,
+          "exchangeRatio": null,
+          "rawDamageUnitsNotComparableAcrossShieldSizes": true,
+          "shieldFractionDamageDealt": 1.8000000000000007,
+          "shieldFractionDamageReceived": 0,
+          "normalizedExchangeRatio": null,
+          "permanentlyLostSquad": 0,
+          "retreatEpisodes": 0,
+          "retreatSuccesses": 0,
+          "definition": "Retreat success: survives >=5s with shield fraction no lower than entry; one episode per tank, end censoring explicit",
+          "retreatFailures": 0,
+          "censoredRetreats": 0
+        }
+      },
+      "diagnostics": {
+        "bodyContacts": 0,
+        "friendlyFireDamage": 0,
+        "stopReason": "player-death",
+        "seconds": 39.46666666666667
+      }
+    },
+    {
+      "scenario": {
+        "index": 2,
+        "level": 5,
+        "behavior": "rushflags",
+        "seed": "built-in deterministic level seed; no seed override",
+        "profile": "scripted"
+      },
+      "stopReason": "player-death",
+      "errors": [],
+      "tenMetrics": {
+        "contactReacquisition": {
+          "seconds": [],
+          "median": null,
+          "p95": null,
+          "rightCensoredLostContacts": 0,
+          "definition": "Squad union own FOV/LOS loss to rediscovery by any living squad member",
+          "perTankSecondsDiagnostic": [
+            0.1,
+            1.8333333333333333,
+            0.6333333333333333,
+            7.1,
+            4.666666666666667,
+            0.4666666666666667,
+            1.4,
+            2.5,
+            6.733333333333333,
+            2.8333333333333335,
+            8.766666666666667
+          ]
+        },
+        "firstAimedShot": {
+          "medianSeconds": 1.0666666666666667,
+          "p95Seconds": 8.233333333333333,
+          "episodesWithShot": 5,
+          "unfiredContacts": [
+            {
+              "id": "enemy-L5-2|player",
+              "contactSeconds": 1.2,
+              "censored": false
+            },
+            {
+              "id": "enemy-L5-2|player",
+              "contactSeconds": 3.8,
+              "censored": false
+            },
+            {
+              "id": "enemy-L5-1|player",
+              "contactSeconds": 4.833333333333333,
+              "censored": false
+            },
+            {
+              "id": "enemy-L5-1|player",
+              "contactSeconds": 1.1666666666666667,
+              "censored": false
+            },
+            {
+              "id": "enemy-L5-2|player",
+              "contactSeconds": 1.8,
+              "censored": false
+            },
+            {
+              "id": "enemy-L5-1|player",
+              "contactSeconds": 0.9666666666666667,
+              "censored": false
+            },
+            {
+              "id": "enemy-L5-2|player",
+              "contactSeconds": 0.43333333333333335,
+              "censored": false
+            },
+            {
+              "id": "enemy-L5-1|player",
+              "contactSeconds": 0.03333333333333333,
+              "censored": false
+            },
+            {
+              "id": "enemy-L5-1|player",
+              "contactSeconds": 6.1,
+              "censored": true
+            }
+          ]
+        },
+        "shootingOpportunity": {
+          "shotsPerContactSecond": 0.2375215146299484,
+          "fireReadySafeOpportunityFraction": 0.3108108108108108,
+          "safeOpportunityTicks": 74
+        },
+        "hitAccuracy": {
+          "resolvedHitPercent": 56.52173913043478,
+          "resolvedShots": 23,
+          "pendingCensoredShots": 0,
+          "enemyShots": 23,
+          "unlinkedHitEvents": 0,
+          "limitation": null
+        },
+        "pressure": {
+          "playerDamagePerContactSecond": 1.611015490533563,
+          "playerDamage": 156,
+          "enemyTankContactSeconds": 96.83333333333333
+        },
+        "crossfire": {
+          "usefulFraction": 0.09320809248554913,
+          "ticks": 129,
+          "definition": "Two own-visible enemy firing lanes to same target, safe paths, bearing separation >=45 degrees"
+        },
+        "search": {
+          "uniqueTenUnitCellsByTank": {
+            "enemy-L5-0": 16,
+            "enemy-L5-1": 14,
+            "enemy-L5-2": 10
+          },
+          "globalUniqueCells": 40,
+          "uniqueCellsPerSearchTankMinute": 103.59712230215827,
+          "duplicateEntryWaste": 0.024390243902439025,
+          "perTankDuplicateEntryDiagnostic": 0.024390243902439025,
+          "searchTankSeconds": 23.166666666666668
+        },
+        "movement": {
+          "assignedStallFraction": 0.13486736976669864,
+          "longestStallSeconds": 1.6666666666666667,
+          "movementTicks": 3129,
+          "definition": "Assigned non-hold waypoint at least3 units away, including zero-thrust guard stalls; speed <0.5 units/s; useful aligned firing ticks excluded"
+        },
+        "flagDefense": {
+          "episodes": [
+            {
+              "flagId": "flag-0",
+              "startTick": 134,
+              "endTick": 157,
+              "seconds": 0.7666666666666667,
+              "outcome": "captured"
+            },
+            {
+              "flagId": "flag-2",
+              "startTick": 294,
+              "endTick": 318,
+              "seconds": 0.8,
+              "outcome": "captured"
+            },
+            {
+              "flagId": "flag-9",
+              "startTick": 749,
+              "endTick": 805,
+              "seconds": 1.8666666666666667,
+              "outcome": "exited-without-capture"
+            },
+            {
+              "flagId": "flag-1",
+              "startTick": 822,
+              "endTick": 847,
+              "seconds": 0.8333333333333334,
+              "outcome": "captured"
+            }
+          ],
+          "uniqueApproachedFlags": 4,
+          "approachInterruptions": 1,
+          "captures": 3,
+          "resolvedCaptureDenialFraction": 0.25,
+          "rightCensoredEpisodes": 0,
+          "approachSeconds": 4.266666666666667,
+          "timeBoughtSecondsProxy": 53.833333333333336,
+          "limitation": "Approach exits/attacker deaths without capture are denial proxies; no causal extra time against a counterfactual"
+        },
+        "survival": {
+          "damageDealt": 156,
+          "damageReceived": 0,
+          "exchangeRatio": null,
+          "rawDamageUnitsNotComparableAcrossShieldSizes": true,
+          "shieldFractionDamageDealt": 1.5600000000000005,
+          "shieldFractionDamageReceived": 0,
+          "normalizedExchangeRatio": null,
+          "permanentlyLostSquad": 0,
+          "retreatEpisodes": 0,
+          "retreatSuccesses": 0,
+          "definition": "Retreat success: survives >=5s with shield fraction no lower than entry; one episode per tank, end censoring explicit",
+          "retreatFailures": 0,
+          "censoredRetreats": 0
+        }
+      },
+      "diagnostics": {
+        "bodyContacts": 0,
+        "friendlyFireDamage": 0,
+        "stopReason": "player-death",
+        "seconds": 53.833333333333336
+      }
+    }
+  ],
+  "notes": [
+    "Mocked run decisions are fabricated fixtures, never gameplay quality evidence.",
+    "Scripted player chooses from own observable options only; enemy choices are provider results in paid mode.",
+    "Built-in level seed used; no independent seed override.",
+    "Frame/event records are per simulated tick; video is actual browser recording.",
+    "Opportunity timing corrected from recorded frames/actions after identifying pre-steering alignment and cooldown-decrement mismatch; gameplay and provider data untouched."
+  ],
+  "observerCorrection": {
+    "gameplayUnchanged": true,
+    "description": "Recomputed from original immutable frames/actions: pre-command cooldown<=1 and actual legal shots count as opportunities; no resolved shots means null accuracy; nearest-rank quantiles; evaluate through first terminal tick, excluding automatic next-level roster. Actual shot heading/origin after steering determines aim; observer death ends unfired contacts and classifies failed recovery."
+  }
+}

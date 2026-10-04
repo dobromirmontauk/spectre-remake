@@ -86,3 +86,7 @@ Every parsed provider response envelope is retained with the request and result/
 Spacing recovery retains a chosen escape direction until nine-unit clearance, with a 120-tick maximum lifetime and level/rollback/lifecycle resets. It lives only in local controller memory, outside provider observations and pure simulation state. Actual session regressions cover the motor memory and expired-plan grace, rather than only isolated controller calls.
 
 Approved September 30 recordings, exact example calls and review reports: `test/validation/README.md` and `test/validation/jev-ai/2026-09-30/EVALUATION.md`. This directory is validation evidence, not runtime code or deployment assets. The user approved its repository publication.
+
+## Separate AI mode (2026-10-01)
+
+The [AI-mode contract](AI-MODE.md) adds finite per-level lives and a central squad mission layer. In this mode commanders choose short tactical actions at 2 Hz; they cannot replace their assigned mission. Normal solo/local/network behavior is preserved. See the [ten-game evaluation](test/validation/ai-mode/2026-10-01/REPORT.md) for measured outcomes, costs, raw calls and recordings. Historical individual-strategy experiments below remain prior evidence rather than the current AI-mode contract.

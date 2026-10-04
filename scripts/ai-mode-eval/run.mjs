@@ -2,16 +2,16 @@ import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {mkdir,writeFile} from 'node:fs/promises';
 import {gzipSync} from 'node:zlib';
-import {resolve} from 'node:path';
+import {resolve,dirname} from 'node:path';
 import {evaluate} from './metrics.mjs';
 const args=Object.fromEntries(process.argv.slice(2).map(a=>{const m=/^--([a-z-]+)(?:=(.*))?$/.exec(a);if(!m)throw Error('Use --name=value');return [m[1],m[2]??'true'];}));
 const count=Number(args.games??10),start=Number(args.start??0),duration=Number(args.duration??90),profile=args.profile??'scripted',paid=args.paid==='true',url=args.url??'http://127.0.0.1:5183/',out=resolve(args.out??`test/validation/ai-mode/${new Date().toISOString().slice(0,10)}/run-${Date.now()}`);
 if(!Number.isInteger(count)||count<1||count>10||!Number.isInteger(start)||start<0||start+count>10||duration<1||duration>120||!['scripted','jev'].includes(profile))throw Error('Bounded games/start/duration/profile required');
 if(!['localhost','127.0.0.1'].includes(new URL(url).hostname))throw Error('Loopback only');
-await mkdir(out,{recursive:false});
+await mkdir(dirname(out),{recursive:true});await mkdir(out,{recursive:false});
 const pw=process.env.PLAYWRIGHT_MODULE??'playwright';const {chromium}=await import(pw);
 const browser=await chromium.launch({headless:true,...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH?{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH}:{}),args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
-const scenarios=Array.from({length:10},(_,i)=>({index:i,level:[1,3,5,1,3,5,1,3,5,5][i],behavior:['rushflags','evade','hunt'][Math.floor(i/3)%3],seed:'built-in deterministic level seed; no seed override',profile}));
+const scenarios=Array.from({length:10},(_,i)=>({index:i,level:[1,3,5,1,3,5,1,3,5,5][i],behavior:['rushflags','rushflags','rushflags','rushflags','rushflags','rushflags','evade','hunt','evade','hunt'][i],seed:'built-in deterministic level seed; no seed override',profile}));
 const sourceSha=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();const reports=[];
 try{for(const scenario of scenarios.slice(start,start+count)){
  const dir=resolve(out,`game-${String(scenario.index).padStart(2,'0')}-level${scenario.level}-${scenario.behavior}`);await mkdir(dir);
@@ -48,7 +48,7 @@ try{for(const scenario of scenarios.slice(start,start+count)){
  healthAfter=await page.evaluate(()=>fetch('/api/jev/health').then(r=>r.json()));await page.screenshot({path:resolve(dir,'end.png')});
  }catch(e){errors.push(e.message);stopReason='harness-error';}finally{await context.close();}
  await Promise.allSettled(sourceTasks);const report={sourceSha,loadedSourceHashes,scenario,mocked:!paid,stopReason,errors,healthBefore,healthAfter,sessionStats,...evaluate({frames,actions,stopReason})};
- for(const [name,data]of Object.entries({frames,actions,decisions}))await writeFile(resolve(dir,name+'.json.gz'),gzipSync(JSON.stringify(data)));await writeFile(resolve(dir,'report.json'),JSON.stringify(report,null,2));reports.push(report);
+ for(const [name,data]of Object.entries({frames,actions,decisions}))await writeFile(resolve(dir,name+'.json.gz'),gzipSync(JSON.stringify(data)));await writeFile(resolve(dir,'report.json'),JSON.stringify(report,null,2));reports.push(report);console.log(JSON.stringify({game:scenario.index,scenario,stopReason,seconds:report.diagnostics.seconds,firstShot:report.tenMetrics.firstAimedShot.medianSeconds,hitPercent:report.tenMetrics.hitAccuracy.resolvedHitPercent,longestStall:report.tenMetrics.movement.longestStallSeconds,spend:healthAfter?.spentUsd,errors}));
  if(errors.length||['budget','safety'].includes(stopReason))break;
  }}finally{await browser.close();await writeFile(resolve(out,'summary.json'),JSON.stringify({sourceSha,mocked:!paid,profile,scenarios:reports.map(r=>({scenario:r.scenario,stopReason:r.stopReason,errors:r.errors,tenMetrics:r.tenMetrics,diagnostics:r.diagnostics})),notes:['Mocked run decisions are fabricated fixtures, never gameplay quality evidence.','Scripted player chooses from own observable options only; enemy choices are provider results in paid mode.','Built-in level seed used; no independent seed override.','Frame/event records are per simulated tick; video is actual browser recording.']},null,2));}
 console.log(JSON.stringify({out,games:reports.length,mocked:!paid,stops:reports.map(r=>r.stopReason)}));if(reports.some(r=>r.errors.length))process.exitCode=1;
