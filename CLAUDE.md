@@ -72,8 +72,7 @@ bezel-less radar dot-cluster upper-right · "Filled" wireframe toggle · menu = 
 
 ## Known deviations / open items
 
-- Enemies respawn infinitely (~4s, arena edge). **The original had a finite roster** — destroying all
-  tanks completed the level. Faithful change (finite roster + kill-all-wins, respawn behind a flag) is designed but not built.
+- Normal modes retain infinite enemy respawn. Separate solo **AI mode** enables Jev at 2 Hz, caps enemies at three, gives the player one life per level, and never respawns enemies within a level. Collecting all flags or destroying the squad clears the level. Preserve normal-mode deterministic fixtures. See `AI-MODE.md`.
 - Enemy-vs-enemy friendly fire is ON by default and toggleable (`state.enemyFriendlyFire`,
   `ENEMY_FRIENDLY_FIRE_DEFAULT`, `__game.setEnemyFriendlyFire`). It's a match-constant option set at
   `createInitialState` — no net-protocol plumbing, so the debug setter throws in net play.
@@ -91,3 +90,5 @@ User chose 2 Hz for local testing; this is the default. Design/run instructions 
 User intelligence update (2026-09-30): enemies patrol around known flags when no opponent is visible and prefer survival/retreat/regroup under fire. Levels 1–2 retain approximate individually seen flags; from level 3, exact own map location and advance typed objective/item positions are authorized. From level 5, shared other AI tank locations and last strategies are authorized; player location is shared only while any enemy has visual contact. Sightings include last observed heading, observation time and age versus now; unseen tracks must not refresh from hidden state. Persist every provider request and result/error with timestamps, excluding credentials, and expose human-readable live summaries with exact inputs collapsed by default. These explicit tiers supersede the previous uniform limited-vision objective policy.
 
 Approved Jev review artifacts live under `test/validation/jev-ai/2026-09-30/` (index: `test/validation/README.md`), outside the runtime application. Keep new recordings and call examples under `test/validation/`, never commit credentials or the continuously growing local spend/provider ledger. Commander personality randomness is outside the pure simulation; never consume or mutate `state.rng` for model commander personalities.
+
+AI mode squad missions are assigned centrally, then Jev chooses tactical actions within them. Evidence and ten-game measurements: `test/validation/ai-mode/2026-10-01/REPORT.md`. Radio shares actual sightings; never leak hidden player coordinates. Keep old optional-Jev diagnostics distinct from the primary AI-mode ruleset.

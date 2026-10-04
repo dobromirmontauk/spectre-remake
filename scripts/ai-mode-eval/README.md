@@ -28,3 +28,7 @@ Ten metrics, defined in `metrics.mjs`:
 10. Squad raw damage exchange (unequal shield sizes explicitly flagged), shield-fraction-normalized damage exchange, permanently dead enemies and retreat success. A retreat/recover episode succeeds if alive5seconds later with shields no lower than entry. Current implementation records one such episode/tank; unresolved episodes are conservatively censored, not asserted failures.
 
 Body contacts, friendly fire, budget, observer duration and stop reason are additional diagnostics. These numbers do not prove human enjoyment. Lead acceptance targets are provisional: zero contacts/ally damage, no nonfiring movement stall>5s, first-shot median≤2s/p95≤5s, stable useful missions and watchable pressure/close calls. Inspect video and exact logs before attributing coordinated intent or calling a maneuver smart.
+
+Observer corrections: calculations stop at the first LevelComplete/PlayerDestroyed event even when a render batch captures next-level ticks. Raw traces remain untouched. Quantiles use empirical nearest rank (ceil(p × n)); sparse p95 samples include their observed slowest episode. Unlinked ShotHit diagnostics include player projectiles, which are intentionally absent from enemy shot accuracy.
+
+Aimed first shots use the actual ShotFired heading/origin and current target position after steering, rather than the pre-command bearing. Dead observers end unfired contacts explicitly; a recovery attempt ending in observed death is a retreat failure, not an end-censored attempt.

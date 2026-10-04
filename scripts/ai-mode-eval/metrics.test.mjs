@@ -21,3 +21,23 @@ test('ongoing unique flag approach is censored rather than denied',()=>{const f=
 test('normalized exchange accounts for player100 shield versus enemy3',()=>{const f=frame(0,[{type:'TankDamaged',shooterId:'enemy',tankId:'player',amount:10},{type:'TankDamaged',shooterId:'player',tankId:'enemy',amount:1}]);f.tanks[0].maxShield=3;f.tanks[1].maxShield=100;const r=evaluate({frames:[f],actions:[]});assert.equal(r.tenMetrics.survival.exchangeRatio,10);assert(Math.abs(r.tenMetrics.survival.normalizedExchangeRatio-.3)<1e-10);});
 test('all pending shots have unknown accuracy rather than a fabricated zero',()=>{const r=evaluate({frames:[frame(0,[{type:'ShotFired',ownerId:'enemy',projectileId:'pending'}],[{id:'pending'}])],actions:[action(0,{actualShot:true})]});assert.equal(r.tenMetrics.hitAccuracy.resolvedHitPercent,null);assert.equal(r.tenMetrics.hitAccuracy.pendingCensoredShots,1);});
 test('verified legal shots after steering and cooldown decrement count as used opportunities',()=>{const r=evaluate({frames:[frame(0)],actions:[action(0,{actualShot:true,safeOpportunity:false,fireCooldown:1})]});assert.equal(r.tenMetrics.shootingOpportunity.fireReadySafeOpportunityFraction,1);});
+test('level clear stops evaluation before automatic next-level roster replaces dead squad',()=>{
+ const terminal=frame(30,[{type:'LevelComplete',level:5}]);terminal.tanks[0].alive=false;
+ const next=frame(31);next.tanks[0].id='new-enemy';
+ const r=evaluate({frames:[frame(0),terminal,next],actions:[action(0),action(30),action(31)],stopReason:'level-clear'});
+ assert.equal(r.tenMetrics.survival.permanentlyLostSquad,1);assert.equal(r.diagnostics.seconds,1);
+});
+test('p95 includes slowest episode when only two reacquisitions exist',()=>{
+ const r=evaluate({frames:[frame(0),frame(30),frame(60),frame(90),frame(210)],actions:[action(0),action(30,{visibleOpponentsNow:[]}),action(60),action(90,{visibleOpponentsNow:[]}),action(210)]});
+ assert.equal(r.tenMetrics.contactReacquisition.p95,4);
+});
+test('aimed-shot latency uses the actual firing heading after steering',()=>{
+ const r=evaluate({frames:[frame(0,[{type:'ShotFired',ownerId:'enemy',projectileId:'shot',position:{x:0,z:-5},heading:0}]),frame(30)],actions:[action(0,{actualShot:true,heading:.15,visibleOpponentsNow:[{id:'player',bearingError:-.15}]}),action(30,{actualShot:true,visibleOpponentsNow:[{id:'player',bearingError:0}]})]});
+ assert.equal(r.tenMetrics.firstAimedShot.medianSeconds,0);
+});
+test('dead observer ends an unfired contact and failed retreat rather than censoring both',()=>{
+ const end=frame(90);end.tanks[0].alive=false;
+ const r=evaluate({frames:[frame(0),end,frame(150)],actions:[action(0,{shieldFraction:.3,strategy:'retreat'})]});
+ assert.equal(r.tenMetrics.firstAimedShot.unfiredContacts[0].contactSeconds,3);assert.equal(r.tenMetrics.firstAimedShot.unfiredContacts[0].censored,false);
+ assert.equal(r.tenMetrics.survival.retreatFailures,1);assert.equal(r.tenMetrics.survival.censoredRetreats,0);
+});

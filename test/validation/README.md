@@ -14,3 +14,7 @@ Start with the [evaluation report](jev-ai/2026-09-30/EVALUATION.md).
 `browser-repro.mjs` exercises the live UI with mocked model responses. `realism-play.mjs` records manual bounded experiments against the development server on port 5183; its default uses the local paid backend. `MOCK_JEV=1` selects mocked decisions. Neither script runs automatically during the game build or ordinary tests. Use the existing persistent ledger, 2 Hz cadence and maximum three enemies plus one player for any paid rerun; never reset the cumulative $10 test ledger.
 
 The complete local spend ledger, API credentials and continuously growing provider audit are excluded from git. Saved call examples and selected audit records are game-only data.
+
+## Separate AI mode: ten-game evaluation
+
+[Report, exact calls/actions and recordings](ai-mode/2026-10-01/REPORT.md) · [top-down squad video](ai-mode/2026-10-01/squad-replay.mp4) · [normal gameplay video](ai-mode/2026-10-01/iteration/game-05-level5-rushflags/gameplay.mp4). Ten actual 2 Hz Jev games, finite enemy squad and one player life per level; original modes preserved.

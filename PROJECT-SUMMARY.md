@@ -97,3 +97,9 @@ The final gameplay measurements correspond to source revision `84d64cc`. Evidenc
 
 
 A [48-second group-combat video](test/validation/jev-ai/group-tactics/group-tactics.mp4) presents the real Level 5 trace as a readable tactical replay, including retreat and regroup choices. The [original capture](test/validation/jev-ai/2026-09-30/level5/gameplay.mp4) is available alongside it. This is evidence of those behaviors, rather than proof of coordinated flanking.
+
+## AI mode and squad missions — 2026-10-01
+
+A separate AI mode now enables Jev with one player life per level and a finite enemy squad. The squad planner owns search, hunt, intercept, attack and recovery missions; individual tanks select tactical actions within those missions at 2 Hz. Shared sightings carry timestamps, and withdrawal can keep a gun on a personally visible opponent while backing toward safety. Original game modes retain their existing behavior.
+
+Ten real model-backed games covered Levels 1, 3 and 5, with three paired baseline/revised flag-rush cases plus evasion/hunting cases. The revised runs recorded first-shot medians of 0.77–1.20 seconds, zero body contacts and friendly damage, and no assigned-movement stall longer than 2.27 seconds. Nine scripted-player deaths and one complete squad defeat show pressure and a viable winning route, but do not establish human fairness. Long firing delays and unfired contacts remain measurable weaknesses. The batch cost $0.338845; cumulative experiment spend is $2.022747. Full ten-metric definitions, limitations, exact calls/actions and videos are in the [evaluation report](test/validation/ai-mode/2026-10-01/REPORT.md).

@@ -263,7 +263,7 @@
     "lastSafetyEvents": [],
     "budgetExhausted": false,
     "pending": false,
-    "status": "Suspended · single-player, visible, unpaused gameplay only",
+    "status": "Suspended \u00b7 single-player, visible, unpaused gameplay only",
     "active": false
   },
   "tenMetrics": {
@@ -289,9 +289,9 @@
       ]
     },
     "firstAimedShot": {
-      "medianSeconds": 4.2,
-      "p95Seconds": 5.733333333333333,
-      "episodesWithShot": 5,
+      "medianSeconds": 1.5666666666666667,
+      "p95Seconds": 5.066666666666666,
+      "episodesWithShot": 7,
       "unfiredContacts": [
         {
           "id": "enemy-L3-1|player",
@@ -314,11 +314,6 @@
           "censored": false
         },
         {
-          "id": "enemy-L3-1|player",
-          "contactSeconds": 12.7,
-          "censored": false
-        },
-        {
           "id": "enemy-L3-2|player",
           "contactSeconds": 1.9,
           "censored": false
@@ -336,11 +331,6 @@
         {
           "id": "enemy-L3-2|player",
           "contactSeconds": 2.066666666666667,
-          "censored": true
-        },
-        {
-          "id": "enemy-L3-1|player",
-          "contactSeconds": 2.5,
           "censored": true
         }
       ]
@@ -466,6 +456,7 @@
       "retreatEpisodes": 0,
       "retreatSuccesses": 0,
       "definition": "Retreat success: survives >=5s with shield fraction no lower than entry; one episode per tank, end censoring explicit",
+      "retreatFailures": 0,
       "censoredRetreats": 0
     }
   },
@@ -481,5 +472,8 @@
     "Search cell revisit waste can include tactically useful revisits.",
     "Reacquisition episodes and first-shot contacts use current own FOV/LOS."
   ],
-  "observerCorrection": "Corrected opportunity timing: cooldown decrements before weapon firing and steering can establish aim; legal actual shots included. No gameplay/model data changed."
+  "observerCorrection": {
+    "gameplayUnchanged": true,
+    "description": "Recomputed from original immutable frames/actions: pre-command cooldown<=1 and actual legal shots count as opportunities; no resolved shots means null accuracy; nearest-rank quantiles; evaluate through first terminal tick, excluding automatic next-level roster. Actual shot heading/origin after steering determines aim; observer death ends unfired contacts and classifies failed recovery."
+  }
 }

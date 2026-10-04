@@ -297,7 +297,7 @@
     "lastSafetyEvents": [],
     "budgetExhausted": false,
     "pending": false,
-    "status": "Suspended · single-player, visible, unpaused gameplay only",
+    "status": "Suspended \u00b7 single-player, visible, unpaused gameplay only",
     "active": false
   },
   "tenMetrics": {
@@ -322,15 +322,10 @@
       ]
     },
     "firstAimedShot": {
-      "medianSeconds": 0.7,
-      "p95Seconds": 1.0666666666666667,
-      "episodesWithShot": 4,
+      "medianSeconds": 1.0666666666666667,
+      "p95Seconds": 8.233333333333333,
+      "episodesWithShot": 5,
       "unfiredContacts": [
-        {
-          "id": "enemy-L5-2|player",
-          "contactSeconds": 5.2,
-          "censored": false
-        },
         {
           "id": "enemy-L5-2|player",
           "contactSeconds": 1.2,
@@ -471,6 +466,7 @@
       "retreatEpisodes": 0,
       "retreatSuccesses": 0,
       "definition": "Retreat success: survives >=5s with shield fraction no lower than entry; one episode per tank, end censoring explicit",
+      "retreatFailures": 0,
       "censoredRetreats": 0
     }
   },
@@ -486,5 +482,8 @@
     "Search cell revisit waste can include tactically useful revisits.",
     "Reacquisition episodes and first-shot contacts use current own FOV/LOS."
   ],
-  "observerCorrection": "Corrected opportunity timing: cooldown decrements before weapon firing and steering can establish aim; legal actual shots included. No gameplay/model data changed."
+  "observerCorrection": {
+    "gameplayUnchanged": true,
+    "description": "Recomputed from original immutable frames/actions: pre-command cooldown<=1 and actual legal shots count as opportunities; no resolved shots means null accuracy; nearest-rank quantiles; evaluate through first terminal tick, excluding automatic next-level roster. Actual shot heading/origin after steering determines aim; observer death ends unfired contacts and classifies failed recovery."
+  }
 }

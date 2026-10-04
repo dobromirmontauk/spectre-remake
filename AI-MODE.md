@@ -32,3 +32,7 @@ Initial targets are zero friendly damage and physical contacts, no recurrence of
 Use repeated level/player scenarios where possible to compare changes. Record the exact source revision, prompt version, configuration, player policy, terminated outcome, actual observation boundaries and spend before/after each batch. Ten trials cannot establish a human win rate or prove fun. Difficult, recoverable close calls and opportunities to misdirect or escape the squad still require human playtesting.
 
 Artifacts belong under `test/validation/ai-mode/`, with recordings and screenshots tracked in Git LFS. Paid calls are run only by the lead after budget, roster and mock checks. Do not reset or replace the experiment ledger.
+
+## Measured ten-game follow-up
+
+The [ten-game report](test/validation/ai-mode/2026-10-01/REPORT.md) records three baseline games and seven revised games, exact calls/actions, browser recordings and a top-down mission replay. Revised first-shot medians were 0.77–1.20 seconds; tail latencies and unfired contacts still need work. Zero body contacts/friendly damage and no movement stall longer than 2.27 seconds were observed. The scripted player lost nine games and destroyed the squad in one; this does not establish human balance. Batch cost was $0.338845, cumulative $2.022747 on the preserved ledger.
